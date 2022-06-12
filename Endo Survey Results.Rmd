@@ -87,7 +87,6 @@ plot_xtab(SURVEY$AGE2, SURVEY$BIRTHSEX, margin = "row",
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
-
 ```
 
 <br>
