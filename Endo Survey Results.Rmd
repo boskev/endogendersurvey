@@ -42,7 +42,8 @@ SURVEY  <-
             BIRTHSEX != "OTHER" &
             !is.na(BIRTHSEX) ) %>% 
    select( BIRTHSEX, RACE_SOUTHASIAN:RACE_OTHER, AGE, TRAINING_LEVEL, HEIGHT, GLOVE, GLOVE_SIZE_AVAILABLE, PERFORMANCE_HOURS, TEACHER_GENDER_PREFERENCE,
-           FEMALE_TRAINERS, MALE_TRAINERS) %>% 
+           FEMALE_TRAINERS, MALE_TRAINERS, EVER_INJURED, EXPERIENCED_TRANSIENT_PAIN_NO, EXPERIENCED_TRANSIENT_PAIN_HAND, EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER,
+           EXPERIENCED_TRANSIENT_PAIN_BACK, EXPERIENCED_TRANSIENT_PAIN_LEG, EXPERIENCED_TRANSIENT_PAIN_FOOT, GROWING_PAINS) %>% 
   
     mutate(AGE2 = ifelse( AGE %in% c('< 30', '30-34', '35-40'), AGE, '> 40' )) %>% 
   
@@ -86,7 +87,17 @@ SURVEY  <-
                                                            '1-2' = '1-2',
                                                            '3-5' = '3-5',
                                                            '6-10' = '6-10',
-                                                           '> 10' = '> 10' ))
+                                                           '> 10' = '> 10' )) %>% 
+  
+  mutate( EVER_INJURED = factor(EVER_INJURED)) %>% 
+  mutate( EXPERIENCED_TRANSIENT_PAIN_NO = factor(EXPERIENCED_TRANSIENT_PAIN_NO)) %>% 
+  mutate( EXPERIENCED_TRANSIENT_PAIN_HAND = factor(EXPERIENCED_TRANSIENT_PAIN_HAND)) %>% 
+  mutate( EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER = factor(EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER)) %>% 
+  mutate( EXPERIENCED_TRANSIENT_PAIN_BACK = factor(EXPERIENCED_TRANSIENT_PAIN_BACK)) %>% 
+  mutate( EXPERIENCED_TRANSIENT_PAIN_LEG = factor(EXPERIENCED_TRANSIENT_PAIN_LEG)) %>% 
+  mutate( EXPERIENCED_TRANSIENT_PAIN_FOOT = factor(EXPERIENCED_TRANSIENT_PAIN_FOOT))  %>% 
+  
+  mutate( GROWING_PAINS = factor(GROWING_PAINS))
   
             
             
@@ -107,7 +118,7 @@ SURVEY  <-
   
 plot_xtab(SURVEY$AGE2, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          title = "Age Distribution by BIRTHSEX",
+          title = "Age Distribution by Birth Sex",
           axis.titles = c('Respondents Age Bands'), 
           legend.title= "Birth Sex",
           geom.colors = c("#006cc5","#cbcccb"), 
@@ -224,6 +235,7 @@ plot_xtab(SURVEY$GLOVE, SURVEY$BIRTHSEX, margin = "row",
 eov.ttest(SURVEY, GLOVE, BIRTHSEX)
 
 ```
+
 ***
 
 #### Question 6:  Distribution of AVG ENDOSCOPY HOURS x BIRTHSEX
@@ -302,3 +314,144 @@ plot_xtab(SURVEY$MALE_TRAINERS, SURVEY$BIRTHSEX, margin = "row",
   set_theme(base= theme_classic())
 
 ```
+
+
+***
+
+#### Question 8A & 8B:  Endoscopy-Related Injury or Transient Pain Immediately Following Session
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-INJURY_GENERAL }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$EVER_INJURED, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Ever Endo Injured by Birth Sex",
+          axis.titles = c('Experienced Endo-Related Injury?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$EXPERIENCED_TRANSIENT_PAIN_NO, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Ever Experience Transient Pain after Session by Birth Sex",
+          axis.titles = c('Approx. Male Trainers'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+
+
+***
+
+#### Question 9A-9E:  Transient Pain Immediately Following Session - Specific Body Part
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-INJURY_SPECIFIC }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$EXPERIENCED_TRANSIENT_PAIN_HAND, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Transient Pain in Hand after Procedure by Birth Sex",
+          axis.titles = c('Transient Hand Pain?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Transient Pain in Neck/Shoulder after Procedure by Birth Sex",
+          axis.titles = c('Transient Neck/Shoulder Pain?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+plot_xtab(SURVEY$EXPERIENCED_TRANSIENT_PAIN_BACK, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Transient Pain in Back after Procedure by Birth Sex",
+          axis.titles = c('Transient Back Pain?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+plot_xtab(SURVEY$EXPERIENCED_TRANSIENT_PAIN_LEG, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Transient Pain in Leg after Procedure by Birth Sex",
+          axis.titles = c('Transient Leg Pain?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$EXPERIENCED_TRANSIENT_PAIN_FOOT, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Transient Pain in Foot after Procedure by Birth Sex",
+          axis.titles = c('Transient Foot Pain?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+```
+
+
+***
+
+#### Question 9:  Told Injuries were "Growing Pains" x BIRTHSEX
+###### (Exclude all respondents who did **not** report having been injured)
+
+<br>
+
+  
+  
+```{r CROSSTAB-BIRTHSEX-GROWING-PAINS }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+
+SUBSET <-  sqldf( "select BIRTHSEX,
+                          GROWING_PAINS
+                  from SURVEY
+                  where GROWING_PAINS != 'NA' ")
+
+SUBSET <- SUBSET %>% 
+    mutate(GROWING_PAINS = recode_factor( GROWING_PAINS, "N" = "N",
+                                                         "Y" = "Y")) %>% droplevels()
+
+          
+
+plot_xtab(SUBSET$GROWING_PAINS, SUBSET$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Told Injuries were Growing Pains by Birth Sex",
+          axis.titles = c('Injuries Growing Pains?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+
+
