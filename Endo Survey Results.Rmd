@@ -1,0 +1,113 @@
+---
+title:     "Endoscopy Gender Survey Resuls"
+author:     "Kevin Williams"
+requestor:    "Loren Rabinowitz"
+date:       "June 12, 2021"
+output: 
+  html_document:
+    theme: default
+
+---
+
+```{r SETUP-KNITR, setup, include=FALSE}
+      knitr::opts_chunk$set(echo = TRUE)
+
+```
+  
+<br>
+
+## Introduction
+
+This is a brief workflow highlighting the exploratory analysis of survey data mined to assist in the writing of the manuscript, ***"Gender Disparities Persist in Endoscopy Suite"*** **(Rabinowitz, et al.)**. Where appropriate, samples of the exact R syntax used will be displayed, along with the corresponding output (tabular data, graphical plots, maps, etc.).
+
+<br>
+
+***
+
+
+#### Task 1:  Remediate the R data frame, ***GEND_DIFF_DATA_LABELS *** to include a factor variable called ***AGE2*** - a recasting of the ***AGE*** variable as a factor with only four discrete levels, including NA values
+
+<br>
+
+
+```{r FACTOR-PHASE-VARIABLE}
+
+
+require(broom)
+require(dplyr)
+
+SURVEY  <-
+    GENDER_DIFF_DATA_LABELS %>% 
+    filter( COMPLETE != "Incomplete" &
+            BIRTHSEX != "OTHER" &
+            !is.na(BIRTHSEX) ) %>% 
+   select( BIRTHSEX, RACE_SOUTHASIAN:RACE_OTHER, AGE) %>% 
+  
+    mutate(AGE2 = ifelse( AGE %in% c('< 30', '30-34', '35-40'), AGE, '> 40' )) %>% 
+  
+  
+    mutate( RACE = ifelse( RACE_HISPANIC == "Y", "HISPANIC",
+                   ifelse( RACE_WHITE == "Y", "WHITE",
+                   ifelse( RACE_BLACK == "Y", "BLACK",
+                   ifelse (RACE_SOUTHASIAN == "Y", "ASIAN SOUTH",
+                   ifelse (RACE_EASTASIAN == "Y", "ASIAN EAST",
+                   ifelse (RACE_NATIVEAMER == "Y", "OTHER",
+                   ifelse (RACE_PACIFICISLAND == "Y", "OTHER",
+                   ifelse (RACE_OTHER == "Y", "OTHER", "OTHER" )))))))))  %>% 
+    mutate( BIRTHSEX = factor( BIRTHSEX,  levels= c("F","M") ))  %>% 
+    mutate (AGE2 = factor(AGE2, levels = c('< 30', '30-34', '35-40', '> 40'))) %>%  
+    mutate( RACE = factor(RACE, levels= c('ASIAN EAST', 'ASIAN SOUTH', 'BLACK', 'HISPANIC', 'WHITE', 'OTHER')))
+            
+            
+```
+  
+
+<br>
+  
+  
+```{r CROSSTAB-GENDER-AGE }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$AGE2, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          axis.titles = c('Race Distribution by Birthsex'), 
+          legend.title= "Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+```
+
+
+<br>
+
+***
+
+#### Task 2:  Remediate the R data frame, ***GEND_DIFF_DATA_LABELS *** to include a factor variable called ***RACE*** that takes the results from the eight discrete variables that capture race data and places them into this one new variable.  (NOTE:  Since there are no Native American or Pacific Islander respondents, and since one repondent did not identify as beign a member of any of the provided racial categories, these results were placed in the OTHER bucket.)
+
+<br>
+
+  
+  
+```{r CROSSTAB-GENDER-RACE }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$RACE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          axis.titles = c('Race Distribution by Birthsex'), 
+          legend.title= "Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+```
+
+
+***
+
