@@ -1,5 +1,5 @@
 ---
-title:     "Endoscopy Gender Survey Resuls"
+title:     "Endoscopy Gender Survey Results"
 author:     "Kevin Williams"
 requestor:    "Loren Rabinowitz"
 date:       "June 12, 2021"
@@ -41,7 +41,8 @@ SURVEY  <-
     filter( COMPLETE != "Incomplete" &
             BIRTHSEX != "OTHER" &
             !is.na(BIRTHSEX) ) %>% 
-   select( BIRTHSEX, RACE_SOUTHASIAN:RACE_OTHER, AGE, TRAINING_LEVEL) %>% 
+   select( BIRTHSEX, RACE_SOUTHASIAN:RACE_OTHER, AGE, TRAINING_LEVEL, HEIGHT, GLOVE, GLOVE_SIZE_AVAILABLE, PERFORMANCE_HOURS, TEACHER_GENDER_PREFERENCE,
+           FEMALE_TRAINERS, MALE_TRAINERS) %>% 
   
     mutate(AGE2 = ifelse( AGE %in% c('< 30', '30-34', '35-40'), AGE, '> 40' )) %>% 
   
@@ -61,7 +62,32 @@ SURVEY  <-
     mutate( TRAINING_LEVEL = recode_factor( TRAINING_LEVEL, 'First year fellow'= 'First Year', 
                                                             'Second year fellow'= 'Second Year', 
                                                             'Third year fellow' = 'Third Year', 
-                                                            'Advanced fellow' = "Avanced", .ordered = T) )
+                                                            'Advanced fellow' = "Avanced", .ordered = T) ) %>% 
+   mutate( HEIGHT2 = factor(HEIGHT, levels= c("< 5'", "5-5'3", "5'4-5'6", "5'7-5'9", "5'10-6'", "6'1-6'4", "> 6'4"))) %>% 
+   mutate( PERFORMANCE_HOURS = factor(PERFORMANCE_HOURS),
+           PERFORMANCE_HOURS = recode_factor(PERFORMANCE_HOURS, "< 10" = "< 10",
+                                                               "10-20" = "10-20",
+                                                               "21-30" = "21-30",
+                                                               "31-40" = "31-40",
+                                                               .default = "> 40")) %>% 
+  
+  mutate(TEACHER_GENDER_PREFERENCE = factor(TEACHER_GENDER_PREFERENCE),
+         TEACHER_GENDER_PREFERENCE = recode_factor(TEACHER_GENDER_PREFERENCE, "Yes" = "Yes",
+                                                                      .default = "No")) %>% 
+  
+  mutate( FEMALE_TRAINERS = factor(FEMALE_TRAINERS),
+          FEMALE_TRAINERS = recode_factor(FEMALE_TRAINERS, 'None' = 'None',
+                                                           '1-2' = '1-2',
+                                                           '3-5' = '3-5',
+                                                           '6-10' = '6-10',
+                                                           '> 10' = '> 10' )) %>% 
+  mutate( MALE_TRAINERS = factor(MALE_TRAINERS),
+          MALE_TRAINERS = recode_factor(MALE_TRAINERS, 'None' = 'None',
+                                                           '1-2' = '1-2',
+                                                           '3-5' = '3-5',
+                                                           '6-10' = '6-10',
+                                                           '> 10' = '> 10' ))
+  
             
             
 ```
@@ -69,24 +95,23 @@ SURVEY  <-
 
 <br>
   
-#### Task 2:  Distribution by RACE x AGE
+#### Task 2:  Distribution of RACE x AGE
 
 <br>
 
   
-```{r CROSSTAB-GENDER-AGE }
+```{r CROSSTAB-BIRTHSEX-AGE }
   
 
 #SJPlot cross tabulation with Chi-Square/df
   
 plot_xtab(SURVEY$AGE2, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          axis.titles = c('Race Distribution by Birthsex'), 
+          axis.titles = c('Age Distribution of Birthsex'), 
           legend.title= "Sex",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
-
 
 ```
 
@@ -94,20 +119,20 @@ plot_xtab(SURVEY$AGE2, SURVEY$BIRTHSEX, margin = "row",
 
 ***
 
-#### Task 3:  Distribution by RACE x BIRTHSEX
+#### Task 3:  Distribution of RACE x BIRTHSEX
 
 <br>
 
   
   
-```{r CROSSTAB-GENDER-RACE }
+```{r CROSSTAB-BIRTHSEX-RACE }
   
 
 #SJPlot cross tabulation with Chi-Square/df
   
 plot_xtab(SURVEY$RACE, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          axis.titles = c('Race Distribution by Birthsex'), 
+          axis.titles = c('Race Distribution of Birthsex'), 
           legend.title= "Sex",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
@@ -120,20 +145,20 @@ plot_xtab(SURVEY$RACE, SURVEY$BIRTHSEX, margin = "row",
 
 ***
 
-#### Task 4:  Distribution by TRAINING LEVEL x BIRTHSEX
+#### Task 4:  Distribution of TRAINING LEVEL x BIRTHSEX
 
 <br>
 
   
   
-```{r CROSSTAB-GENDER-TRAINING }
+```{r CROSSTAB-BIRTHSEX-TRAINING }
   
 
 #SJPlot cross tabulation with Chi-Square/df
   
 plot_xtab(SURVEY$TRAINING_LEVEL, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          axis.titles = c('Race Distribution by Birthsex'), 
+          axis.titles = c('Training Distribution of Birthsex'), 
           legend.title= "Sex",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
@@ -144,3 +169,127 @@ plot_xtab(SURVEY$TRAINING_LEVEL, SURVEY$BIRTHSEX, margin = "row",
 
 
 ***
+
+#### Task 5:  Distribution of HEIGHT2 x BIRTHSEX
+
+<br>
+
+  
+  
+```{r CROSSTAB-BIRTHSEX-HEIGHT }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$HEIGHT2, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          axis.titles = c('Height Band Distribution of Birthsex'), 
+          legend.title= "Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+```
+
+***
+
+#### Task 6:  Distribution of GLOVE SIZE x BIRTHSEX
+
+<br>
+
+  
+  
+```{r CROSSTAB-BIRTHSEX-GLOVE2 }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$GLOVE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          axis.titles = c('Glove Size Distribution of Birthsex'), 
+          legend.title= "Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+#Mean Glove Size - Sex Difference ?
+
+eov.ttest(SURVEY, GLOVE, BIRTHSEX)
+
+```
+***
+
+#### Task 7:  Distribution of AVG ENDOSCOPY HOURS x BIRTHSEX
+
+<br>
+
+  
+  
+```{r CROSSTAB-BIRTHSEX-PERFORMANCE_HOURS }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$PERFORMANCE_HOURS, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          axis.titles = c('Avg Perofrmance Hours Distribution of Birthsex'), 
+          legend.title= "Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+***
+
+#### Task 8:  Distribution of TEACHER SEX PEREFERENCE x BIRTHSEX
+
+<br>
+
+
+```{r CROSSTAB-BIRTHSEX-TEACHER-PREFERENCE }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$TEACHER_GENDER_PREFERENCE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          axis.titles = c('Teacher Gender Pref Distribution of Birthsex'), 
+          legend.title= "Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+***
+
+#### Task 9:  Distribution of NUMBER OF TEACHERS BY SEX x BIRTHSEX
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-TEACHER-SEX }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$FEMALE_TRAINERS, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          axis.titles = c('Female Trainers Distribution of Birthsex'), 
+          legend.title= "Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$MALE_TRAINERS, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          axis.titles = c('Male Trainers Distribution of Birthsex'), 
+          legend.title= "Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
