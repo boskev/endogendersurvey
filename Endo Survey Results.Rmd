@@ -25,7 +25,7 @@ This is a brief workflow highlighting the exploratory analysis of survey data mi
 ***
 
 
-#### Task 1:  Data Clean-Up
+#### Data Clean-Up
 
 <br>
 
@@ -95,7 +95,7 @@ SURVEY  <-
 
 <br>
   
-#### Task 2:  Distribution of RACE x AGE
+#### Question 1:  Distribution of RACE x AGE
 
 <br>
 
@@ -120,7 +120,7 @@ plot_xtab(SURVEY$AGE2, SURVEY$BIRTHSEX, margin = "row",
 
 ***
 
-#### Task 3:  Distribution of RACE x BIRTHSEX
+#### Question 2:  Distribution of RACE x BIRTHSEX
 
 <br>
 
@@ -147,7 +147,7 @@ plot_xtab(SURVEY$RACE, SURVEY$BIRTHSEX, margin = "row",
 
 ***
 
-#### Task 4:  Distribution of TRAINING LEVEL x BIRTHSEX
+#### Question 3:  Distribution of TRAINING LEVEL x BIRTHSEX
 
 <br>
 
@@ -173,7 +173,7 @@ plot_xtab(SURVEY$TRAINING_LEVEL, SURVEY$BIRTHSEX, margin = "row",
 
 ***
 
-#### Task 5:  Distribution of HEIGHT2 x BIRTHSEX
+#### Question 4:  Distribution of HEIGHT2 x BIRTHSEX
 
 <br>
 
@@ -198,7 +198,7 @@ plot_xtab(SURVEY$HEIGHT2, SURVEY$BIRTHSEX, margin = "row",
 
 ***
 
-#### Task 6:  Distribution of GLOVE SIZE x BIRTHSEX
+#### Question 5:  Distribution of GLOVE SIZE x BIRTHSEX
 
 <br>
 
@@ -226,7 +226,7 @@ eov.ttest(SURVEY, GLOVE, BIRTHSEX)
 ```
 ***
 
-#### Task 7:  Distribution of AVG ENDOSCOPY HOURS x BIRTHSEX
+#### Question 6:  Distribution of AVG ENDOSCOPY HOURS x BIRTHSEX
 
 <br>
 
@@ -250,7 +250,7 @@ plot_xtab(SURVEY$PERFORMANCE_HOURS, SURVEY$BIRTHSEX, margin = "row",
 
 ***
 
-#### Task 8:  Distribution of TEACHER SEX PEREFERENCE x BIRTHSEX
+#### Question 7:  Distribution of TEACHER SEX PEREFERENCE x BIRTHSEX
 
 <br>
 
@@ -273,7 +273,7 @@ plot_xtab(SURVEY$TEACHER_GENDER_PREFERENCE, SURVEY$BIRTHSEX, margin = "row",
 
 ***
 
-#### Task 9:  Distribution of NUMBER OF TEACHERS BY SEX x BIRTHSEX
+#### Question 8A & 8B:  Distribution of NUMBER OF TEACHERS BY SEX x BIRTHSEX
 
 <br>
 
