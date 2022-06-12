@@ -107,8 +107,9 @@ SURVEY  <-
   
 plot_xtab(SURVEY$AGE2, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          axis.titles = c('Age Distribution of Birthsex'), 
-          legend.title= "Sex",
+          title = "Age Distribution by BIRTHSEX",
+          axis.titles = c('Respondents Age Bands'), 
+          legend.title= "Birth Sex",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -132,8 +133,9 @@ plot_xtab(SURVEY$AGE2, SURVEY$BIRTHSEX, margin = "row",
   
 plot_xtab(SURVEY$RACE, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          axis.titles = c('Race Distribution of Birthsex'), 
-          legend.title= "Sex",
+          title = "Race Distribution by Birth Sex",
+          axis.titles = c('Race Categories '), 
+          legend.title= "Birth Sex",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -158,8 +160,9 @@ plot_xtab(SURVEY$RACE, SURVEY$BIRTHSEX, margin = "row",
   
 plot_xtab(SURVEY$TRAINING_LEVEL, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          axis.titles = c('Training Distribution of Birthsex'), 
-          legend.title= "Sex",
+          title = "Training Levels by Birth Sex",
+          axis.titles = c('Training Levels'), 
+          legend.title= "Birth Sex",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -183,8 +186,9 @@ plot_xtab(SURVEY$TRAINING_LEVEL, SURVEY$BIRTHSEX, margin = "row",
   
 plot_xtab(SURVEY$HEIGHT2, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          axis.titles = c('Height Band Distribution of Birthsex'), 
-          legend.title= "Sex",
+          title = "Height Bands by Birth Sex",
+          axis.titles = c('Height Bands'), 
+          legend.title= "Birth Sex",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -207,8 +211,9 @@ plot_xtab(SURVEY$HEIGHT2, SURVEY$BIRTHSEX, margin = "row",
   
 plot_xtab(SURVEY$GLOVE, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          axis.titles = c('Glove Size Distribution of Birthsex'), 
-          legend.title= "Sex",
+          title = "Glove Size by Birth Sex",
+          axis.titles = c('Glove Sizes'), 
+          legend.title= "Birth Sex",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -234,8 +239,9 @@ eov.ttest(SURVEY, GLOVE, BIRTHSEX)
   
 plot_xtab(SURVEY$PERFORMANCE_HOURS, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          axis.titles = c('Avg Perofrmance Hours Distribution of Birthsex'), 
-          legend.title= "Sex",
+          title = "Performance Hours by Birth Sex",
+          axis.titles = c('Performance Hour Bands'), 
+          legend.title= "Birth Sex",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -255,9 +261,10 @@ plot_xtab(SURVEY$PERFORMANCE_HOURS, SURVEY$BIRTHSEX, margin = "row",
 #SJPlot cross tabulation with Chi-Square/df
   
 plot_xtab(SURVEY$TEACHER_GENDER_PREFERENCE, SURVEY$BIRTHSEX, margin = "row", 
-          bar.pos = "stack", coord.flip = TRUE, 
-          axis.titles = c('Teacher Gender Pref Distribution of Birthsex'), 
-          legend.title= "Sex",
+          bar.pos = "stack", coord.flip = TRUE,
+          title = "Teacher Sex Preference by Birth Sex",
+          axis.titles = c('Trainer Sex Preference?'), 
+          legend.title= "Birth Sex",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -277,8 +284,9 @@ plot_xtab(SURVEY$TEACHER_GENDER_PREFERENCE, SURVEY$BIRTHSEX, margin = "row",
   
 plot_xtab(SURVEY$FEMALE_TRAINERS, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          axis.titles = c('Female Trainers Distribution of Birthsex'), 
-          legend.title= "Sex",
+          title = "Number of Female Trainers by Birth Sex",
+          axis.titles = c('Approx. Female Trainers'), 
+          legend.title= "Birth Sex",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -286,8 +294,9 @@ plot_xtab(SURVEY$FEMALE_TRAINERS, SURVEY$BIRTHSEX, margin = "row",
 
 plot_xtab(SURVEY$MALE_TRAINERS, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          axis.titles = c('Male Trainers Distribution of Birthsex'), 
-          legend.title= "Sex",
+          title = "Number of Male Trainers by Birth Sex",
+          axis.titles = c('Approx. Male Trainers'), 
+          legend.title= "Birth Sex",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
