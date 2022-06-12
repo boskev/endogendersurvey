@@ -25,7 +25,7 @@ This is a brief workflow highlighting the exploratory analysis of survey data mi
 ***
 
 
-#### Task 1:  Remediate the R data frame, ***GEND_DIFF_DATA_LABELS *** to include a factor variable called ***AGE2*** - a recasting of the ***AGE*** variable as a factor with only four discrete levels, including NA values
+#### Task 1:  Data Clean-Up
 
 <br>
 
@@ -41,7 +41,7 @@ SURVEY  <-
     filter( COMPLETE != "Incomplete" &
             BIRTHSEX != "OTHER" &
             !is.na(BIRTHSEX) ) %>% 
-   select( BIRTHSEX, RACE_SOUTHASIAN:RACE_OTHER, AGE) %>% 
+   select( BIRTHSEX, RACE_SOUTHASIAN:RACE_OTHER, AGE, TRAINING_LEVEL) %>% 
   
     mutate(AGE2 = ifelse( AGE %in% c('< 30', '30-34', '35-40'), AGE, '> 40' )) %>% 
   
@@ -56,7 +56,12 @@ SURVEY  <-
                    ifelse (RACE_OTHER == "Y", "OTHER", "OTHER" )))))))))  %>% 
     mutate( BIRTHSEX = factor( BIRTHSEX,  levels= c("F","M") ))  %>% 
     mutate (AGE2 = factor(AGE2, levels = c('< 30', '30-34', '35-40', '> 40'))) %>%  
-    mutate( RACE = factor(RACE, levels= c('ASIAN EAST', 'ASIAN SOUTH', 'BLACK', 'HISPANIC', 'WHITE', 'OTHER')))
+    mutate( RACE = factor(RACE, levels= c('ASIAN EAST', 'ASIAN SOUTH', 'BLACK', 'HISPANIC', 'WHITE', 'OTHER'))) %>% 
+    mutate( TRAINING_LEVEL = factor (TRAINING_LEVEL, levels= c('First year fellow','Second year fellow', 'Third year fellow', 'Advanced fellow'))) %>% 
+    mutate( TRAINING_LEVEL = recode_factor( TRAINING_LEVEL, 'First year fellow'= 'First Year', 
+                                                            'Second year fellow'= 'Second Year', 
+                                                            'Third year fellow' = 'Third Year', 
+                                                            'Advanced fellow' = "Avanced", .ordered = T) )
             
             
 ```
@@ -64,6 +69,10 @@ SURVEY  <-
 
 <br>
   
+#### Task 2:  Distribution by RACE x AGE
+
+<br>
+
   
 ```{r CROSSTAB-GENDER-AGE }
   
@@ -81,12 +90,11 @@ plot_xtab(SURVEY$AGE2, SURVEY$BIRTHSEX, margin = "row",
 
 ```
 
-
 <br>
 
 ***
 
-#### Task 2:  Remediate the R data frame, ***GEND_DIFF_DATA_LABELS *** to include a factor variable called ***RACE*** that takes the results from the eight discrete variables that capture race data and places them into this one new variable.  (NOTE:  Since there are no Native American or Pacific Islander respondents, and since one repondent did not identify as beign a member of any of the provided racial categories, these results were placed in the OTHER bucket.)
+#### Task 3:  Distribution by RACE x BIRTHSEX
 
 <br>
 
@@ -108,6 +116,31 @@ plot_xtab(SURVEY$RACE, SURVEY$BIRTHSEX, margin = "row",
 
 ```
 
+<br>
 
 ***
 
+#### Task 4:  Distribution by TRAINING LEVEL x BIRTHSEX
+
+<br>
+
+  
+  
+```{r CROSSTAB-GENDER-TRAINING }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$TRAINING_LEVEL, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          axis.titles = c('Race Distribution by Birthsex'), 
+          legend.title= "Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+```
+
+
+***
