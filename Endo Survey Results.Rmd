@@ -55,7 +55,9 @@ SURVEY  <-
            TEACHER_SENSITIVITY_BY_GENDER, TACTILE_INSTRUCTION_FROM_MALES, TACTILE_INSTRUCTION_FROM_FEMALES,
            COMFORTABLE_ASKING_NURSES, ASK_NURSES_ONCE, ASK_NURSES_TWICE, ASK_NURSES_MORE,
            COMFORTABLE_ASKING_TECHS, MALE_ATTENDINGS_ASKING, FEMALE_ATTENDINGS_ASKING,
-           RECOGNIZED_RESPECTED_ES_STAFF, RECOGNIZED_RESPECTED_ANESTHETISTS, RECOGNIZED_RESPECTED_GASTRO_ATTENDING, FIRST_NAME_NO_PERMISSION) %>% 
+           RECOGNIZED_RESPECTED_ES_STAFF, RECOGNIZED_RESPECTED_ANESTHETISTS, RECOGNIZED_RESPECTED_GASTRO_ATTENDING, FIRST_NAME_NO_PERMISSION, 
+           ERGO_TRAINING_MANDATORY, ERGO_OPTIMIZAITON_BUDGET_REQUIRED, EXPERIENCE_IMPROVED_DIAL_EXTENDERS, EXPERIENCE_IMPROVED_PEDI_COLONOSCOPES, EXPERIENCE_IMPROVED_APRONS,
+           ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED) %>% 
   
     mutate(AGE2 = ifelse( AGE %in% c('< 30', '30-34', '35-40'), AGE, '> 40' )) %>% 
   
@@ -216,9 +218,40 @@ SURVEY  <-
            FEMALE_ATTENDINGS_ASKING = recode_factor(FEMALE_ATTENDINGS_ASKING, "Once" = "Once",
                                                                              "Twice" = "Twice",
                                                                              "More than twice" = "More than Twice",
-                                                                             "Not applicable, I do not work with any female attendings" = "Don't work with FemAtt", .ordered=T))
+                                                                             "Not applicable, I do not work with any female attendings" = "Don't work with FemAtt", .ordered=T)) %>% 
   
-
+   mutate( ERGO_TRAINING_MANDATORY = factor(ERGO_TRAINING_MANDATORY),
+           ERGO_TRAINING_MANDATORY = recode_factor(ERGO_TRAINING_MANDATORY, 'Y' = 'Y',
+                                                                              'N' = 'N',
+                                                                            "Don't know" = 'DK', .ordered= T) ,
+    
+           ERGO_OPTIMIZAITON_BUDGET_REQUIRED = factor(ERGO_OPTIMIZAITON_BUDGET_REQUIRED),
+           ERGO_OPTIMIZAITON_BUDGET_REQUIRED = recode_factor(ERGO_OPTIMIZAITON_BUDGET_REQUIRED, 'Y' = 'Y',
+                                                                              'N' = 'N',
+                                                                            "Don't know" = 'DK', .ordered= T),
+                 
+                                                
+          EXPERIENCE_IMPROVED_DIAL_EXTENDERS = factor(EXPERIENCE_IMPROVED_DIAL_EXTENDERS),
+           EXPERIENCE_IMPROVED_DIAL_EXTENDERS = recode_factor(EXPERIENCE_IMPROVED_DIAL_EXTENDERS, 'Y' = 'Y',
+                                                                              'N' = 'N',
+                                                                            "Don't know" = 'DK', .ordered= T),
+     
+           EXPERIENCE_IMPROVED_PEDI_COLONOSCOPES = factor(EXPERIENCE_IMPROVED_PEDI_COLONOSCOPES),
+           EXPERIENCE_IMPROVED_PEDI_COLONOSCOPES = recode_factor(EXPERIENCE_IMPROVED_PEDI_COLONOSCOPES, 'Y' = 'Y',
+                                                                              'N' = 'N',
+                                                                            "Don't know" = 'DK', .ordered= T) ,
+     
+           EXPERIENCE_IMPROVED_APRONS = factor(EXPERIENCE_IMPROVED_APRONS),
+           EXPERIENCE_IMPROVED_APRONS = recode_factor(EXPERIENCE_IMPROVED_APRONS, 'Y' = 'Y',
+                                                                              'N' = 'N',
+                                                                            "Don't know" = 'DK', .ordered= T),
+     
+           ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED = factor(ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED),
+           ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED = recode_factor(ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED, 'Y' = 'Y',
+                                                                              'N' = 'N',
+                                                                            "Don't know" = 'DK', .ordered= T))
+   
+   
 ```
   
 
@@ -1241,5 +1274,111 @@ plot_xtab(SURVEY$FIRST_NAME_NO_PERMISSION, SURVEY$BIRTHSEX, margin = "row",
 
 
 
+#### Question 1:  Distribution of MANDAOTRY ERGO TRAINING by BIRTH SEX
 
 
+<br>
+
+```{r CROSSTAB-BIRTHSEX-FUTURE-ENDO-TRAINING }
+  
+plot_xtab(SURVEY$ERGO_TRAINING_MANDATORY, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Should Ergo Training be Mandaotry by Birth Sex",
+          axis.titles = c('Mandatory Ergo Training?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+
+#### Question 2:  Distribution of ERGO BUDGET FOR OPTIMIZATION by BIRTH SEX
+
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-FUTURE-ENDO-OPTO-BUDGET }
+  
+plot_xtab(SURVEY$ERGO_OPTIMIZAITON_BUDGET_REQUIRED, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Should Budget Include Ergo Optimiation by Birth Sex",
+          axis.titles = c('Budget Should Include Ergo Opti?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+#### Question 3:  Distribution of INCREASED AVAILABILITY OF DIAL EXTENDERS by BIRTH SEX
+
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-FUTURE-DIAL-EXTENDERS }
+  
+plot_xtab(SURVEY$EXPERIENCE_IMPROVED_DIAL_EXTENDERS, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Increased Availability of Dial Extenders by Birth Sex",
+          axis.titles = c('More Dial Extenders Available?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+
+#### Question 4:  Distribution of INCREASED AVAILABILITY OF PEDI COLONSCOPES by BIRTH SEX
+
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-FUTURE-PEDI-COLONOSCOPOES }
+  
+plot_xtab(SURVEY$EXPERIENCE_IMPROVED_PEDI_COLONOSCOPES, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Increased Availability of Pedi Colonoscopes by Birth Sex",
+          axis.titles = c('More Pedi Colonoscopes Available?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+#### Question 5:  Distribution of INCREASED AVAILABILITY OF LEAD APRONS by BIRTH SEX
+
+
+<br>
+```{r CROSSTAB-BIRTHSEX-FUTURE-LEAD-APRONS }
+  
+plot_xtab(SURVEY$EXPERIENCE_IMPROVED_APRONS, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Increased Availability of Lead Aprons by Birth Sex",
+          axis.titles = c('More Lead Aprons Available?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+
+#### Question 6:  Distribution of ERGO TRAINING REQUIRED FOR TEACHERS by BIRTH SEX
+
+
+<br>
+```{r CROSSTAB-BIRTHSEX-FUTURE-MANDATOR-TEACHER-TRAINING }
+  
+plot_xtab(SURVEY$ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Formal Ergo Training Required for Teachers by Birth Sex",
+          axis.titles = c('Ergo Training Required for Teachers?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
