@@ -57,7 +57,8 @@ SURVEY  <-
            COMFORTABLE_ASKING_TECHS, MALE_ATTENDINGS_ASKING, FEMALE_ATTENDINGS_ASKING,
            RECOGNIZED_RESPECTED_ES_STAFF, RECOGNIZED_RESPECTED_ANESTHETISTS, RECOGNIZED_RESPECTED_GASTRO_ATTENDING, FIRST_NAME_NO_PERMISSION, 
            ERGO_TRAINING_MANDATORY, ERGO_OPTIMIZAITON_BUDGET_REQUIRED, EXPERIENCE_IMPROVED_DIAL_EXTENDERS, EXPERIENCE_IMPROVED_PEDI_COLONOSCOPES, EXPERIENCE_IMPROVED_APRONS,
-           ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED) %>% 
+           ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED,
+           ERGONOMIC_IMPORTANCE, MITIGATING_MUSCLE_STRAIN, BED_POSITION, ENDO_TRAINER_POSITION, WHEN_DISABILITY_INSURANCE) %>% 
   
     mutate(AGE2 = ifelse( AGE %in% c('< 30', '30-34', '35-40'), AGE, '> 40' )) %>% 
   
@@ -249,7 +250,28 @@ SURVEY  <-
            ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED = factor(ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED),
            ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED = recode_factor(ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED, 'Y' = 'Y',
                                                                               'N' = 'N',
-                                                                            "Don't know" = 'DK', .ordered= T))
+                                                                            "Don't know" = 'DK', .ordered= T))  %>% 
+  
+  
+   mutate( ERGONOMIC_IMPORTANCE = factor(ERGONOMIC_IMPORTANCE),
+           ERGONOMIC_IMPORTANCE = recode_factor(ERGONOMIC_IMPORTANCE, 'Both A and C' = 'Correct',
+                                                                       .default = 'Incorrect', .ordered= T) ,
+    
+           MITIGATING_MUSCLE_STRAIN = factor(MITIGATING_MUSCLE_STRAIN),
+           MITIGATING_MUSCLE_STRAIN = recode_factor(MITIGATING_MUSCLE_STRAIN, 'All of the above' = 'Correct',
+                                                                       .default = 'Incorrect', .ordered= T) ,
+    
+           BED_POSITION = factor(BED_POSITION),
+           BED_POSITION = recode_factor(BED_POSITION, '10 cm below elbow height' = 'Correct',
+                                                                       .default = 'Incorrect', .ordered= T) ,
+    
+           ENDO_TRAINER_POSITION = factor(ENDO_TRAINER_POSITION),
+           ENDO_TRAINER_POSITION = recode_factor(ENDO_TRAINER_POSITION, 'At the foot of the bed, on the same side of the trainee.' = 'Correct',
+                                                                       .default = 'Incorrect', .ordered= T) ,
+    
+           WHEN_DISABILITY_INSURANCE = factor(WHEN_DISABILITY_INSURANCE),
+           WHEN_DISABILITY_INSURANCE = recode_factor(WHEN_DISABILITY_INSURANCE, 'During training' = 'Correct',
+                                                                       .default = 'Incorrect', .ordered= T) )
    
    
 ```
@@ -1149,7 +1171,7 @@ plot_xtab(SURVEY$TACTILE_INSTRUCTION_FROM_FEMALES, SURVEY$BIRTHSEX, margin = "ro
 
 ***
 
-#### Question 7A - 7I:  Distribution of RESPECT-ORIENTED ANSWERS by BIRTH SEX
+#### Question 8A - 8I:  Distribution of RESPECT-ORIENTED ANSWERS by BIRTH SEX
 
 
 <br>
@@ -1292,6 +1314,7 @@ plot_xtab(SURVEY$ERGO_TRAINING_MANDATORY, SURVEY$BIRTHSEX, margin = "row",
 
 ```
 
+***
 
 #### Question 2:  Distribution of ERGO BUDGET FOR OPTIMIZATION by BIRTH SEX
 
@@ -1310,6 +1333,8 @@ plot_xtab(SURVEY$ERGO_OPTIMIZAITON_BUDGET_REQUIRED, SURVEY$BIRTHSEX, margin = "r
   set_theme(base= theme_classic())
 
 ```
+
+***
 
 #### Question 3:  Distribution of INCREASED AVAILABILITY OF DIAL EXTENDERS by BIRTH SEX
 
@@ -1330,6 +1355,8 @@ plot_xtab(SURVEY$EXPERIENCE_IMPROVED_DIAL_EXTENDERS, SURVEY$BIRTHSEX, margin = "
 ```
 
 
+***
+
 #### Question 4:  Distribution of INCREASED AVAILABILITY OF PEDI COLONSCOPES by BIRTH SEX
 
 
@@ -1347,6 +1374,8 @@ plot_xtab(SURVEY$EXPERIENCE_IMPROVED_PEDI_COLONOSCOPES, SURVEY$BIRTHSEX, margin 
   set_theme(base= theme_classic())
 
 ```
+
+***
 
 #### Question 5:  Distribution of INCREASED AVAILABILITY OF LEAD APRONS by BIRTH SEX
 
@@ -1366,6 +1395,8 @@ plot_xtab(SURVEY$EXPERIENCE_IMPROVED_APRONS, SURVEY$BIRTHSEX, margin = "row",
 ```
 
 
+***
+
 #### Question 6:  Distribution of ERGO TRAINING REQUIRED FOR TEACHERS by BIRTH SEX
 
 
@@ -1376,6 +1407,117 @@ plot_xtab(SURVEY$ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED, SURVEY$BIRTHSEX, margin
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Formal Ergo Training Required for Teachers by Birth Sex",
           axis.titles = c('Ergo Training Required for Teachers?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+
+***
+***
+
+
+#### ERGONOMIC KNOWLEDGE
+
+#### Question 1: Importance of Ergonomics in Relation to ERI
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-KNOWLEDGE-ERGO }
+  
+
+plot_xtab(SURVEY$ERGONOMIC_IMPORTANCE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Importance of Ergonomics in Relation to ERI",
+          axis.titles = c('Answered Correctly?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+***
+
+#### Question 2: Mitigation Stategies to Reduce Muscle Strain Risk
+
+<br>
+
+  
+```{r CROSSTAB-BIRTHSEX-KNOWLEDGE-MUSCLE-STRAIN }
+  
+
+plot_xtab(SURVEY$MITIGATING_MUSCLE_STRAIN, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Mitigation Strategies to Reduce Muscle Strain Risk",
+          axis.titles = c('Answered Correctly?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+***
+
+
+#### Question 3: Mitigation Stategies to Reduce Muscle Strain Risk
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-KNOWLEDGE-BED-POSITION }
+  
+
+plot_xtab(SURVEY$BED_POSITION, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Bed Position in Relation to the Elbow",
+          axis.titles = c('Answered Correctly?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+***
+
+#### Question 4: Best Position for Endoscopy Trainer
+
+<br>
+
+  
+```{r CROSSTAB-BIRTHSEX-KNOWLEDGE-TRAINER-POSITION }
+  
+
+plot_xtab(SURVEY$ENDO_TRAINER_POSITION, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Best Position for Endoscopy Trainer",
+          axis.titles = c('Answered Correctly?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+```
+
+***
+
+#### Question 5: Best Time to Explore Disability Insurance
+
+<br>
+
+
+  
+```{r CROSSTAB-BIRTHSEX-KNOWLEDGE-DISABILITY-INSURANCE }
+  
+
+plot_xtab(SURVEY$WHEN_DISABILITY_INSURANCE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Best Time to Explore Disability Insurance",
+          axis.titles = c('Answered Correctly?'), 
           legend.title= "Birth Sex",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
