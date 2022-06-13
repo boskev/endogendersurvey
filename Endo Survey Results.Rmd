@@ -50,7 +50,9 @@ SURVEY  <-
            TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE, ERGO_TRAINING_BUDGET, ERGO_FEEDBACK, ERGO_FEEDBACK_BY_WHOM, ERGO_OPTIMIZATION, GLOVE_SIZE_AVAILABLE,
            DIAL_EXTENDERS_AVAILABLE, DIAL_EXTENDERS_ENCOURAGED, DIAL_EXTENDERS_FEMALEATT, DIAL_EXTENDERS_MALEATT, PEDI_COLONOSCOPES_AVAILABLE,
            LEAD_APRONS_DONTKNOW,  LEAD_APRONS_LW_ONEPIECE, LEAD_APRONS_LW_TWOPIECE, LEAD_APRONS_STANDARD_ONEPIECE, LEAD_APRONS_STANDARD_TWOPIECE,
-           LEAD_APRONS_DOUBLE, LEAD_APRONS_THYROID, LEAD_APRONS_MATERNALDOS, LEAD_APRONS_FETALDOS) %>% 
+           LEAD_APRONS_DOUBLE, LEAD_APRONS_THYROID, LEAD_APRONS_MATERNALDOS, LEAD_APRONS_FETALDOS,
+           ERGO_FORMAL_TIMEOUT_PRIOR, ERGO_INFORMAL_TIMEOUT_PRIOR, MONITORS_ADJUSTABLE, TEACHER_SENSITIVITY_STATURE_HANDSIZE,
+           TEACHER_SENSITIVITY_BY_GENDER, TACTILE_INSTRUCTION_FROM_MALES, TACTILE_INSTRUCTION_FROM_FEMALES) %>% 
   
     mutate(AGE2 = ifelse( AGE %in% c('< 30', '30-34', '35-40'), AGE, '> 40' )) %>% 
   
@@ -174,7 +176,24 @@ SURVEY  <-
   
    mutate( LEAD_APRONS_DONTKNOW = factor(LEAD_APRONS_DONTKNOW),
           LEAD_APRONS_DONTKNOW = recode_factor(LEAD_APRONS_DONTKNOW, 'N' = 'Aware',
-                                                                     'Y' = 'Not Aware',.ordered= T))
+                                                                     'Y' = 'Not Aware',.ordered= T)) %>% 
+  
+   mutate( TEACHER_SENSITIVITY_BY_GENDER = factor(TEACHER_SENSITIVITY_BY_GENDER),
+          TEACHER_SENSITIVITY_BY_GENDER = recode_factor(TEACHER_SENSITIVITY_BY_GENDER, 'Male' = 'Male',
+                                                           'Female' = 'Female',
+                                                           'Both equally' = 'Both Equally',
+                                                           'I have not had female endoscopy teachers' = 'Never had female teacher',
+                                                           'Not sure' = 'Not Sure', .ordered= T ))  %>% 
+  
+   mutate( TACTILE_INSTRUCTION_FROM_MALES = factor(TACTILE_INSTRUCTION_FROM_MALES),
+          TACTILE_INSTRUCTION_FROM_MALES = recode_factor(TACTILE_INSTRUCTION_FROM_MALES, 'No' = 'No',
+                                                                                         'Yes, rarely' = 'Rarely',
+                                                                                         'Yes, often' = 'Often', .ordered= T)) %>% 
+  
+   mutate( TACTILE_INSTRUCTION_FROM_FEMALES = factor(TACTILE_INSTRUCTION_FROM_FEMALES),
+          TACTILE_INSTRUCTION_FROM_FEMALES = recode_factor(TACTILE_INSTRUCTION_FROM_FEMALES, 'No' = 'No',
+                                                                                         'Yes, rarely' = 'Rarely',
+                                                                                         'Yes, often' = 'Often', .ordered= T)) 
   
 
 ```
@@ -978,5 +997,92 @@ plot_xtab(SURVEY$LEAD_APRONS_FETALDOS, SURVEY$BIRTHSEX, margin = "row",
 
 
 
+
+```
+
+
+
+
+
+<br>
+
+***
+
+#### Question 7A - 7G:  Distribution of ERGONOMIC CONSIDERATIONS by BIRTH SEX
+
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-ERGO-CONSIDERATIONS }
+  
+
+plot_xtab(SURVEY$ERGO_FORMAL_TIMEOUT_PRIOR, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Formal Ergo Timeouts at Institution by Birth Sex",
+          axis.titles = c('Formal Ergo Timeouts at Institution?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$ERGO_INFORMAL_TIMEOUT_PRIOR, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Informal Ergo Timeouts at Institution by Birth Sex",
+          axis.titles = c('Informal Ergo Timeouts at Institution?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$MONITORS_ADJUSTABLE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Monitors Easily Adjustable at Institution by Birth Sex",
+          axis.titles = c('Easily Adjustable Monitors at Institution?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$TEACHER_SENSITIVITY_STATURE_HANDSIZE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Teachers Train with Sensitivity to Stature/Hand Size by Birth Sex",
+          axis.titles = c('Teachers Sensitive to Stature/Hand Size?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$TEACHER_SENSITIVITY_BY_GENDER, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Sex of Sensitive Teachers by Birth Sex",
+          axis.titles = c('Male or Female Teachers More Sensitive?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$TACTILE_INSTRUCTION_FROM_MALES, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Tactile Instruction from Male Teachers by Birth Sex",
+          axis.titles = c('Male Teachers Tacile Instruction?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$TACTILE_INSTRUCTION_FROM_FEMALES, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Tactile Instruction from Female Teachers by Birth Sex",
+          axis.titles = c('Female Teachers Tacile Instruction?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
 
 ```
