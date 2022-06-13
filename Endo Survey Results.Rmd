@@ -48,7 +48,9 @@ SURVEY  <-
            FELLOWSHIP_FORMAL_ERGO_TRAINING, INFORMAL_TRAINING, TRAINING_TECHNIQUES_POSTURAL, TRAINING_TECHNIQUES_BEDHEIGHT, TRAINING_TECHNIQUES_BEDANGLE,
            TRAINING_TECHNIQUES_MONITORHEIGHT, TRAINING_TECHNIQUES_MUSCULOSKELETAL, TRAINING_TECHNIQUES_EXERCISE_STRETCHING, TRAINING_TECHNIQUES_DIAL_EXTENDERS,
            TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE, ERGO_TRAINING_BUDGET, ERGO_FEEDBACK, ERGO_FEEDBACK_BY_WHOM, ERGO_OPTIMIZATION, GLOVE_SIZE_AVAILABLE,
-           DIAL_EXTENDERS_AVAILABLE, DIAL_EXTENDERS_ENCOURAGED, DIAL_EXTENDERS_FEMALEATT, DIAL_EXTENDERS_MALEATT, PEDI_COLONOSCOPES_AVAILABLE) %>% 
+           DIAL_EXTENDERS_AVAILABLE, DIAL_EXTENDERS_ENCOURAGED, DIAL_EXTENDERS_FEMALEATT, DIAL_EXTENDERS_MALEATT, PEDI_COLONOSCOPES_AVAILABLE,
+           LEAD_APRONS_DONTKNOW,  LEAD_APRONS_LW_ONEPIECE, LEAD_APRONS_LW_TWOPIECE, LEAD_APRONS_STANDARD_ONEPIECE, LEAD_APRONS_STANDARD_TWOPIECE,
+           LEAD_APRONS_DOUBLE, LEAD_APRONS_THYROID, LEAD_APRONS_MATERNALDOS, LEAD_APRONS_FETALDOS) %>% 
   
     mutate(AGE2 = ifelse( AGE %in% c('< 30', '30-34', '35-40'), AGE, '> 40' )) %>% 
   
@@ -168,9 +170,13 @@ SURVEY  <-
     mutate( PEDI_COLONOSCOPES_AVAILABLE = factor(PEDI_COLONOSCOPES_AVAILABLE),
           PEDI_COLONOSCOPES_AVAILABLE = recode_factor(PEDI_COLONOSCOPES_AVAILABLE, 'Y' = 'Y',
                                                                                    'N' = 'N',
-                                                                                   "Don't know" = 'DK', .ordered= T))
+                                                                                   "Don't know" = 'DK', .ordered= T)) %>% 
   
+   mutate( LEAD_APRONS_DONTKNOW = factor(LEAD_APRONS_DONTKNOW),
+          LEAD_APRONS_DONTKNOW = recode_factor(LEAD_APRONS_DONTKNOW, 'N' = 'Aware',
+                                                                     'Y' = 'Not Aware',.ordered= T))
   
+
 ```
   
 
@@ -747,7 +753,7 @@ plot_xtab(SURVEY$ERGO_FEEDBACK_BY_WHOM, SURVEY$BIRTHSEX, margin = "row",
 
 ***
 
-#### Question 5A - 5M:  Distribution of EQUIPMENT OPITIMIZATOIN & AVAILABILITY by BIRTH SEX
+#### Question 5A - 5G:  Distribution of EQUIPMENT OPITIMIZATOIN & AVAILABILITY by BIRTH SEX
 
 
 <br>
@@ -865,5 +871,112 @@ plot_xtab(SURVEY$PEDI_COLONOSCOPES_AVAILABLE, SURVEY$BIRTHSEX, margin = "row",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
+
+```
+
+
+
+<br>
+
+***
+
+#### Question 6A - 6I:  Distribution of TYPE OF LEAD APRON AVAILABILITY by BIRTH SEX
+
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-LEAD-APRON-AVAILABILITY }
+  
+
+plot_xtab(SURVEY$LEAD_APRONS_DONTKNOW, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Don't Know Whether Lead Aprons Available at Institution by Birth Sex",
+          axis.titles = c('Lead Apron at Institution?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$LEAD_APRONS_LW_ONEPIECE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Lead Aprons LW One-Piece Available at Institution by Birth Sex",
+          axis.titles = c('Lightweight One-Piece Lead Apron at Institution?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$LEAD_APRONS_LW_TWOPIECE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Lead Aprons LW Two-Piece Available at Institution by Birth Sex",
+          axis.titles = c('Lightweight Two-Piece Lead Apron at Institution?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+plot_xtab(SURVEY$LEAD_APRONS_STANDARD_ONEPIECE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Lead Aprons SW One-Piece Available at Institution by Birth Sex",
+          axis.titles = c('Standard Weight One-Piece Lead Apron at Institution?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$LEAD_APRONS_STANDARD_TWOPIECE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Lead Aprons SW Two-Piece Available at Institution by Birth Sex",
+          axis.titles = c('Standard Weight Two-Piece Lead Apron at Institution?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$LEAD_APRONS_DOUBLE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Lead Aprons Double Lead (Maternity) Available at Institution by Birth Sex",
+          axis.titles = c('Double Lead (Maternity) Lead Apron at Institution?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$LEAD_APRONS_THYROID, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Lead Aprons Thyroid Shield Available at Institution by Birth Sex",
+          axis.titles = c('Thyroid Shield Lead Apron at Institution?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$LEAD_APRONS_MATERNALDOS, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Lead Aprons Maternal Dosimeter Available at Institution by Birth Sex",
+          axis.titles = c('Maternal Dosimeter Lead Apron at Institution?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$LEAD_APRONS_FETALDOS, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Lead Aprons Fetal Dosimeter Available at Institution by Birth Sex",
+          axis.titles = c('Fetal Dosimeter Lead Apron at Institution?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
 
 ```
