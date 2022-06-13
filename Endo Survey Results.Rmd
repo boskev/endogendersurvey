@@ -52,7 +52,10 @@ SURVEY  <-
            LEAD_APRONS_DONTKNOW,  LEAD_APRONS_LW_ONEPIECE, LEAD_APRONS_LW_TWOPIECE, LEAD_APRONS_STANDARD_ONEPIECE, LEAD_APRONS_STANDARD_TWOPIECE,
            LEAD_APRONS_DOUBLE, LEAD_APRONS_THYROID, LEAD_APRONS_MATERNALDOS, LEAD_APRONS_FETALDOS,
            ERGO_FORMAL_TIMEOUT_PRIOR, ERGO_INFORMAL_TIMEOUT_PRIOR, MONITORS_ADJUSTABLE, TEACHER_SENSITIVITY_STATURE_HANDSIZE,
-           TEACHER_SENSITIVITY_BY_GENDER, TACTILE_INSTRUCTION_FROM_MALES, TACTILE_INSTRUCTION_FROM_FEMALES) %>% 
+           TEACHER_SENSITIVITY_BY_GENDER, TACTILE_INSTRUCTION_FROM_MALES, TACTILE_INSTRUCTION_FROM_FEMALES,
+           COMFORTABLE_ASKING_NURSES, ASK_NURSES_ONCE, ASK_NURSES_TWICE, ASK_NURSES_MORE,
+           COMFORTABLE_ASKING_TECHS, MALE_ATTENDINGS_ASKING, FEMALE_ATTENDINGS_ASKING,
+           RECOGNIZED_RESPECTED_ES_STAFF, RECOGNIZED_RESPECTED_ANESTHETISTS, RECOGNIZED_RESPECTED_GASTRO_ATTENDING, FIRST_NAME_NO_PERMISSION) %>% 
   
     mutate(AGE2 = ifelse( AGE %in% c('< 30', '30-34', '35-40'), AGE, '> 40' )) %>% 
   
@@ -193,7 +196,27 @@ SURVEY  <-
    mutate( TACTILE_INSTRUCTION_FROM_FEMALES = factor(TACTILE_INSTRUCTION_FROM_FEMALES),
           TACTILE_INSTRUCTION_FROM_FEMALES = recode_factor(TACTILE_INSTRUCTION_FROM_FEMALES, 'No' = 'No',
                                                                                          'Yes, rarely' = 'Rarely',
-                                                                                         'Yes, often' = 'Often', .ordered= T)) 
+                                                                                         'Yes, often' = 'Often', .ordered= T)) %>% 
+  
+   mutate( NURSES_ASKING = ifelse( ASK_NURSES_MORE == "Y", "More than Twice",
+                           ifelse( ASK_NURSES_TWICE == "Y", "Twice",
+                           ifelse( ASK_NURSES_ONCE == "Y", "Once", NA))),
+           
+           NURSES_ASKING = factor(NURSES_ASKING),
+           NURSES_ASKING = recode_factor(NURSES_ASKING, "Once" = "Once",
+                                                        "Twice" = "Twice",
+                                                        "More than Twicce" = "More than Twice", .ordered=T),
+  
+           MALE_ATTENDINGS_ASKING = factor(MALE_ATTENDINGS_ASKING),
+           MALE_ATTENDINGS_ASKING = recode_factor(MALE_ATTENDINGS_ASKING, "Once" = "Once",
+                                                                          "Twice" = "Twice",
+                                                                           "More than Twice" = "More than Twice", .ordered=T),
+
+           FEMALE_ATTENDINGS_ASKING = factor(FEMALE_ATTENDINGS_ASKING),
+           FEMALE_ATTENDINGS_ASKING = recode_factor(FEMALE_ATTENDINGS_ASKING, "Once" = "Once",
+                                                                             "Twice" = "Twice",
+                                                                             "More than twice" = "More than Twice",
+                                                                             "Not applicable, I do not work with any female attendings" = "Don't work with FemAtt", .ordered=T))
   
 
 ```
@@ -1086,3 +1109,137 @@ plot_xtab(SURVEY$TACTILE_INSTRUCTION_FROM_FEMALES, SURVEY$BIRTHSEX, margin = "ro
   set_theme(base= theme_classic())
 
 ```
+
+
+
+<br>
+
+***
+
+#### Question 7A - 7I:  Distribution of RESPECT-ORIENTED ANSWERS by BIRTH SEX
+
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-RESPECT }
+  
+plot_xtab(SURVEY$COMFORTABLE_ASKING_NURSES, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Comfortable Asking Nurses for Help by Birth Sex",
+          axis.titles = c('Comfortable Asking Nurses?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+SUBSET <-  sqldf( "select BIRTHSEX,
+                          COMFORTABLE_ASKING_TECHS
+                  from SURVEY
+                  where COMFORTABLE_ASKING_TECHS != 'NA' ")
+
+SUBSET <- SUBSET %>% 
+    mutate(COMFORTABLE_ASKING_TECHS = recode_factor( COMFORTABLE_ASKING_TECHS, "N" = "N",
+                                                         "Y" = "Y")) %>% droplevels()
+
+
+
+plot_xtab(SUBSET$COMFORTABLE_ASKING_TECHS, SUBSET$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Comfortable Asking Techs for Help by Birth Sex (Includes only respondents with Techs)",
+          axis.titles = c('Comfortable Asking Techs?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$NURSES_ASKING, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Times Asking Nurses for Help by Birth Sex",
+          axis.titles = c('Times Asking Nurses?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$MALE_ATTENDINGS_ASKING, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Times Male Attending Asking Nurses for Help by Birth Sex",
+          axis.titles = c('Times Male Att Asking Nurses?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+plot_xtab(SURVEY$FEMALE_ATTENDINGS_ASKING, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Times Female Attending Asking Nurses for Help by Birth Sex",
+          axis.titles = c('Times Female Att Asking Nurses?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+plot_xtab(SURVEY$RECOGNIZED_RESPECTED_ES_STAFF, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Recognized/Respected by ES Staff by Birth Sex",
+          axis.titles = c('Endoscopy Suite Staff Respectful?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$RECOGNIZED_RESPECTED_ANESTHETISTS, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Recognized/Respected by Anesthetists by Birth Sex",
+          axis.titles = c('Anesthesia Staff Respectful?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+plot_xtab(SURVEY$RECOGNIZED_RESPECTED_GASTRO_ATTENDING, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Recognized/Respected by Gastro Attending by Birth Sex",
+          axis.titles = c('Gastro Attending Respectful?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+plot_xtab(SURVEY$FIRST_NAME_NO_PERMISSION, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "First Name Used No Permission by Birth Sex",
+          axis.titles = c('First Name Used No Permission?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+```
+
+
+
+***
+***
+
+
+#### FUTURE DESIRES FOR ENDOSCOPY SUITE
+
+
+
+
+
+
