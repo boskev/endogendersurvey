@@ -47,7 +47,8 @@ SURVEY  <-
            EXPERIENCED_TRANSIENT_PAIN_BACK, EXPERIENCED_TRANSIENT_PAIN_LEG, EXPERIENCED_TRANSIENT_PAIN_FOOT, GROWING_PAINS,
            FELLOWSHIP_FORMAL_ERGO_TRAINING, INFORMAL_TRAINING, TRAINING_TECHNIQUES_POSTURAL, TRAINING_TECHNIQUES_BEDHEIGHT, TRAINING_TECHNIQUES_BEDANGLE,
            TRAINING_TECHNIQUES_MONITORHEIGHT, TRAINING_TECHNIQUES_MUSCULOSKELETAL, TRAINING_TECHNIQUES_EXERCISE_STRETCHING, TRAINING_TECHNIQUES_DIAL_EXTENDERS,
-           TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE, ERGO_TRAINING_BUDGET, ERGO_FEEDBACK, ERGO_FEEDBACK_BY_WHOM) %>% 
+           TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE, ERGO_TRAINING_BUDGET, ERGO_FEEDBACK, ERGO_FEEDBACK_BY_WHOM, ERGO_OPTIMIZATION, GLOVE_SIZE_AVAILABLE,
+           DIAL_EXTENDERS_AVAILABLE, DIAL_EXTENDERS_ENCOURAGED, DIAL_EXTENDERS_FEMALEATT, DIAL_EXTENDERS_MALEATT, PEDI_COLONOSCOPES_AVAILABLE) %>% 
   
     mutate(AGE2 = ifelse( AGE %in% c('< 30', '30-34', '35-40'), AGE, '> 40' )) %>% 
   
@@ -129,7 +130,47 @@ SURVEY  <-
           ERGO_FEEDBACK_BY_WHOM = recode_factor(ERGO_FEEDBACK_BY_WHOM, 'I do not or rarely receive ergonomic feedback' = "Do not/rarely received feedback",
                                                                      'Mostly male endoscopy teachers' = 'Mostly male teachers',
                                                                      'Mostly female endoscopy teachers' = 'Mostly female teachers',
-                                                                     'Both male and female endoscopy teachers equally' = 'Both equally' , .ordered = T)) 
+                                                                     'Both male and female endoscopy teachers equally' = 'Both equally' , .ordered = T)) %>% 
+  
+  
+  mutate( ERGO_OPTIMIZATION = factor(ERGO_OPTIMIZATION),
+          ERGO_OPTIMIZATION = recode_factor(ERGO_OPTIMIZATION, 'Y' = 'Y',
+                                                                     'N' = 'N',
+                                                                     "Don't know" = 'DK', .ordered= T)) %>% 
+  
+  mutate( GLOVE_SIZE_AVAILABLE = factor(GLOVE_SIZE_AVAILABLE)) %>% 
+  
+  mutate( DIAL_EXTENDERS_AVAILABLE = factor(DIAL_EXTENDERS_AVAILABLE),
+          DIAL_EXTENDERS_AVAILABLE = recode_factor(DIAL_EXTENDERS_AVAILABLE, 'Y' = 'Y',
+                                                                             'N' = 'N',
+                                                                             "Don't know" = 'DK', .ordered= T)) %>% 
+  
+  mutate( DIAL_EXTENDERS_ENCOURAGED = factor(DIAL_EXTENDERS_ENCOURAGED),
+          DIAL_EXTENDERS_ENCOURAGED = recode_factor(DIAL_EXTENDERS_ENCOURAGED, 'Y' = 'Y',
+                                                                                 'N' = 'N',
+                                                                                 "Don't use" = 'DU', .ordered= T)) %>% 
+  
+  
+
+  mutate( DIAL_EXTENDERS_FEMALEATT = factor(DIAL_EXTENDERS_FEMALEATT),
+          DIAL_EXTENDERS_FEMALEATT = recode_factor(DIAL_EXTENDERS_FEMALEATT, 'Not Likely' = 'Not Likely',
+                                                                             'Somewhat Likely' = 'Somewhat Likely',
+                                                                             'Sometimes' = 'Sometimes',
+                                                                             'Verly Likely' = 'Very Likely',
+                                                                             'NA' = 'NA', .ordered = T )) %>% 
+
+  mutate( DIAL_EXTENDERS_MALEATT = factor(DIAL_EXTENDERS_MALEATT),
+          DIAL_EXTENDERS_MALEATT = recode_factor(DIAL_EXTENDERS_MALEATT, 'Not Likely' = 'Not Likely',
+                                                                             'Somewhat Likely' = 'Somewhat Likely',
+                                                                             'Sometimes' = 'Sometimes',
+                                                                             'Verly Likely' = 'Very Likely',
+                                                                             'NA' = 'NA', .ordered = T ))  %>% 
+    mutate( PEDI_COLONOSCOPES_AVAILABLE = factor(PEDI_COLONOSCOPES_AVAILABLE),
+          PEDI_COLONOSCOPES_AVAILABLE = recode_factor(PEDI_COLONOSCOPES_AVAILABLE, 'Y' = 'Y',
+                                                                                   'N' = 'N',
+                                                                                   "Don't know" = 'DK', .ordered= T))
+  
+  
 ```
   
 
@@ -701,3 +742,128 @@ plot_xtab(SURVEY$ERGO_FEEDBACK_BY_WHOM, SURVEY$BIRTHSEX, margin = "row",
 
 ```
 
+
+<br>
+
+***
+
+#### Question 5A - 5M:  Distribution of EQUIPMENT OPITIMIZATOIN & AVAILABILITY by BIRTH SEX
+
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-EQUIPMENT-OPTIMIZATION-AVAILABILITY }
+  
+
+plot_xtab(SURVEY$ERGO_OPTIMIZATION, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Ergonomically Optimized Equipment by Birth Sex",
+          axis.titles = c('Equipment Ergonomically Optimized?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$GLOVE_SIZE_AVAILABLE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Glove Size Availability by Birth Sex",
+          axis.titles = c('Glove Size Readily Available?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$DIAL_EXTENDERS_AVAILABLE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Dial Extender Availability by Birth Sex",
+          axis.titles = c('Dial Extenders Availabile?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+
+SUBSET <-  sqldf( "select BIRTHSEX,
+                          DIAL_EXTENDERS_ENCOURAGED
+                  from SURVEY
+                  where DIAL_EXTENDERS_ENCOURAGED != 'DU' ")
+
+SUBSET <- SUBSET %>% 
+    mutate(DIAL_EXTENDERS_ENCOURAGED = recode_factor( DIAL_EXTENDERS_ENCOURAGED, "N" = "N",
+                                                         "Y" = "Y")) %>% droplevels()
+
+
+
+plot_xtab(SUBSET$DIAL_EXTENDERS_ENCOURAGED, SUBSET$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Dial Extenders Encouraged by Birth Sex - (Includes only subjects who use Dial Extenders)",
+          axis.titles = c('Dial Extenders Encouraged?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+
+
+SUBSET <-  sqldf( "select BIRTHSEX,
+                          DIAL_EXTENDERS_FEMALEATT
+                  from SURVEY
+                  where DIAL_EXTENDERS_FEMALEATT != 'NA' ")
+
+SUBSET <- SUBSET %>% 
+    mutate(DIAL_EXTENDERS_FEMALEATT = recode_factor( DIAL_EXTENDERS_FEMALEATT, "N" = "N",
+                                                         "Y" = "Y")) %>% droplevels()
+
+
+
+plot_xtab(SUBSET$DIAL_EXTENDERS_FEMALEATT, SUBSET$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Dial Extenders Encouraged with Female Att by Birth Sex - (Includes only subjects who use Dial Extenders)",
+          axis.titles = c('Dial Extenders Encouraged by Female Att?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+
+SUBSET <-  sqldf( "select BIRTHSEX,
+                          DIAL_EXTENDERS_MALEATT
+                  from SURVEY
+                  where DIAL_EXTENDERS_MALEATT != 'NA' ")
+
+SUBSET <- SUBSET %>% 
+    mutate(DIAL_EXTENDERS_MALEATT = recode_factor( DIAL_EXTENDERS_MALEATT, "N" = "N",
+                                                         "Y" = "Y")) %>% droplevels()
+
+
+
+plot_xtab(SUBSET$DIAL_EXTENDERS_MALEATT, SUBSET$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Dial Extenders Encouraged with Male Att by Birth Sex - (Includes only subjects who use Dial Extenders)",
+          axis.titles = c('Dial Extenders Encouraged by Male Att?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+
+plot_xtab(SURVEY$PEDI_COLONOSCOPES_AVAILABLE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Pediatric Colonoscopes by Birth Sex",
+          axis.titles = c('Pedi Colonoscopes Available?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
