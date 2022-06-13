@@ -145,8 +145,8 @@ glimpse(SURVEY)
 ```
 
 
----
----
+***
+***
 
 #### DEMOGRAPHIC DATA
 
@@ -229,6 +229,8 @@ plot_xtab(SURVEY$TRAINING_LEVEL, SURVEY$BIRTHSEX, margin = "row",
 ```
 
 
+<br>
+
 ***
 
 #### Question 4:  Distribution of HEIGHT2 x BIRTHSEX
@@ -253,6 +255,8 @@ plot_xtab(SURVEY$HEIGHT2, SURVEY$BIRTHSEX, margin = "row",
 
 
 ```
+
+<br>
 
 ***
 
@@ -283,6 +287,8 @@ eov.ttest(SURVEY, GLOVE, BIRTHSEX)
 
 ```
 
+<br> 
+
 ***
 
 #### Question 6:  Distribution of AVG ENDOSCOPY HOURS x BIRTHSEX
@@ -307,6 +313,8 @@ plot_xtab(SURVEY$PERFORMANCE_HOURS, SURVEY$BIRTHSEX, margin = "row",
 
 ```
 
+<br>
+
 ***
 
 #### Question 7:  Distribution of TEACHER SEX PEREFERENCE x BIRTHSEX
@@ -329,6 +337,8 @@ plot_xtab(SURVEY$TEACHER_GENDER_PREFERENCE, SURVEY$BIRTHSEX, margin = "row",
   set_theme(base= theme_classic())
 
 ```
+
+<br>
 
 ***
 
@@ -362,10 +372,11 @@ plot_xtab(SURVEY$MALE_TRAINERS, SURVEY$BIRTHSEX, margin = "row",
 
 ```
 
+<br>
 
 ***
 
-#### Question 8A & 8B:  Endoscopy-Related Injury or Transient Pain Immediately Following Session
+#### Question 9A & 9B:  Endoscopy-Related Injury or Transient Pain Immediately Following Session
 
 <br>
 
@@ -395,11 +406,11 @@ plot_xtab(SURVEY$EXPERIENCED_TRANSIENT_PAIN_NO, SURVEY$BIRTHSEX, margin = "row",
 
 ```
 
-
+<br>
 
 ***
 
-#### Question 9A-9E:  Transient Pain Immediately Following Session - Specific Body Part
+#### Question 10A-10E:  Transient Pain Immediately Following Session - Specific Body Part
 
 <br>
 
@@ -461,11 +472,11 @@ plot_xtab(SURVEY$EXPERIENCED_TRANSIENT_PAIN_FOOT, SURVEY$BIRTHSEX, margin = "row
 
 
 ```
-
+<br>
 
 ***
 
-#### Question 9:  Told Injuries were "Growing Pains" x BIRTHSEX
+#### Question 11:  Told Injuries were "Growing Pains" x BIRTHSEX
 ###### (Exclude all respondents who did **not** report having been injured)
 
 <br>
@@ -500,14 +511,15 @@ plot_xtab(SUBSET$GROWING_PAINS, SUBSET$BIRTHSEX, margin = "row",
 
 ```
 
----
----
+***
+***
+
 
 #### ENDOSCOPIC SUITE ENVIRONMENT
 
 #### Question 1A & 1B:  Distribution of FORMAL TRAINING & INFORMAL TRAINING by BIRTH SEX
 
-
+<br>
 
   
 ```{r CROSSTAB-BIRTHSEX-TRAINING-TYPES }
@@ -533,10 +545,15 @@ plot_xtab(SURVEY$INFORMAL_TRAINING, SURVEY$BIRTHSEX, margin = "row",
   set_theme(base= theme_classic())
 
 ```
+<br>
+
+***
 
 
 #### Question 2A-2H:  Distribution of TECHNIQUES DISCUSSED DURING TRAINING by BIRTH SEX
 
+
+<br>
 
 
   
@@ -625,8 +642,13 @@ plot_xtab(SURVEY$TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE, SURVEY$BIRTHSEX, mar
 
 ```
 
+<br>
+
+***
 
 #### Question 3:  Distribution of BUDGET ALLOTMENT by BIRTH SEX
+
+<br>
 
   
 ```{r CROSSTAB-BIRTHSEX-TRAINING-BUDGET }
@@ -644,9 +666,14 @@ plot_xtab(SURVEY$ERGO_TRAINING_BUDGET, SURVEY$BIRTHSEX, margin = "row",
 ```
 
 
+<br>
+
+***
 
 #### Question 4A & 4B:  Distribution of FEEBACK FREQUENCY & FEEDBACK BY WHOM by BIRTH SEX
 
+
+<br>
 
 
   
