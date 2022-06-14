@@ -70,10 +70,19 @@ SURVEY  <-
                    ifelse (RACE_EASTASIAN == "Y", "ASIAN EAST",
                    ifelse (RACE_NATIVEAMER == "Y", "OTHER",
                    ifelse (RACE_PACIFICISLAND == "Y", "OTHER",
-                   ifelse (RACE_OTHER == "Y", "OTHER", "OTHER" )))))))))  %>% 
+                   ifelse (RACE_OTHER == "Y", "OTHER", "OTHER" )))))))),
+            RACE = factor(RACE, levels= c('ASIAN EAST', 'ASIAN SOUTH', 'BLACK', 'HISPANIC', 'WHITE', 'OTHER'))) %>%
+  
     mutate( BIRTHSEX = factor( BIRTHSEX,  levels= c("F","M") ))  %>% 
     mutate (AGE2 = factor(AGE2, levels = c('< 30', '30-34', '35-40', '> 40'))) %>%  
-    mutate( RACE = factor(RACE, levels= c('ASIAN EAST', 'ASIAN SOUTH', 'BLACK', 'HISPANIC', 'WHITE', 'OTHER'))) %>% 
+
+    mutate (RACE2 = case_when( RACE != "WHITE" ~ 'NON-WHITE',
+                               TRUE ~ 'WHITE'),
+            RACE2 = factor(RACE2, levels = c("WHITE", "NON-WHITE"))) %>% 
+            
+
+                           
+                           
     mutate( TRAINING_LEVEL = factor (TRAINING_LEVEL, levels= c('First year fellow','Second year fellow', 'Third year fellow', 'Advanced fellow'))) %>% 
     mutate( TRAINING_LEVEL = recode_factor( TRAINING_LEVEL, 'First year fellow'= 'First Year', 
                                                             'Second year fellow'= 'Second Year', 
@@ -412,6 +421,7 @@ plot_xtab(SURVEY$HEIGHT2, SURVEY$BIRTHSEX, margin = "row",
   
 ```{r CROSSTAB-BIRTHSEX-GLOVE2 }
   
+require(ggstatsplot)
 
 #SJPlot cross tabulation with Chi-Square/df
   
@@ -428,6 +438,21 @@ plot_xtab(SURVEY$GLOVE, SURVEY$BIRTHSEX, margin = "row",
 #Mean Glove Size - Sex Difference ?
 
 eov.ttest(SURVEY, GLOVE, BIRTHSEX)
+
+#Median Glove Size - Sex Difference
+
+
+  SURVEY %>% 
+  group_by( BIRTHSEX) %>% 
+  summarize( GLOVE_MEDIAN = median(GLOVE, na.rm=T))
+
+  
+ggbetweenstats( data= SURVEY,
+                x = BIRTHSEX,
+                y = GLOVE,
+                type="nonparametric",
+                p.adjust.method = "none")
+
 
 ```
 
@@ -1278,6 +1303,19 @@ plot_xtab(SURVEY$FIRST_NAME_NO_PERMISSION, SURVEY$BIRTHSEX, margin = "row",
           title = "First Name Used No Permission by Birth Sex",
           axis.titles = c('First Name Used No Permission?'), 
           legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+#Is there a race difference on this question ?
+
+
+plot_xtab(SURVEY$FIRST_NAME_NO_PERMISSION, SURVEY$RACE2, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "First Name Used No Permission by Race (Broad)",
+          axis.titles = c('First Name Used No Permission?'), 
+          legend.title= "Binary Race",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
