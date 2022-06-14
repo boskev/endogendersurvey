@@ -1308,6 +1308,16 @@ plot_xtab(SURVEY$FIRST_NAME_NO_PERMISSION, SURVEY$BIRTHSEX, margin = "row",
   set_theme(base= theme_classic())
 
 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$FIRST_NAME_NO_PERMISSION, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "First Name Used No Permission by Birth Sex",
+          axis.titles = c('Birth Sex of Respondent'), 
+          legend.title= "Y/N",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
 #Is there a race difference on this question ?
 
 
