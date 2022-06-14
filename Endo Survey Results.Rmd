@@ -407,6 +407,12 @@ plot_xtab(SURVEY$HEIGHT2, SURVEY$BIRTHSEX, margin = "row",
   set_theme(base= theme_classic())
 
 
+ggplot(  SURVEY, aes(x= HEIGHT2)) + facet_grid( SURVEY$BIRTHSEX ) +  
+  geom_bar(fill= "darkred" ) +
+  stat_count(geom="text", aes(label=..count..), vjust= -.3) + 
+  theme_538()
+
+
 ```
 
 <br>
