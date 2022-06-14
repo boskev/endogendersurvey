@@ -412,6 +412,7 @@ plot_xtab(SURVEY$HEIGHT2, SURVEY$BIRTHSEX, margin = "row",
   
 ```{r CROSSTAB-BIRTHSEX-GLOVE2 }
   
+require(ggstatsplot)
 
 #SJPlot cross tabulation with Chi-Square/df
   
@@ -428,6 +429,21 @@ plot_xtab(SURVEY$GLOVE, SURVEY$BIRTHSEX, margin = "row",
 #Mean Glove Size - Sex Difference ?
 
 eov.ttest(SURVEY, GLOVE, BIRTHSEX)
+
+#Median Glove Size - Sex Difference
+
+
+  SURVEY %>% 
+  group_by( BIRTHSEX) %>% 
+  summarize( GLOVE_MEDIAN = median(GLOVE, na.rm=T))
+
+  
+ggbetweenstats( data= SURVEY,
+                x = BIRTHSEX,
+                y = GLOVE,
+                type="nonparametric",
+                p.adjust.method = "none")
+
 
 ```
 
