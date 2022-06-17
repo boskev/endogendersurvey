@@ -1399,6 +1399,7 @@ plot_xtab(SURVEY$BIRTHSEX, SURVEY$RECOGNIZED_RESPECTED_ES_STAFF, margin = "row",
   set_theme(base= theme_classic())
 
 
+
 plot_xtab(SURVEY$BIRTHSEX, SURVEY$RECOGNIZED_RESPECTED_ANESTHETISTS, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Recognized/Respected by Anesthetists by Birth Sex",
