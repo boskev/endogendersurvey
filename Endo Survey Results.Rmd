@@ -336,7 +336,7 @@ plot_xtab(SURVEY$AGE2, SURVEY$BIRTHSEX, margin = "row",
 #Alternative View, if Birth Sex by Age is desired 
 
 
-CrossTable(SURVEY$BIRTHSEX, SURVEY$AGE, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+CrossTable(SURVEY$AGE, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
 
 
 ```
@@ -402,7 +402,7 @@ plot_xtab(SURVEY$TRAINING_LEVEL, SURVEY$BIRTHSEX, margin = "row",
 #Alternative View, if Birth Sex by Training Level is desired 
 
 
-CrossTable(SURVEY$BIRTHSEX, SURVEY$TRAINING_LEVEL, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=F)  #rows then/over columns
+CrossTable(SURVEY$TRAINING_LEVEL, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=T, fisher=F)  #rows then/over columns
 
 
 ```
@@ -1379,16 +1379,10 @@ plot_xtab(SURVEY$FEMALE_ATTENDINGS_ASKING, SURVEY$BIRTHSEX, margin = "row",
 
 #Alternative View, if Birth Sex by Times Asking Female Attending is desired 
 
-CrossTable(SURVEY$BIRTHSEX, SURVEY$FEMALE_ATTENDINGS_ASKING, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
-<<<<<<< HEAD
+CrossTable(SURVEY$FEMALE_ATTENDINGS_ASKING, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
 
 
 
-=======
-
-
-
->>>>>>> cf5bd88abc0315e5e4934940adbca2f9401192aa
 plot_xtab(SURVEY$BIRTHSEX, SURVEY$RECOGNIZED_RESPECTED_ES_STAFF, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Recognized/Respected by ES Staff by Birth Sex",
