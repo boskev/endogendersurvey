@@ -280,7 +280,7 @@ SURVEY  <-
     
            WHEN_DISABILITY_INSURANCE = factor(WHEN_DISABILITY_INSURANCE),
            WHEN_DISABILITY_INSURANCE = recode_factor(WHEN_DISABILITY_INSURANCE, 'During training' = 'Correct',
-                                                                       .default = 'Incorrect', .ordered= T) )
+                                                                       .default = 'Incorrect', .ordered= T) ) 
    
    
 ```
@@ -366,6 +366,12 @@ plot_xtab(SURVEY$RACE, SURVEY$BIRTHSEX, margin = "row",
   set_theme(base= theme_classic())
 
 
+#Alternative View, if Birth Sex by Race is desired 
+
+
+CrossTable(SURVEY$RACE, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r = F, prop.t=F, chisq=T, fisher=F)  #rows then/over columns
+
+
 ```
 
 <br>
@@ -391,6 +397,12 @@ plot_xtab(SURVEY$TRAINING_LEVEL, SURVEY$BIRTHSEX, margin = "row",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
+
+
+#Alternative View, if Birth Sex by Training Level is desired 
+
+
+CrossTable(SURVEY$BIRTHSEX, SURVEY$TRAINING_LEVEL, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=F)  #rows then/over columns
 
 
 ```
@@ -437,6 +449,13 @@ ggplot(  SUBSET2, aes(x= HEIGHT2)) + facet_grid( SUBSET2$BIRTHSEX ) +
 
 
 
+#Alternative View, if Birth Sex by Height is desired 
+
+
+
+CrossTable(SURVEY$HEIGHT2, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r = F, prop.t=F, chisq=T, fisher=F)  #rows then/over columns
+
+
 ```
 
 <br>
@@ -465,9 +484,11 @@ plot_xtab(SURVEY$GLOVE, SURVEY$BIRTHSEX, margin = "row",
   set_theme(base= theme_classic())
 
 
-#Mean Glove Size - Sex Difference ?
+#Alternative View, if Birth Sex by Glove Size is desired 
 
-eov.ttest(SURVEY, GLOVE, BIRTHSEX)
+
+CrossTable(SURVEY$GLOVE, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=T)  #rows then/over columns
+
 
 #Median Glove Size - Sex Difference
 
@@ -510,6 +531,13 @@ plot_xtab(SURVEY$PERFORMANCE_HOURS, SURVEY$BIRTHSEX, margin = "row",
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
+
+#Alternative View, if Birth Sex by Performance Hours is desired 
+
+
+CrossTable(SURVEY$BIRTHSEX, SURVEY$PERFORMANCE_HOURS, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
 ```
 
 <br>
@@ -526,14 +554,16 @@ plot_xtab(SURVEY$PERFORMANCE_HOURS, SURVEY$BIRTHSEX, margin = "row",
 
 #SJPlot cross tabulation with Chi-Square/df
   
-plot_xtab(SURVEY$TEACHER_GENDER_PREFERENCE, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TEACHER_GENDER_PREFERENCE,  margin = "row", 
           bar.pos = "stack", coord.flip = TRUE,
           title = "Teacher Sex Preference by Birth Sex",
-          axis.titles = c('Trainer Sex Preference?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Teacher Sex Pref?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
+
+
 
 ```
 
@@ -560,6 +590,12 @@ plot_xtab(SURVEY$FEMALE_TRAINERS, SURVEY$BIRTHSEX, margin = "row",
   set_theme(base= theme_classic())
 
 
+#Alternative View, if Birth Sex by Number of Female Trainers is desired 
+
+CrossTable(SURVEY$BIRTHSEX, SURVEY$FEMALE_TRAINERS, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
+
 plot_xtab(SURVEY$MALE_TRAINERS, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Number of Male Trainers by Birth Sex",
@@ -568,6 +604,11 @@ plot_xtab(SURVEY$MALE_TRAINERS, SURVEY$BIRTHSEX, margin = "row",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
+
+
+#Alternative View, if Birth Sex by Number of Male Trainers is desired 
+
+CrossTable(SURVEY$BIRTHSEX, SURVEY$MALE_TRAINERS, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
 
 ```
 
@@ -584,24 +625,27 @@ plot_xtab(SURVEY$MALE_TRAINERS, SURVEY$BIRTHSEX, margin = "row",
 
 #SJPlot cross tabulation with Chi-Square/df
   
-plot_xtab(SURVEY$EVER_INJURED, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX,SURVEY$EVER_INJURED,  margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Ever Endo Injured by Birth Sex",
-          axis.titles = c('Experienced Endo-Related Injury?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Ever Injured?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$EXPERIENCED_TRANSIENT_PAIN_NO, SURVEY$BIRTHSEX, margin = "row", 
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$EXPERIENCED_TRANSIENT_PAIN_NO, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "NEVER Experienced Transient Pain after Session by Birth Sex",
-          axis.titles = c('Approx. Male Trainers'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Never Transient Pain?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
+
+
 
 ```
 
@@ -618,56 +662,59 @@ plot_xtab(SURVEY$EXPERIENCED_TRANSIENT_PAIN_NO, SURVEY$BIRTHSEX, margin = "row",
 
 #SJPlot cross tabulation with Chi-Square/df
   
-plot_xtab(SURVEY$EXPERIENCED_TRANSIENT_PAIN_HAND, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab( SURVEY$BIRTHSEX, SURVEY$EXPERIENCED_TRANSIENT_PAIN_HAND, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Transient Pain in Hand after Procedure by Birth Sex",
-          axis.titles = c('Transient Hand Pain?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Hand Pain?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER, SURVEY$BIRTHSEX, margin = "row", 
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Transient Pain in Neck/Shoulder after Procedure by Birth Sex",
-          axis.titles = c('Transient Neck/Shoulder Pain?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Neck/Should Pain?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
 
-plot_xtab(SURVEY$EXPERIENCED_TRANSIENT_PAIN_BACK, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX,SURVEY$EXPERIENCED_TRANSIENT_PAIN_BACK,  margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Transient Pain in Back after Procedure by Birth Sex",
-          axis.titles = c('Transient Back Pain?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Back Pain?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-
-plot_xtab(SURVEY$EXPERIENCED_TRANSIENT_PAIN_LEG, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$EXPERIENCED_TRANSIENT_PAIN_LEG, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Transient Pain in Leg after Procedure by Birth Sex",
-          axis.titles = c('Transient Leg Pain?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Leg Pain?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$EXPERIENCED_TRANSIENT_PAIN_FOOT, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$EXPERIENCED_TRANSIENT_PAIN_FOOT,  margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Transient Pain in Foot after Procedure by Birth Sex",
-          axis.titles = c('Transient Foot Pain?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Foot Pain?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
+
+
 
 
 ```
@@ -699,11 +746,11 @@ SUBSET <- SUBSET %>%
 
           
 
-plot_xtab(SUBSET$GROWING_PAINS, SUBSET$BIRTHSEX, margin = "row", 
+plot_xtab(SUBSET$BIRTHSEX, SUBSET$GROWING_PAINS, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Told Injuries were Growing Pains by Birth Sex",
-          axis.titles = c('Injuries Growing Pains?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Growing Pains?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -724,11 +771,11 @@ plot_xtab(SUBSET$GROWING_PAINS, SUBSET$BIRTHSEX, margin = "row",
 ```{r CROSSTAB-BIRTHSEX-TRAINING-TYPES }
   
 
-plot_xtab(SURVEY$FELLOWSHIP_FORMAL_ERGO_TRAINING, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$FELLOWSHIP_FORMAL_ERGO_TRAINING, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Formal Ergo Training by Birth Sex",
-          axis.titles = c('Formal Ergo Training Provided?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Formal Ergo Traiing?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -737,8 +784,8 @@ plot_xtab(SURVEY$FELLOWSHIP_FORMAL_ERGO_TRAINING, SURVEY$BIRTHSEX, margin = "row
 plot_xtab(SURVEY$INFORMAL_TRAINING, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Informal Ergo Training by Birth Sex",
-          axis.titles = c('Informal Ergo Training Provided?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Informal Ergo Training?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -759,61 +806,61 @@ plot_xtab(SURVEY$INFORMAL_TRAINING, SURVEY$BIRTHSEX, margin = "row",
 ```{r CROSSTAB-BIRTHSEX-SPECIFIC-TRAINING-TECHNIQUES }
   
 
-plot_xtab(SURVEY$TRAINING_TECHNIQUES_POSTURAL, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TRAINING_TECHNIQUES_POSTURAL, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Training on Postural Awareness by Birth Sex",
-          axis.titles = c('Postural Awareness Training Provided?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Training Postural Awareness?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$TRAINING_TECHNIQUES_BEDHEIGHT, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TRAINING_TECHNIQUES_BEDHEIGHT, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Training on Bed Height Adjustments by Birth Sex",
-          axis.titles = c('Bed Height Adjustment Training Provided?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex",  
+          legend.title= "Training Bed Height?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$TRAINING_TECHNIQUES_BEDANGLE, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TRAINING_TECHNIQUES_BEDANGLE, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Training on Bed Angle Adjustments by Birth Sex",
-          axis.titles = c('Bed Angle Adjustment Training Provided?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Training Bed Angle?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$TRAINING_TECHNIQUES_MONITORHEIGHT, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TRAINING_TECHNIQUES_MONITORHEIGHT, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Training on Monitor Height Adjustments by Birth Sex",
-          axis.titles = c('Monitor Height Adjustment Training Provided?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Training Monitor Height?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$TRAINING_TECHNIQUES_MUSCULOSKELETAL, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TRAINING_TECHNIQUES_MUSCULOSKELETAL, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Training on Musculoskeletal Maneuvers by Birth Sex",
-          axis.titles = c('Musculoskeletal Maneuvers Training Provided?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Training Musculoskeletal?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$TRAINING_TECHNIQUES_EXERCISE_STRETCHING, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TRAINING_TECHNIQUES_EXERCISE_STRETCHING, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Training on Exercise/Stretching by Birth Sex",
-          axis.titles = c('Exercise/Stretching Adjustment Training Provided?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Training Exer/Stretch?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -822,18 +869,18 @@ plot_xtab(SURVEY$TRAINING_TECHNIQUES_EXERCISE_STRETCHING, SURVEY$BIRTHSEX, margi
 plot_xtab(SURVEY$TRAINING_TECHNIQUES_DIAL_EXTENDERS, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Training on Dial Extenders by Birth Sex",
-          axis.titles = c('Dial Extenders Training Provided?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Training Dial Ext?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Training on Pediatric Colonoscopes by Birth Sex",
-          axis.titles = c('Pedi Colonoscopes Training Provided?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Traiing Pedi Coloscope?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -862,6 +909,14 @@ plot_xtab(SURVEY$ERGO_TRAINING_BUDGET, SURVEY$BIRTHSEX, margin = "row",
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
+
+#Alternative View, if Birth Sex by Ergo Training Budget is desired 
+
+
+CrossTable(SURVEY$BIRTHSEX, SURVEY$ERGO_TRAINING_BUDGET, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
+
 ```
 
 
@@ -889,6 +944,13 @@ plot_xtab(SURVEY$ERGO_FEEDBACK, SURVEY$BIRTHSEX, margin = "row",
   set_theme(base= theme_classic())
 
 
+#Alternative View, if Birth Sex by Ergo Feedback Frequency is desired 
+
+
+CrossTable(SURVEY$BIRTHSEX, SURVEY$ERGO_FEEDBACK, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
+
 plot_xtab(SURVEY$ERGO_FEEDBACK_BY_WHOM, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Who Provides Ergo Feedback by Birth Sex",
@@ -897,6 +959,12 @@ plot_xtab(SURVEY$ERGO_FEEDBACK_BY_WHOM, SURVEY$BIRTHSEX, margin = "row",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
+
+
+#Alternative View, if Birth Sex by Ergo Feedback by Whom is desired 
+
+
+CrossTable(SURVEY$ERGO_FEEDBACK_BY_WHOM, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
 
 ```
 
@@ -913,32 +981,32 @@ plot_xtab(SURVEY$ERGO_FEEDBACK_BY_WHOM, SURVEY$BIRTHSEX, margin = "row",
 ```{r CROSSTAB-BIRTHSEX-EQUIPMENT-OPTIMIZATION-AVAILABILITY }
   
 
-plot_xtab(SURVEY$ERGO_OPTIMIZATION, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab( SURVEY$BIRTHSEX, SURVEY$ERGO_OPTIMIZATION, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Ergonomically Optimized Equipment by Birth Sex",
-          axis.titles = c('Equipment Ergonomically Optimized?'), 
-          legend.title= "Birth Sex",
-          geom.colors = c("#006cc5","#cbcccb"), 
+          axis.titles = "Birth Sex", 
+          legend.title= "Ergo Optimization?",
+          geom.colors = c("#006cc5", "lightblue", "#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$GLOVE_SIZE_AVAILABLE, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$GLOVE_SIZE_AVAILABLE, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Glove Size Availability by Birth Sex",
-          axis.titles = c('Glove Size Readily Available?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Glove Size Avail?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$DIAL_EXTENDERS_AVAILABLE, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$DIAL_EXTENDERS_AVAILABLE, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Dial Extender Availability by Birth Sex",
-          axis.titles = c('Dial Extenders Availabile?'), 
-          legend.title= "Birth Sex",
-          geom.colors = c("#006cc5","#cbcccb"), 
+          axis.titles = "Birth Sex", 
+          legend.title= "Dial Ext Avail?",
+          geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
@@ -956,11 +1024,11 @@ SUBSET <- SUBSET %>%
 
 
 
-plot_xtab(SUBSET$DIAL_EXTENDERS_ENCOURAGED, SUBSET$BIRTHSEX, margin = "row", 
+plot_xtab(SUBSET$BIRTHSEX, SUBSET$DIAL_EXTENDERS_ENCOURAGED, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Dial Extenders Encouraged by Birth Sex - (Includes only subjects who use Dial Extenders)",
-          axis.titles = c('Dial Extenders Encouraged?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Dial Ext Encouraged?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -980,12 +1048,12 @@ SUBSET <- SUBSET %>%
 
 
 
-plot_xtab(SUBSET$DIAL_EXTENDERS_FEMALEATT, SUBSET$BIRTHSEX, margin = "row", 
+plot_xtab(SUBSET$BIRTHSEX, SUBSET$DIAL_EXTENDERS_FEMALEATT, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Dial Extenders Encouraged with Female Att by Birth Sex - (Includes only subjects who use Dial Extenders)",
-          axis.titles = c('Dial Extenders Encouraged by Female Att?'), 
-          legend.title= "Birth Sex",
-          geom.colors = c("#006cc5","#cbcccb"), 
+          axis.titles = "Birth Sex", 
+          legend.title= "Dial Ext FemAtt?",
+          geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
@@ -1003,14 +1071,15 @@ SUBSET <- SUBSET %>%
 
 
 
-plot_xtab(SUBSET$DIAL_EXTENDERS_MALEATT, SUBSET$BIRTHSEX, margin = "row", 
+plot_xtab(SUBSET$BIRTHSEX, SUBSET$DIAL_EXTENDERS_MALEATT, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Dial Extenders Encouraged with Male Att by Birth Sex - (Includes only subjects who use Dial Extenders)",
-          axis.titles = c('Dial Extenders Encouraged by Male Att?'), 
-          legend.title= "Birth Sex",
-          geom.colors = c("#006cc5","#cbcccb"), 
+          axis.titles = "Birth Sex", 
+          legend.title= "Dial Ext MaleAtt?",
+          geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
+
 
 
 
@@ -1023,6 +1092,12 @@ plot_xtab(SURVEY$PEDI_COLONOSCOPES_AVAILABLE, SURVEY$BIRTHSEX, margin = "row",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
+
+#Alternative View, if Birth Sex by Pedi Colonoscopes is desired 
+
+
+CrossTable(SURVEY$BIRTHSEX, SURVEY$PEDI_COLONOSCOPES_AVAILABLE, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
 
 ```
 
@@ -1040,94 +1115,93 @@ plot_xtab(SURVEY$PEDI_COLONOSCOPES_AVAILABLE, SURVEY$BIRTHSEX, margin = "row",
 ```{r CROSSTAB-BIRTHSEX-LEAD-APRON-AVAILABILITY }
   
 
-plot_xtab(SURVEY$LEAD_APRONS_DONTKNOW, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_DONTKNOW, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Don't Know Whether Lead Aprons Available at Institution by Birth Sex",
-          axis.titles = c('Lead Apron at Institution?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Aware of Lead Aprons?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$LEAD_APRONS_LW_ONEPIECE, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab( SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_LW_ONEPIECE,margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Lead Aprons LW One-Piece Available at Institution by Birth Sex",
-          axis.titles = c('Lightweight One-Piece Lead Apron at Institution?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Lead Aprons LW 1P?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$LEAD_APRONS_LW_TWOPIECE, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_LW_TWOPIECE, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Lead Aprons LW Two-Piece Available at Institution by Birth Sex",
-          axis.titles = c('Lightweight Two-Piece Lead Apron at Institution?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Lead Aprons LW 2P?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
-plot_xtab(SURVEY$LEAD_APRONS_STANDARD_ONEPIECE, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_STANDARD_ONEPIECE, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Lead Aprons SW One-Piece Available at Institution by Birth Sex",
-          axis.titles = c('Standard Weight One-Piece Lead Apron at Institution?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Lead Aprons Std 1P?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$LEAD_APRONS_STANDARD_TWOPIECE, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_STANDARD_TWOPIECE, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Lead Aprons SW Two-Piece Available at Institution by Birth Sex",
-          axis.titles = c('Standard Weight Two-Piece Lead Apron at Institution?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Lead Aprons Std 2P?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$LEAD_APRONS_DOUBLE, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_DOUBLE, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Lead Aprons Double Lead (Maternity) Available at Institution by Birth Sex",
-          axis.titles = c('Double Lead (Maternity) Lead Apron at Institution?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Lead Aprons Double?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$LEAD_APRONS_THYROID, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_THYROID, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Lead Aprons Thyroid Shield Available at Institution by Birth Sex",
-          axis.titles = c('Thyroid Shield Lead Apron at Institution?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Lead Aprons Thyroid?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$LEAD_APRONS_MATERNALDOS, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_MATERNALDOS, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Lead Aprons Maternal Dosimeter Available at Institution by Birth Sex",
-          axis.titles = c('Maternal Dosimeter Lead Apron at Institution?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Lead Aprons Maternal?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$LEAD_APRONS_FETALDOS, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_FETALDOS, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Lead Aprons Fetal Dosimeter Available at Institution by Birth Sex",
-          axis.titles = c('Fetal Dosimeter Lead Apron at Institution?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Lead Aprons Fetal?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
-
 
 
 
@@ -1149,41 +1223,41 @@ plot_xtab(SURVEY$LEAD_APRONS_FETALDOS, SURVEY$BIRTHSEX, margin = "row",
 ```{r CROSSTAB-BIRTHSEX-ERGO-CONSIDERATIONS }
   
 
-plot_xtab(SURVEY$ERGO_FORMAL_TIMEOUT_PRIOR, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$ERGO_FORMAL_TIMEOUT_PRIOR, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Formal Ergo Timeouts at Institution by Birth Sex",
-          axis.titles = c('Formal Ergo Timeouts at Institution?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Formal Ergo Timeout?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$ERGO_INFORMAL_TIMEOUT_PRIOR, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$ERGO_INFORMAL_TIMEOUT_PRIOR, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Informal Ergo Timeouts at Institution by Birth Sex",
-          axis.titles = c('Informal Ergo Timeouts at Institution?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Informal Ergo Timeout?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$MONITORS_ADJUSTABLE, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab( SURVEY$BIRTHSEX, SURVEY$MONITORS_ADJUSTABLE,margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Monitors Easily Adjustable at Institution by Birth Sex",
-          axis.titles = c('Easily Adjustable Monitors at Institution?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Monitors Easily Adjust?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$TEACHER_SENSITIVITY_STATURE_HANDSIZE, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TEACHER_SENSITIVITY_STATURE_HANDSIZE, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Teachers Train with Sensitivity to Stature/Hand Size by Birth Sex",
-          axis.titles = c('Teachers Sensitive to Stature/Hand Size?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Teacher Sensitivity to Stature?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -1199,22 +1273,31 @@ plot_xtab(SURVEY$TEACHER_SENSITIVITY_BY_GENDER, SURVEY$BIRTHSEX, margin = "row",
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$TACTILE_INSTRUCTION_FROM_MALES, SURVEY$BIRTHSEX, margin = "row", 
+#Alternative View, if Birth Sex by Male or Female Teacher more Sensitive is desired 
+
+CrossTable(SURVEY$TEACHER_SENSITIVITY_BY_GENDER, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
+
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TACTILE_INSTRUCTION_FROM_MALES, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Tactile Instruction from Male Teachers by Birth Sex",
-          axis.titles = c('Male Teachers Tacile Instruction?'), 
-          legend.title= "Birth Sex",
-          geom.colors = c("#006cc5","#cbcccb"), 
+          axis.titles = "Birth Sex", 
+          legend.title= "Tactile Instruction from Males?",
+          geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$TACTILE_INSTRUCTION_FROM_FEMALES, SURVEY$BIRTHSEX, margin = "row", 
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TACTILE_INSTRUCTION_FROM_FEMALES, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          title = "Tactile Instruction from Female Teachers by Birth Sex",
-          axis.titles = c('Female Teachers Tacile Instruction?'), 
-          legend.title= "Birth Sex",
-          geom.colors = c("#006cc5","#cbcccb"), 
+          title = "Tactile Instruction from Females Teachers by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Tactile Instruction from Females?",
+          geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
@@ -1233,11 +1316,11 @@ plot_xtab(SURVEY$TACTILE_INSTRUCTION_FROM_FEMALES, SURVEY$BIRTHSEX, margin = "ro
 
 ```{r CROSSTAB-BIRTHSEX-RESPECT }
   
-plot_xtab(SURVEY$COMFORTABLE_ASKING_NURSES, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$COMFORTABLE_ASKING_NURSES,  margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Comfortable Asking Nurses for Help by Birth Sex",
-          axis.titles = c('Comfortable Asking Nurses?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Comfortable Asking Nurses?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -1254,32 +1337,32 @@ SUBSET <- SUBSET %>%
 
 
 
-plot_xtab(SUBSET$COMFORTABLE_ASKING_TECHS, SUBSET$BIRTHSEX, margin = "row", 
+plot_xtab(SUBSET$BIRTHSEX, SUBSET$COMFORTABLE_ASKING_TECHS, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Comfortable Asking Techs for Help by Birth Sex (Includes only respondents with Techs)",
-          axis.titles = c('Comfortable Asking Techs?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Comfortable Asking Techs?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$NURSES_ASKING, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab( SURVEY$BIRTHSEX, SURVEY$NURSES_ASKING, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Times Asking Nurses for Help by Birth Sex",
-          axis.titles = c('Times Asking Nurses?'), 
-          legend.title= "Birth Sex",
-          geom.colors = c("#006cc5","#cbcccb"), 
+          axis.titles = "Birth Sex", 
+          legend.title= "Times Asking Nurses?",
+          geom.colors = c("#006cc5", "lightblue", "#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$MALE_ATTENDINGS_ASKING, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$MALE_ATTENDINGS_ASKING, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Times Male Attending Asking Nurses for Help by Birth Sex",
-          axis.titles = c('Times Male Att Asking Nurses?'), 
-          legend.title= "Birth Sex",
-          geom.colors = c("#006cc5","#cbcccb"), 
+          axis.titles = "Birth Sex", 
+          legend.title= "Times Asking MaleAtt?",
+          geom.colors = c("#006cc5", "lightblue", "#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
@@ -1294,68 +1377,63 @@ plot_xtab(SURVEY$FEMALE_ATTENDINGS_ASKING, SURVEY$BIRTHSEX, margin = "row",
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
+#Alternative View, if Birth Sex by Times Asking Female Attending is desired 
+
+CrossTable(SURVEY$BIRTHSEX, SURVEY$FEMALE_ATTENDINGS_ASKING, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
 
 
-plot_xtab(SURVEY$RECOGNIZED_RESPECTED_ES_STAFF, SURVEY$BIRTHSEX, margin = "row", 
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$RECOGNIZED_RESPECTED_ES_STAFF, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Recognized/Respected by ES Staff by Birth Sex",
-          axis.titles = c('Endoscopy Suite Staff Respectful?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Recog by ES Staff?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$RECOGNIZED_RESPECTED_ANESTHETISTS, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$RECOGNIZED_RESPECTED_ANESTHETISTS, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Recognized/Respected by Anesthetists by Birth Sex",
-          axis.titles = c('Anesthesia Staff Respectful?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Recog by Anesthetists?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
 
-plot_xtab(SURVEY$RECOGNIZED_RESPECTED_GASTRO_ATTENDING, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab( SURVEY$BIRTHSEX, SURVEY$RECOGNIZED_RESPECTED_GASTRO_ATTENDING,margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Recognized/Respected by Gastro Attending by Birth Sex",
-          axis.titles = c('Gastro Attending Respectful?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Recog by Gastro Att?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
 
 
-plot_xtab(SURVEY$FIRST_NAME_NO_PERMISSION, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$FIRST_NAME_NO_PERMISSION,  margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "First Name Used No Permission by Birth Sex",
-          axis.titles = c('First Name Used No Permission?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "First Name No Permission?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
-
-plot_xtab(SURVEY$BIRTHSEX, SURVEY$FIRST_NAME_NO_PERMISSION, margin = "row", 
-          bar.pos = "stack", coord.flip = TRUE, 
-          title = "First Name Used No Permission by Birth Sex",
-          axis.titles = c('Birth Sex of Respondent'), 
-          legend.title= "Y/N",
-          geom.colors = c("#006cc5","#cbcccb"), 
-          show.summary = TRUE )+ 
-  set_theme(base= theme_classic())
 
 
 #Is there a race difference on this question ?
 
 
-plot_xtab(SURVEY$FIRST_NAME_NO_PERMISSION, SURVEY$RACE2, margin = "row", 
+plot_xtab(SURVEY$RACE2, SURVEY$FIRST_NAME_NO_PERMISSION, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "First Name Used No Permission by Race (Broad)",
-          axis.titles = c('First Name Used No Permission?'), 
-          legend.title= "Binary Race",
+          axis.titles = "Binary Race Category", 
+          legend.title= "First Name Used No Permission?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -1390,6 +1468,11 @@ plot_xtab(SURVEY$ERGO_TRAINING_MANDATORY, SURVEY$BIRTHSEX, margin = "row",
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
+#Alternative View, if Birth Sex by Ergo Training be Mandatory is desired 
+
+CrossTable(SURVEY$BIRTHSEX, SURVEY$ERGO_TRAINING_MANDATORY, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
 ```
 
 ***
@@ -1410,6 +1493,12 @@ plot_xtab(SURVEY$ERGO_OPTIMIZAITON_BUDGET_REQUIRED, SURVEY$BIRTHSEX, margin = "r
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
+
+#Alternative View, if Birth Sex by Ergo Optimization Budget be Mandatory is desired 
+
+CrossTable(SURVEY$BIRTHSEX, SURVEY$ERGO_OPTIMIZAITON_BUDGET_REQUIRED, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
 ```
 
 ***
@@ -1421,12 +1510,12 @@ plot_xtab(SURVEY$ERGO_OPTIMIZAITON_BUDGET_REQUIRED, SURVEY$BIRTHSEX, margin = "r
 
 ```{r CROSSTAB-BIRTHSEX-FUTURE-DIAL-EXTENDERS }
   
-plot_xtab(SURVEY$EXPERIENCE_IMPROVED_DIAL_EXTENDERS, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$EXPERIENCE_IMPROVED_DIAL_EXTENDERS, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Increased Availability of Dial Extenders by Birth Sex",
-          axis.titles = c('More Dial Extenders Available?'), 
-          legend.title= "Birth Sex",
-          geom.colors = c("#006cc5","#cbcccb"), 
+          axis.titles = "Birth Sex", 
+          legend.title= "Increase Avail Dial Ext?",
+          geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
@@ -1442,12 +1531,12 @@ plot_xtab(SURVEY$EXPERIENCE_IMPROVED_DIAL_EXTENDERS, SURVEY$BIRTHSEX, margin = "
 
 ```{r CROSSTAB-BIRTHSEX-FUTURE-PEDI-COLONOSCOPOES }
   
-plot_xtab(SURVEY$EXPERIENCE_IMPROVED_PEDI_COLONOSCOPES, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$EXPERIENCE_IMPROVED_PEDI_COLONOSCOPES, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Increased Availability of Pedi Colonoscopes by Birth Sex",
-          axis.titles = c('More Pedi Colonoscopes Available?'), 
-          legend.title= "Birth Sex",
-          geom.colors = c("#006cc5","#cbcccb"), 
+          axis.titles = "Birth Sex", 
+          legend.title= "Increase Avail Pediscopes?",
+          geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
@@ -1461,12 +1550,12 @@ plot_xtab(SURVEY$EXPERIENCE_IMPROVED_PEDI_COLONOSCOPES, SURVEY$BIRTHSEX, margin 
 <br>
 ```{r CROSSTAB-BIRTHSEX-FUTURE-LEAD-APRONS }
   
-plot_xtab(SURVEY$EXPERIENCE_IMPROVED_APRONS, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$EXPERIENCE_IMPROVED_APRONS, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Increased Availability of Lead Aprons by Birth Sex",
-          axis.titles = c('More Lead Aprons Available?'), 
-          legend.title= "Birth Sex",
-          geom.colors = c("#006cc5","#cbcccb"), 
+          axis.titles = "Birth Sex", 
+          legend.title= "Improve Aprons?",
+          geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
@@ -1490,6 +1579,11 @@ plot_xtab(SURVEY$ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED, SURVEY$BIRTHSEX, margin
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
+#Alternative View, if Birth Sex by Ergo Optimization Budget be Mandatory is desired 
+
+CrossTable(SURVEY$BIRTHSEX, SURVEY$ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
 ```
 
 
@@ -1506,11 +1600,11 @@ plot_xtab(SURVEY$ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED, SURVEY$BIRTHSEX, margin
 ```{r CROSSTAB-BIRTHSEX-KNOWLEDGE-ERGO }
   
 
-plot_xtab(SURVEY$ERGONOMIC_IMPORTANCE, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$ERGONOMIC_IMPORTANCE, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Importance of Ergonomics in Relation to ERI",
-          axis.titles = c('Answered Correctly?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Ergo Importance Response",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -1527,11 +1621,11 @@ plot_xtab(SURVEY$ERGONOMIC_IMPORTANCE, SURVEY$BIRTHSEX, margin = "row",
 ```{r CROSSTAB-BIRTHSEX-KNOWLEDGE-MUSCLE-STRAIN }
   
 
-plot_xtab(SURVEY$MITIGATING_MUSCLE_STRAIN, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$MITIGATING_MUSCLE_STRAIN, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Mitigation Strategies to Reduce Muscle Strain Risk",
-          axis.titles = c('Answered Correctly?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Muscle Strain Response",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -1548,11 +1642,11 @@ plot_xtab(SURVEY$MITIGATING_MUSCLE_STRAIN, SURVEY$BIRTHSEX, margin = "row",
 ```{r CROSSTAB-BIRTHSEX-KNOWLEDGE-BED-POSITION }
   
 
-plot_xtab(SURVEY$BED_POSITION, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$BED_POSITION, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Bed Position in Relation to the Elbow",
-          axis.titles = c('Answered Correctly?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Bed Position Response",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -1569,11 +1663,11 @@ plot_xtab(SURVEY$BED_POSITION, SURVEY$BIRTHSEX, margin = "row",
 ```{r CROSSTAB-BIRTHSEX-KNOWLEDGE-TRAINER-POSITION }
   
 
-plot_xtab(SURVEY$ENDO_TRAINER_POSITION, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$ENDO_TRAINER_POSITION, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Best Position for Endoscopy Trainer",
-          axis.titles = c('Answered Correctly?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Trainer Position Response",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
@@ -1592,13 +1686,36 @@ plot_xtab(SURVEY$ENDO_TRAINER_POSITION, SURVEY$BIRTHSEX, margin = "row",
 ```{r CROSSTAB-BIRTHSEX-KNOWLEDGE-DISABILITY-INSURANCE }
   
 
-plot_xtab(SURVEY$WHEN_DISABILITY_INSURANCE, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$WHEN_DISABILITY_INSURANCE, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Best Time to Explore Disability Insurance",
-          axis.titles = c('Answered Correctly?'), 
-          legend.title= "Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "When Disab Ins Response",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
+
+
+
+
+CORRECT <-
+  
+  SURVEY %>% 
+  mutate(CORRECT = across(.cols =  ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE , .fns = str_count, "Correct")) %>%
+          rowwise() %>%
+          mutate(COUNT_CORRECT = across(.cols = contains("CORRECT"), .fns = sum)) %>% 
+          select (BIRTHSEX, ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE, COUNT_CORRECT) %>% 
+          mutate( COUNT_CORRECT = as.integer(COUNT_CORRECT) )
+
+eov.ttest(CORRECT, COUNT_CORRECT, BIRTHSEX)  
+
+
+ggbetweenstats( data= CORRECT,
+                x = BIRTHSEX,
+                y = COUNT_CORRECT,
+                type="parametric",
+                p.adjust.method = "none",
+                title = "Mean Scores by Birth Sex")
+
 
 ```
