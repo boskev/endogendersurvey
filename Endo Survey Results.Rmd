@@ -947,7 +947,7 @@ plot_xtab(SURVEY$ERGO_FEEDBACK, SURVEY$BIRTHSEX, margin = "row",
 #Alternative View, if Birth Sex by Ergo Feedback Frequency is desired 
 
 
-CrossTable(SURVEY$BIRTHSEX, SURVEY$ERGO_FEEDBACK, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+CrossTable(SURVEY$ERGO_FEEDBACK, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
 
 
 
@@ -1096,7 +1096,7 @@ plot_xtab(SURVEY$PEDI_COLONOSCOPES_AVAILABLE, SURVEY$BIRTHSEX, margin = "row",
 #Alternative View, if Birth Sex by Pedi Colonoscopes is desired 
 
 
-CrossTable(SURVEY$BIRTHSEX, SURVEY$PEDI_COLONOSCOPES_AVAILABLE, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+CrossTable(SURVEY$PEDI_COLONOSCOPES_AVAILABLE, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
 
 
 ```
@@ -1470,7 +1470,7 @@ plot_xtab(SURVEY$ERGO_TRAINING_MANDATORY, SURVEY$BIRTHSEX, margin = "row",
 
 #Alternative View, if Birth Sex by Ergo Training be Mandatory is desired 
 
-CrossTable(SURVEY$BIRTHSEX, SURVEY$ERGO_TRAINING_MANDATORY, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+CrossTable(SURVEY$ERGO_TRAINING_MANDATORY, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F , prop.t=F, chisq=T, fisher=T)  #rows then/over columns
 
 
 ```
@@ -1496,7 +1496,7 @@ plot_xtab(SURVEY$ERGO_OPTIMIZAITON_BUDGET_REQUIRED, SURVEY$BIRTHSEX, margin = "r
 
 #Alternative View, if Birth Sex by Ergo Optimization Budget be Mandatory is desired 
 
-CrossTable(SURVEY$BIRTHSEX, SURVEY$ERGO_OPTIMIZAITON_BUDGET_REQUIRED, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+CrossTable(SURVEY$ERGO_OPTIMIZAITON_BUDGET_REQUIRED, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
 
 
 ```
@@ -1581,7 +1581,7 @@ plot_xtab(SURVEY$ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED, SURVEY$BIRTHSEX, margin
 
 #Alternative View, if Birth Sex by Ergo Optimization Budget be Mandatory is desired 
 
-CrossTable(SURVEY$BIRTHSEX, SURVEY$ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+CrossTable(SURVEY$ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
 
 
 ```
