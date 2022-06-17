@@ -1723,7 +1723,7 @@ CORRECT <-
   SURVEY %>% 
   mutate(CORRECT = across(.cols =  ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE , .fns = str_count, "Correct")) %>%
           rowwise() %>%
-          mutate(COUNT_CORRECT = across(.cols = contains("CORRECT"), .fns = sum)) %>% 
+          mutate(COUNT_CORRECT = across(.cols = contains("Correct"), .fns = sum)) %>% 
           select (BIRTHSEX, ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE, COUNT_CORRECT) %>% 
           mutate( COUNT_CORRECT = as.integer(COUNT_CORRECT) )
 
