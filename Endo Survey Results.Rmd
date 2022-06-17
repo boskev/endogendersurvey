@@ -1433,7 +1433,7 @@ plot_xtab(SURVEY$BIRTHSEX, SURVEY$FIRST_NAME_NO_PERMISSION,  margin = "row",
 
 
 
-#Is there a race difference on this question ?
+#Is there a RACE difference on this question ?
 
 
 plot_xtab(SURVEY$RACE2, SURVEY$FIRST_NAME_NO_PERMISSION, margin = "row", 
@@ -1446,7 +1446,7 @@ plot_xtab(SURVEY$RACE2, SURVEY$FIRST_NAME_NO_PERMISSION, margin = "row",
   set_theme(base= theme_classic())
 
 
-#Is there a race difference on this question ?
+#Is there a TRAINING LEVEL difference on this question ?
 
 
 plot_xtab(SURVEY$TRAINING_LEVEL, SURVEY$FIRST_NAME_NO_PERMISSION, margin = "row", 
@@ -1599,7 +1599,7 @@ plot_xtab(SURVEY$ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED, SURVEY$BIRTHSEX, margin
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
-#Alternative View, if Birth Sex by Ergo Optimization Budget be Mandatory is desired 
+#Alternative View, if Birth Sex by Formal Teacher Training Mandatory is desired 
 
 CrossTable(SURVEY$ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
 
