@@ -25,6 +25,12 @@ This is a brief workflow highlighting the exploratory analysis of survey data mi
 ***
 ***
 
+```{r IMPORT, eval=FALSE, include=FALSE}
+
+GENDER_DIFF_DATA_LABELS <- read_excel("/Volumes/EDrive/Kevin/Data by Project/Misc/Rabinowitz Endoscopy Survey 2 (Gender Differences)/GENDER_DIFF_DATA_LABELS.xlsx")
+
+```
+
 
 #### DATA CLEAN-UP
 
@@ -1432,6 +1438,19 @@ plot_xtab(SURVEY$BIRTHSEX, SURVEY$FIRST_NAME_NO_PERMISSION,  margin = "row",
 plot_xtab(SURVEY$RACE2, SURVEY$FIRST_NAME_NO_PERMISSION, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "First Name Used No Permission by Race (Broad)",
+          axis.titles = "Binary Race Category", 
+          legend.title= "First Name Used No Permission?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+#Is there a race difference on this question ?
+
+
+plot_xtab(SURVEY$TRAINING_LEVEL, SURVEY$FIRST_NAME_NO_PERMISSION, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "First Name Used No Permission by Training Level",
           axis.titles = "Binary Race Category", 
           legend.title= "First Name Used No Permission?",
           geom.colors = c("#006cc5","#cbcccb"), 
