@@ -866,7 +866,7 @@ plot_xtab(SURVEY$BIRTHSEX, SURVEY$TRAINING_TECHNIQUES_EXERCISE_STRETCHING, margi
   set_theme(base= theme_classic())
 
 
-plot_xtab(SURVEY$TRAINING_TECHNIQUES_DIAL_EXTENDERS, SURVEY$BIRTHSEX, margin = "row", 
+plot_xtab( SURVEY$BIRTHSEX, SURVEY$TRAINING_TECHNIQUES_DIAL_EXTENDERS,margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Training on Dial Extenders by Birth Sex",
           axis.titles = "Birth Sex", 
