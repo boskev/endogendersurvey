@@ -1739,3 +1739,93 @@ ggbetweenstats( data= CORRECT,
 
 
 ```
+
+
+
+
+
+
+***
+***
+
+#### PLAYGROUND (FOR TESTING IDEAS)
+
+
+<br>
+  
+#### Question 1:  Is it useful to know a "Pain Score"?
+##### PAIN_SCORE variable is created by turing six questions into numeric variables with binary values:
+
+- Sustained endoscopy-related injury (Yes = 1, No/NA = 0)
+- Tranisient pain experienced in hand (Yes = 1, No/NA = 0)
+- Transient pain experience in neck/shoulders (Yes = 1, No/NA = 0)
+- Transient pain experienced in back (Yes = 1, No/NA = 0)
+- Transient pain experienced in legs (Yes = 1, No/NA = 0)
+- Transient pain experienced in feet (Yes = 1, No/NA = 0)
+
+
+<br>
+
+```{r PLAYGROUND-PAIN-SCORE}
+
+PAIN <-
+
+SURVEY %>% 
+    mutate( BIRTHSEX2 = case_when( BIRTHSEX == "M" ~ 0,
+                                      TRUE ~ 1 ),
+      
+            PAIN_INJ = case_when (EVER_INJURED == 'Y' ~ 1,
+                                  TRUE ~ 0 ),
+            
+            PAIN_HAND = case_when (EXPERIENCED_TRANSIENT_PAIN_HAND == "Y" ~ 1,
+                                   TRUE ~ 0),
+
+            PAIN_NECK = case_when (EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER == "Y" ~ 1,
+                                   TRUE ~ 0),
+
+            PAIN_BACK = case_when (EXPERIENCED_TRANSIENT_PAIN_BACK == "Y" ~ 1,
+                                   TRUE ~ 0),
+
+            PAIN_LEG = case_when (EXPERIENCED_TRANSIENT_PAIN_LEG == "Y" ~ 1,
+                                   TRUE ~ 0),
+
+            PAIN_FOOT = case_when (EXPERIENCED_TRANSIENT_PAIN_FOOT == "Y" ~ 1,
+                                   TRUE ~ 0)) %>% 
+            rowwise() %>% 
+            mutate(PAIN_SCORE = sum(PAIN_INJ+ PAIN_HAND+ PAIN_NECK+ PAIN_BACK + PAIN_LEG+ PAIN_FOOT)) %>% 
+  
+    select( BIRTHSEX, BIRTHSEX2, RACE, RACE2, TRAINING_LEVEL, EVER_INJURED, starts_with("PAIN_") )
+
+
+
+# Test for normality of distribution (will be sensitive to outliers)
+shapiro.test(PAIN$PAIN_SCORE)
+
+
+# Group Means & Standard Deviations
+PAIN %>% 
+  group_by(BIRTHSEX) %>% 
+  summarize( PAINMEAN = mean(PAIN_SCORE),
+             PAINSD = sd(PAIN_SCORE))
+
+
+# Welch's T-test
+
+eov.ttest(PAIN, PAIN_SCORE, BIRTHSEX)
+
+
+# Violin Plot to explore differences between sexes
+ggbetweenstats( data= PAIN,
+                x = BIRTHSEX,
+                y = PAIN_SCORE,
+                type="parametric",
+                p.adjust.method = "none",
+                title = "Mean Pain/Injury Scores by Birth Sex")
+
+
+
+corr.test(  PAIN$BIRTHSEX2,PAIN$PAIN_SCORE, method= 'pearson')
+
+
+
+```
