@@ -2162,6 +2162,7 @@ summary(lm(PAIN_SCORE ~  BIRTHSEX + EQUIP_SCORE , data = SCORES))
 
 # BIRTHSEX predicting PAIN_SCORE when controlled for EQUIP_SCORE & AGEBAND
 
+
 summary(lm(PAIN_SCORE ~  BIRTHSEX + EQUIP_SCORE + AGE2 , data = SCORES))
 
 
