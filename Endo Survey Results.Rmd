@@ -48,7 +48,7 @@ SURVEY  <-
     filter( COMPLETE != "Incomplete" &
             BIRTHSEX != "OTHER" &
             !is.na(BIRTHSEX) ) %>% 
-   select( BIRTHSEX, RACE_SOUTHASIAN:RACE_OTHER, AGE, TRAINING_LEVEL, HEIGHT, GLOVE, GLOVE_SIZE_AVAILABLE, PERFORMANCE_HOURS, TEACHER_GENDER_PREFERENCE,
+   select( RECORD_ID, BIRTHSEX, RACE_SOUTHASIAN:RACE_OTHER, AGE, TRAINING_LEVEL, HEIGHT, GLOVE, GLOVE_SIZE_AVAILABLE, PERFORMANCE_HOURS, TEACHER_GENDER_PREFERENCE,
            FEMALE_TRAINERS, MALE_TRAINERS, EVER_INJURED, EXPERIENCED_TRANSIENT_PAIN_NO, EXPERIENCED_TRANSIENT_PAIN_HAND, EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER,
            EXPERIENCED_TRANSIENT_PAIN_BACK, EXPERIENCED_TRANSIENT_PAIN_LEG, EXPERIENCED_TRANSIENT_PAIN_FOOT, GROWING_PAINS,
            FELLOWSHIP_FORMAL_ERGO_TRAINING, INFORMAL_TRAINING, TRAINING_TECHNIQUES_POSTURAL, TRAINING_TECHNIQUES_BEDHEIGHT, TRAINING_TECHNIQUES_BEDANGLE,
@@ -1794,7 +1794,7 @@ SURVEY %>%
             rowwise() %>% 
             mutate(PAIN_SCORE = sum(PAIN_INJ+ PAIN_HAND+ PAIN_NECK+ PAIN_BACK + PAIN_LEG+ PAIN_FOOT)) %>% 
   
-    select( BIRTHSEX, BIRTHSEX2, RACE, RACE2, TRAINING_LEVEL, EVER_INJURED, starts_with("PAIN_") )
+    select( RECORD_ID, BIRTHSEX, BIRTHSEX2, RACE, RACE2, TRAINING_LEVEL, EVER_INJURED, starts_with("PAIN_") )
 
 
 
@@ -1847,7 +1847,7 @@ corr.test(  PAIN$BIRTHSEX2,PAIN$PAIN_SCORE, method= 'pearson')
 - Use of Dial Extenders (Yes=1, defaut=0)
 - Use of Pedi Colonoscopes (Yes=1, No=0)
 - Ergo Feedback from Teachers (Often=3, Sometimes=2, Rarely=1, Never=0)
-- Equipment optimizaiton (Yes=1, default=0)
+- Equipment optimizatIon (Yes=1, default=0)
 - Glove Size Available (Yes=1, default=0)
 - Dial Extenders Available (Yes=1, default=0)
 - Encouraged to Use Dial Ext (Yes=1, default=0)
@@ -1856,7 +1856,7 @@ corr.test(  PAIN$BIRTHSEX2,PAIN$PAIN_SCORE, method= 'pearson')
 - Formal Ergo Time-Out (Yes=1, No=0)
 - Informal Ergo Time-Out (Yes=1, No=0)
 - Monitors Easily Adjustable (Yes=1, No=0)
-- Teachers Sensitivity During Traiing (Yes=1, No=0)
+- Teachers Sensitivity During Training (Yes=1, No=0)
 - Received Tactile Instruction from Males (Yes=1, No=0)
 - Received Tactile Instruction from Females (Yes=1, default=0)
 
@@ -1943,7 +1943,7 @@ TRAINING <-
                                           TACTILE_INSTRUCTION_FROM_FEMALES == "Rarely" ~ 1,
                                           TRUE ~ 0))  %>% 
   rowwise() %>% 
-  mutate(TRNG_SCORE = sum(TRNG_FORMAL+ TRNG_INFORMAL+ TRNG_POSTURAL+ TRNG_BEDHT+ +TRNG_BEDANG+ TRNG_MONITOR+ TRNG_MANEUVERS+ TRNG_EXERCISE+ TRNG_DIALEXT+
+  mutate(RECORD_ID, TRNG_SCORE = sum(TRNG_FORMAL+ TRNG_INFORMAL+ TRNG_POSTURAL+ TRNG_BEDHT+ +TRNG_BEDANG+ TRNG_MONITOR+ TRNG_MANEUVERS+ TRNG_EXERCISE+ TRNG_DIALEXT+
                           TRNG_PEDISCOPE+ TRNG_FEEDBACK+ TRNG_OPTIM+ TRNG_GLOVE_AVAIL+ TRNG_DIALEXT_AVAIL+ TRNG_DIALEXT_ENC+ TRNG_PEDISCOPE_AVAIL+
                           TRNG_FITTED_APRON_AVAIL+ TRNG_TO_FORMAL+ TRNG_TO_INFORMAL+ TRNG_MONITORS_EASYADJ + TRNG_TRAINERS_SENSITIVITY+
                           TRNG_TACTILE_MALES+ TRNG_TACTILE_FEMALES)) %>% 
@@ -1976,6 +1976,186 @@ ggbetweenstats( data= TRAINING,
 corr.test(  TRAINING$BIRTHSEX2,TRAINING$TRNG_SCORE, method= 'pearson', ci=T)
 
 ```
+
+
+
+<br>
+  
+#### Question 3:  Since Traiing Score was insignificant (almost identical results for each sex), was it too broad?  What happens if we focus on quesetions that had more to do with "equipment ergonomics/availability," since something has to be driving the sex differences observed in the Pain/Injury score:
+
+
+- Equipment optimization (Yes=1, default=0)
+- Glove Size Available (Yes=1, default=0)
+- Dial Extenders Available (Yes=1, default=0)
+- Encouraged to Use Dial Ext (Yes=1, default=0)
+- Pediatric Colonoscopes Available (Yes=1, default=0)
+- Well-fitted Aprons Available (Yes=1, default=0)
+- Monitors Easily Adjustable (Yes=1, No=0)
+- Teachers Sensitivity During Training (Yes=1, No=0)
+
+
+<br>
+
+
+```{r PLAYGROUND-TRAINING-EQUIPMENT-SCORE }
+
+
+TRAINING <-
+  
+  SURVEY %>% 
+  mutate( BIRTHSEX2 = case_when( BIRTHSEX == "M" ~ 0,
+                                 TRUE ~ 1 ),
+          
+          TRNG_FORMAL = case_when (FELLOWSHIP_FORMAL_ERGO_TRAINING == 'Y' ~ 1,
+                                TRUE ~ 0 ),
+          
+          TRNG_INFORMAL = case_when (INFORMAL_TRAINING == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+          TRNG_POSTURAL = case_when (TRAINING_TECHNIQUES_POSTURAL == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+          TRNG_BEDHT = case_when (TRAINING_TECHNIQUES_BEDHEIGHT == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+          TRNG_BEDANG = case_when (TRAINING_TECHNIQUES_BEDANGLE == "Y" ~ 1,
+                                TRUE ~ 0),
+          
+          TRNG_MONITOR = case_when (TRAINING_TECHNIQUES_MONITORHEIGHT == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+          TRNG_MANEUVERS = case_when (TRAINING_TECHNIQUES_MUSCULOSKELETAL == "Y" ~ 1,
+                                    TRUE ~ 0) ,
+
+          TRNG_EXERCISE = case_when (TRAINING_TECHNIQUES_EXERCISE_STRETCHING == "Y" ~ 1,
+                                    TRUE ~ 0),
+          
+          TRNG_DIALEXT= case_when (TRAINING_TECHNIQUES_DIAL_EXTENDERS == "Y" ~ 1,
+                                   TRUE ~ 0),
+          
+          TRNG_PEDISCOPE= case_when (TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE == "Y" ~ 1,
+                                   TRUE ~ 0),
+          
+          TRNG_FEEDBACK= case_when (ERGO_FEEDBACK == "Often" ~ 3,
+                                    ERGO_FEEDBACK == "Sometimes" ~ 2,
+                                    ERGO_FEEDBACK == "Rarely" ~ 1,
+                                    TRUE ~ 0),
+          
+          TRNG_OPTIM= case_when (ERGO_OPTIMIZATION == "Y" ~ 1,
+                                 ERGO_OPTIMIZATION == "N" ~ 0,
+                                TRUE ~ 0),
+          
+          TRNG_GLOVE_AVAIL = case_when (GLOVE_SIZE_AVAILABLE == "Y" ~ 1,
+                                 TRUE ~ 0),
+          TRNG_DIALEXT_AVAIL= case_when (DIAL_EXTENDERS_AVAILABLE == "Y" ~ 1,
+                                        TRUE ~ 0),
+          TRNG_DIALEXT_ENC= case_when (DIAL_EXTENDERS_ENCOURAGED == "Y" ~ 1,
+                                                                    TRUE ~ 0),
+          TRNG_PEDISCOPE_AVAIL = case_when (PEDI_COLONOSCOPES_AVAILABLE == "Y" ~ 1,
+                                        TRUE ~ 0),
+          TRNG_FITTED_APRON_AVAIL = case_when (LEAD_APRONS_DONTKNOW == "Aware" ~ 1,
+                                            TRUE ~ 0),
+          
+          TRNG_TO_FORMAL= case_when (ERGO_FORMAL_TIMEOUT_PRIOR == "Y" ~ 1,
+                                            TRUE ~ 0),
+          TRNG_TO_INFORMAL= case_when (ERGO_INFORMAL_TIMEOUT_PRIOR == "Y" ~ 1,
+                                     TRUE ~ 0),
+
+          TRNG_MONITORS_EASYADJ = case_when (MONITORS_ADJUSTABLE == "Y" ~ 1,
+                                     TRUE ~ 0),
+          
+          TRNG_TRAINERS_SENSITIVITY = case_when (TEACHER_SENSITIVITY_STATURE_HANDSIZE == "Y" ~ 1,
+                                                  TRUE ~ 0),
+          
+          
+          TRNG_TACTILE_MALES = case_when (TACTILE_INSTRUCTION_FROM_MALES == "Often" ~ 2,
+                                          TACTILE_INSTRUCTION_FROM_MALES == "Rarely" ~ 1,
+                                                 TRUE ~ 0),
+          TRNG_TACTILE_FEMALES = case_when (TACTILE_INSTRUCTION_FROM_FEMALES == "Often" ~ 2,
+                                          TACTILE_INSTRUCTION_FROM_FEMALES == "Rarely" ~ 1,
+                                          TRUE ~ 0))  %>% 
+  rowwise() %>% 
+  mutate(TRNG_SCORE = sum(TRNG_FORMAL+ TRNG_INFORMAL+ TRNG_POSTURAL+ TRNG_BEDHT+ +TRNG_BEDANG+ TRNG_MONITOR+ TRNG_MANEUVERS+ TRNG_EXERCISE+ TRNG_DIALEXT+
+                          TRNG_PEDISCOPE+ TRNG_FEEDBACK+ TRNG_OPTIM+ TRNG_GLOVE_AVAIL+ TRNG_DIALEXT_AVAIL+ TRNG_DIALEXT_ENC+ TRNG_PEDISCOPE_AVAIL+
+                          TRNG_FITTED_APRON_AVAIL+ TRNG_TO_FORMAL+ TRNG_TO_INFORMAL+ TRNG_MONITORS_EASYADJ + TRNG_TRAINERS_SENSITIVITY+
+                          TRNG_TACTILE_MALES+ TRNG_TACTILE_FEMALES),
+                          
+          TRNG_SCORE2 = sum(TRNG_FORMAL+ TRNG_INFORMAL+ TRNG_POSTURAL+ TRNG_BEDHT+ +TRNG_BEDANG+ TRNG_MONITOR+ TRNG_MANEUVERS+ TRNG_EXERCISE+ TRNG_DIALEXT+
+                              TRNG_PEDISCOPE+ TRNG_FEEDBACK+ TRNG_TO_FORMAL+ TRNG_TO_INFORMAL+  TRNG_TRAINERS_SENSITIVITY+
+                              TRNG_TACTILE_MALES+ TRNG_TACTILE_FEMALES) ,
+         
+          EQUIP_SCORE = sum(TRNG_OPTIM+ TRNG_GLOVE_AVAIL+ TRNG_DIALEXT_AVAIL+ TRNG_DIALEXT_ENC+ TRNG_PEDISCOPE_AVAIL+
+                              TRNG_FITTED_APRON_AVAIL + TRNG_TRAINERS_SENSITIVITY+ TRNG_MONITORS_EASYADJ
+                              )) %>% 
+  
+  select( RECORD_ID, BIRTHSEX, BIRTHSEX2, AGE2, RACE, RACE2, TRAINING_LEVEL, starts_with("TRNG_"), starts_with("EQUIP_") )
+
+
+
+
+TRAINING %>% 
+  group_by(BIRTHSEX) %>% 
+  summarize( EQUIP = mean(EQUIP_SCORE),
+             TRNGSD = sd(EQUIP_SCORE))
+
+
+shapiro.test(TRAINING$EQUIP_SCORE)
+
+eov.ttest(TRAINING, EQUIP_SCORE, BIRTHSEX)
+
+ggbetweenstats( data= TRAINING,
+                x = BIRTHSEX,
+                y = EQUIP_SCORE,
+                type="parametric",
+                p.adjust.method = "none",
+                title = "Mean Equip/Ergo Scores by Birth Sex")
+
+
+SCORES <- sqldf( " select a.RECORD_ID,
+                          a.BIRTHSEX,
+                          b.AGE2,
+                          a.BIRTHSEX2,
+                          a.PAIN_SCORE,
+                          b.TRNG_SCORE,
+                          b.EQUIP_SCORE
+                 
+                  from  PAIN as a left join TRAINING as b on (a.RECORD_ID = b.RECORD_ID) ")
+
+
+pairs.panels(SCORES[-c(1:3)], pch=21, stars=T,) #CORRELATION MATRIX
+
+
+
+```
+
+
+<br>
+
+#### Simple Regressions
+
+
+<br>
+
+```{r PLAYGROUND-SIMPLE-REGRESSIONS }
+
+# BIRTHSEX predicting PAIN_SCORE
+
+summary(lm(PAIN_SCORE ~ BIRTHSEX , data = SCORES))
+
+
+# BIRTHSEX predicting PAIN_SCORE when controlled for EQUIP_SCORE
+
+summary(lm(PAIN_SCORE ~  BIRTHSEX + EQUIP_SCORE , data = SCORES))
+
+
+# BIRTHSEX predicting PAIN_SCORE when controlled for EQUIP_SCORE & AGEBAND
+
+summary(lm(PAIN_SCORE ~  BIRTHSEX + EQUIP_SCORE + AGE2 , data = SCORES))
+
+
+```
+
+
 
 
 
