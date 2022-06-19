@@ -2122,6 +2122,7 @@ ggbetweenstats( data= TRAINING,
 
 SCORES <- sqldf( " select a.RECORD_ID,
                           a.BIRTHSEX,
+                          b.TRAINING_LEVEL,
                           b.AGE2,
                           a.BIRTHSEX2,
                           b.AGENUM as AGE,
@@ -2133,7 +2134,7 @@ SCORES <- sqldf( " select a.RECORD_ID,
 
 
 
-pairs.panels(SCORES[-c(1:3)], pch=21, stars=T,) #CORRELATION MATRIX
+pairs.panels(SCORES[-c(1:4)], pch=21, stars=T,) #CORRELATION MATRIX
 
 
 
@@ -2165,6 +2166,15 @@ summary(lm(PAIN_SCORE ~  BIRTHSEX + EQUIP_SCORE , data = SCORES))
 
 summary(lm(PAIN_SCORE ~  BIRTHSEX + EQUIP_SCORE + AGE2 , data = SCORES))
 anova(lm(PAIN_SCORE ~ BIRTHSEX + EQUIP_SCORE + AGE2 , data = SCORES))
+
+
+
+# EQUIP_SCORE predicting PAIN_SCORE when controlled for BIRTHSEX & TRAINING_LEVEL & AGEBAND
+# Equipment Score be the "outcome of interest"?  
+
+
+summary(lm(PAIN_SCORE ~ EQUIP_SCORE + BIRTHSEX + TRAINING_LEVEL  , data = SCORES))
+anova(lm(PAIN_SCORE   ~ EQUIP_SCORE + BIRTHSEX + TRAINING_LEVEL , data = SCORES))
 
 ```
 
