@@ -511,6 +511,18 @@ ggbetweenstats( data= SURVEY,
                 p.adjust.method = "none")
 
 
+
+  SURVEY %>% 
+      filter( !is.na(GLOVE) ) %>% 
+  ggplot(aes( x=GLOVE, y= stat(density), fill= BIRTHSEX))+
+  geom_density( alpha=0.5, position = "identity" ) + 
+  scale_x_continuous(breaks = scales::breaks_width(0.5) ) +
+    scale_y_continuous(breaks = scales::breaks_width(.25))+
+    scale_fill_manual(values = c("red","darkgreen"), name ="Birth Sex", labels = c("Female","Male"))+
+  xlab("Glove Size")+ ylab("Density")+
+  ggtitle("Glove Size Density Curve by Sex",  subtitle = "Shows F/M distributions are almost identical, just off by one full size") +
+  theme_538()
+
 ```
 
 <br> 
@@ -2171,7 +2183,6 @@ anova(lm(PAIN_SCORE ~ BIRTHSEX + EQUIP_SCORE + AGE2 , data = SCORES))
 
 # EQUIP_SCORE predicting PAIN_SCORE when controlled for BIRTHSEX & TRAINING_LEVEL & AGEBAND
 # Equipment Score be the "outcome of interest"?  
-
 
 summary(lm(PAIN_SCORE ~ EQUIP_SCORE + BIRTHSEX + TRAINING_LEVEL  , data = SCORES))
 anova(lm(PAIN_SCORE   ~ EQUIP_SCORE + BIRTHSEX + TRAINING_LEVEL , data = SCORES))
