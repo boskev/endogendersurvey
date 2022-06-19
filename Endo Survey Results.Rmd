@@ -2102,8 +2102,8 @@ TRAINING <-
 
 TRAINING %>% 
   group_by(BIRTHSEX) %>% 
-  summarize( EQUIP = mean(EQUIP_SCORE),
-             TRNGSD = sd(EQUIP_SCORE))
+  summarize( EQUIPM = mean(EQUIP_SCORE),
+             EQUIPSD = sd(EQUIP_SCORE))
 
 
 shapiro.test(TRAINING$EQUIP_SCORE)
