@@ -1981,7 +1981,7 @@ corr.test(  TRAINING$BIRTHSEX2,TRAINING$TRNG_SCORE, method= 'pearson', ci=T)
 
 <br>
   
-#### Question 3:  Since Traiing Score was insignificant (almost identical results for each sex), was it too broad?  What happens if we focus on quesetions that had more to do with "equipment ergonomics/availability," since something has to be driving the sex differences observed in the Pain/Injury score:
+#### Question 3:  Since Training Score was insignificant (almost identical results for each sex), was it too broad?  What happens if we focus on quesetions that had more to do with "equipment ergonomics/availability," since something has to be driving the sex differences observed in the Pain/Injury score:
 
 
 - Equipment optimization (Yes=1, default=0)
