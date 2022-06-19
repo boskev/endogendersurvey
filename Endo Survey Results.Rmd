@@ -2006,6 +2006,8 @@ TRAINING <-
   mutate( BIRTHSEX2 = case_when( BIRTHSEX == "M" ~ 0,
                                  TRUE ~ 1 ),
           
+         # AGE2 = factor(AGE2, levels=rev(levels(AGE2))),
+          
           AGENUM  = case_when (AGE2 == "< 30" ~ 1,
                                AGE2 == "30-34" ~2,
                                AGE2 == "35-40" ~3,
@@ -2142,7 +2144,7 @@ pairs.panels(SCORES[-c(1:3)], pch=21, stars=T,) #CORRELATION MATRIX
 
 <br>
 
-#### Simple Regressions
+#### Simple Regressions to Predict Pain Score (Likelihood to Sustain Pain/Injury)
 
 
 <br>
@@ -2153,18 +2155,103 @@ pairs.panels(SCORES[-c(1:3)], pch=21, stars=T,) #CORRELATION MATRIX
 
 summary(lm(PAIN_SCORE ~ BIRTHSEX , data = SCORES))
 
-
 # BIRTHSEX predicting PAIN_SCORE when controlled for EQUIP_SCORE
 
 summary(lm(PAIN_SCORE ~  BIRTHSEX + EQUIP_SCORE , data = SCORES))
-
 
 
 # BIRTHSEX predicting PAIN_SCORE when controlled for EQUIP_SCORE & AGEBAND
 
 
 summary(lm(PAIN_SCORE ~  BIRTHSEX + EQUIP_SCORE + AGE2 , data = SCORES))
+anova(lm(PAIN_SCORE ~ BIRTHSEX + EQUIP_SCORE + AGE2 , data = SCORES))
 
+```
+
+
+
+
+<br>
+  
+#### Question 4:  What happens if we attempt to compute a "Respect Score?"  Gender differences?
+
+
+- Confident Asking Nurses (Yes=1, default=0)
+- Confident Asking Assistants (Yes=1, default=0)
+- Frequency Asking Nurses (More than Twice=3, Twice=2, Once=1, default=0)
+- Recognized by ES Staff (Yes=1, default=0)
+- Recognized by Anesthetists (Yes=1, default=0)
+- Recognized by GI Attending (Yes=1, default=0)
+- First Name Used No Permission (Yes=1, No=0)
+
+
+<br>
+
+
+
+```{r PLAYGROUND-RESPECT}
+
+# CREATE RESPECT INDEX 
+
+RESPECT <-
+  
+  SURVEY %>% 
+  mutate( BIRTHSEX2 = case_when( BIRTHSEX == "M" ~ 0,
+                                 TRUE ~ 1 ),
+          
+          RESPECT_NURSES = case_when (COMFORTABLE_ASKING_NURSES == 'Y' ~ 1,
+                                TRUE ~ 0 ),
+          
+          RESPECT_TECHS = case_when (COMFORTABLE_ASKING_TECHS == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+          RESPECT_NFREQ = case_when (NURSES_ASKING == "More than Twice" ~ 3,
+                                     NURSES_ASKING == "Twice" ~ 2,
+                                     NURSES_ASKING == "Once" ~ 1,
+                                     TRUE ~ 0),
+          
+          RESPECT_ESTAFF = case_when (RECOGNIZED_RESPECTED_ES_STAFF == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+          RESPECT_ANES = case_when (RECOGNIZED_RESPECTED_ANESTHETISTS == "Y" ~ 1,
+                                TRUE ~ 0),
+          
+          RESPECT_GIATT = case_when (RECOGNIZED_RESPECTED_GASTRO_ATTENDING == "Y" ~ 1,
+                                 TRUE ~ 0),
+  
+          RESPECT_FNAME =  case_when (FIRST_NAME_NO_PERMISSION == "Y" ~ 1,
+                                         TRUE ~ 0)) %>% 
+  
+  
+  rowwise() %>% 
+  mutate(RESPECT_SCORE = sum( RESPECT_NURSES + RESPECT_TECHS + RESPECT_NFREQ + RESPECT_ESTAFF + RESPECT_ANES + 
+                           RESPECT_GIATT + RESPECT_FNAME)) %>% 
+  
+  select( BIRTHSEX, BIRTHSEX2, AGE2, RACE, RACE2, TRAINING_LEVEL, EVER_INJURED, starts_with("RESPECT_") )
+
+
+
+RESPECT %>% 
+  group_by(BIRTHSEX) %>% 
+  summarize( RSPECTMEAN = mean(RESPECT_SCORE),
+             RSPECTSD = sd(RESPECT_SCORE))
+
+
+
+
+
+shapiro.test(RESPECT$RESPECT_SCORE)
+
+eov.ttest(RESPECT, RESPECT_SCORE, BIRTHSEX)
+eov.ttest(RESPECT, RESPECT_SCORE, RACE2)
+
+
+ggbetweenstats( data= RESPECT,
+                x = BIRTHSEX,
+                y = RESPECT_SCORE,
+                type="parametric",
+                p.adjust.method = "none",
+                title = "Mean RESPECT Scores by Birth Sex")
 
 ```
 
