@@ -339,6 +339,20 @@ plot_xtab(SURVEY$AGE2, SURVEY$BIRTHSEX, margin = "row",
   set_theme(base= theme_classic())
 
 
+SUBSET2 <-
+SURVEY %>% 
+  filter( !is.na(AGE2)) %>% 
+  mutate(BIRTHSEX = recode_factor( BIRTHSEX, "M" = "MALES", "F" = "FEMALES", .ordered=T))
+
+
+ggplot(  SUBSET2, aes(x= AGE2)) + facet_grid( SUBSET2$BIRTHSEX ) +  
+  geom_bar(aes(fill= BIRTHSEX) ) +
+  stat_count(geom="text", aes(label=..count..), vjust= -.1) + 
+  scale_fill_manual( values = c( "MALES"="darkgrey", "FEMALES"="#006cc5"), guide = "none" )+
+  theme_538()  +
+  xlab("Age Bands")+ ylab("Counts") 
+
+
 #Alternative View, if Birth Sex by Age is desired 
 
 
@@ -370,6 +384,20 @@ plot_xtab(SURVEY$RACE, SURVEY$BIRTHSEX, margin = "row",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
+
+
+SUBSET2 <-
+SURVEY %>% 
+  filter( !is.na(RACE)) %>% 
+  mutate(BIRTHSEX = recode_factor( BIRTHSEX, "M" = "MALES", "F" = "FEMALES", .ordered=T))
+
+
+ggplot(  SUBSET2, aes(x= RACE)) + facet_grid( SUBSET2$BIRTHSEX ) +  
+  geom_bar(aes(fill= BIRTHSEX) ) +
+  stat_count(geom="text", aes(label=..count..), vjust= -.05) + 
+  scale_fill_manual( values = c( "MALES"="darkgrey", "FEMALES"="#006cc5"), guide = "none" )+
+  theme_538()  +
+  xlab("Race/Ethnicity Categories")+ ylab("Counts") 
 
 
 #Alternative View, if Birth Sex by Race is desired 
