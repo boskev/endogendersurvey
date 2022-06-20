@@ -2183,6 +2183,37 @@ anova(lm(PAIN_SCORE ~ BIRTHSEX + EQUIP_SCORE + AGE2 , data = SCORES))
 
 
 
+
+# COMPARE how M/F PAIN_SCORE means differ in unadjusted and fully adjusted model
+
+
+library(emmeans)
+
+#unadjusted model
+pscore.unadj <- emmeans(lm(PAIN_SCORE ~ BIRTHSEX , data = SCORES), specs=  "BIRTHSEX")
+summary(pscore.unadj)
+contrast(pscore.unadj, list(FvM = c(1,-1)))
+
+
+
+#fully adjusted model
+pscore.adj <- emmeans(lm(PAIN_SCORE ~ BIRTHSEX + EQUIP_SCORE + AGE2 , data = SCORES), specs=  "BIRTHSEX")
+summary(pscore.adj)
+contrast(pscore.adj, list(FvM = c(1,-1)))
+
+
+
+#Compare all combinations of BIRTHSEX-AGE2 to see if any sliver is significantly different (after Benjamini-Hochberg correction for mulitple comparison)
+
+pscore.adj2 <- emmeans(lm(PAIN_SCORE ~ BIRTHSEX + EQUIP_SCORE + AGE2 , data = SCORES), specs=  c("BIRTHSEX","AGE2"))
+summary(pscore.adj2)
+pairs(pscore.adj2, adjust="bh", type="response")
+
+#FINDING:  In the fully-adjusted model, of the 28 possible SEX/AGEBAND combinations, the one that is statistically significant - and survives a correction for multiple comparisons - is "Males < 30" versus "Females 30-34." Here the Female mean is 1.327 points higher than the Male's, p=0.0292.  (The F-M differential for entire adjusted model was only 0.388 points.)
+
+
+
+
 # EQUIP_SCORE predicting PAIN_SCORE when controlled for BIRTHSEX & TRAINING_LEVEL & AGEBAND
 # Should Equipment Score be the "outcome of interest"? (In other words, EQUIP_SCORE observed after controlling for Sex and Training Level ... or Age?) 
 
