@@ -959,7 +959,7 @@ plot_xtab(SURVEY$ERGO_TRAINING_BUDGET, SURVEY$BIRTHSEX, margin = "row",
 #Alternative View, if Birth Sex by Ergo Training Budget is desired 
 
 
-CrossTable(SURVEY$BIRTHSEX, SURVEY$ERGO_TRAINING_BUDGET, prop.chisq=F, prop.c=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+CrossTable(SURVEY$ERGO_TRAINING_BUDGET, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
 
 
 
