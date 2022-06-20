@@ -2146,7 +2146,9 @@ SCORES <- sqldf( " select a.RECORD_ID,
 
 
 
-pairs.panels(SCORES[-c(1:4)], pch=21, stars=T,) #CORRELATION MATRIX
+#CORRELATION MATRIX
+
+pairs.panels(SCORES[-c(1:4)], pch=21, stars=T,) 
 
 
 
@@ -2182,7 +2184,7 @@ anova(lm(PAIN_SCORE ~ BIRTHSEX + EQUIP_SCORE + AGE2 , data = SCORES))
 
 
 # EQUIP_SCORE predicting PAIN_SCORE when controlled for BIRTHSEX & TRAINING_LEVEL & AGEBAND
-# Equipment Score be the "outcome of interest"?  
+# Should Equipment Score be the "outcome of interest"? (In other words, EQUIP_SCORE observed after controlling for Sex and Training Level ... or Age?) 
 
 summary(lm(PAIN_SCORE ~ EQUIP_SCORE + BIRTHSEX + TRAINING_LEVEL  , data = SCORES))
 anova(lm(PAIN_SCORE   ~ EQUIP_SCORE + BIRTHSEX + TRAINING_LEVEL , data = SCORES))
