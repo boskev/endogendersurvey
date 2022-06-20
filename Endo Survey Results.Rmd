@@ -2203,14 +2203,14 @@ contrast(pscore.adj, list(FvM = c(1,-1)))
 
 
 
-#Compare all combinations of BIRTHSEX-AGE2 to see if any sliver is significantly different (after Benjamini-Hochberg correction for mulitple comparison)
+#Compare all combinations of BIRTHSEX-AGE2 to see if any sliver is significantly different (after Benjamini-Hochberg correction for multiple comparisons)
 
 pscore.adj2 <- emmeans(lm(PAIN_SCORE ~ BIRTHSEX + EQUIP_SCORE + AGE2 , data = SCORES), specs=  c("BIRTHSEX","AGE2"))
 summary(pscore.adj2)
 pairs(pscore.adj2, adjust="bh", type="response")
 
 #FINDING:  
-#In the fully-adjusted model, of the 28 possible SEX/AGEBAND combinations, the one that is statistically significant - and survives a correction for multiple comparisons - is "Males < 30" versus "Females 30-34." Here the Female mean is 1.327 points higher than the Male's, p=0.0292.  (The F-M differential for entire adjusted model was only 0.388 points.)
+#In the fully-adjusted model, of the 28 possible SEX/AGEBAND combinations, the one that is statistically significant - and survives a correction for multiple comparisons - is "Males < 30" versus "Females 30-34." Here the Females' mean is 1.327 points higher than the Males', p=0.0292.  (The F-M differential for entire adjusted model was only 0.388 points.)
 
 
 #Since Females 30-34 have the highest adjusted Pain Score, how does that score compare to the mean Pain Score of ALL OTHER RESPONDENTS?
