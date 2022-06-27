@@ -320,7 +320,7 @@ glimpse(SURVEY)
 ```{r CROSSTAB-BIRTHSEX-AGE }
   
 
-#Chi-Square Test of Proportions
+#Female/Male Totals
 
 sqldf("select BIRTHSEX,
               count(RECORD_ID) as N
@@ -328,7 +328,15 @@ sqldf("select BIRTHSEX,
        where BIRTHSEX in ('F','M') 
        group by 1")
 
-females_males = c(length(SURVEY$BIRTHSEX[SURVEY$BIRTHSEX =="F"]), length(SURVEY$BIRTHSEX[SURVEY$BIRTHSEX =="M"]))
+
+#Chi-Square Test of Proportions
+
+fcount <- length(SURVEY$BIRTHSEX[SURVEY$BIRTHSEX =="F"])
+mcount <- length(SURVEY$BIRTHSEX[SURVEY$BIRTHSEX =="M"])
+fcount
+mcount
+
+females_males = c(fcount, mcount )
 chisq.test(females_males, p= c(1/2, 1/2))
 
 
