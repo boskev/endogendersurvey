@@ -322,7 +322,13 @@ glimpse(SURVEY)
 
 #Chi-Square Test of Proportions
 
-females_males = c(99, 101)
+sqldf("select BIRTHSEX,
+              count(RECORD_ID) as N
+       from SURVEY 
+       where BIRTHSEX in ('F','M') 
+       group by 1")
+
+females_males = c(length(SURVEY$BIRTHSEX[SURVEY$BIRTHSEX =="F"]), length(SURVEY$BIRTHSEX[SURVEY$BIRTHSEX =="M"]))
 chisq.test(females_males, p= c(1/2, 1/2))
 
 
