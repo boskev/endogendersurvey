@@ -1772,14 +1772,28 @@ plot_xtab(SURVEY$BIRTHSEX, SURVEY$WHEN_DISABILITY_INSURANCE, margin = "row",
 
 
 
+# CORRECT <-
+#   
+#   SURVEY %>% 
+#   mutate(CORRECT = across(.cols =  ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE , .fns = str_count, "Correct")) %>%
+#           rowwise() %>%
+#           mutate(COUNT_CORRECT = across(.cols = contains("Correct"), .fns = sum)) %>% 
+#           select (BIRTHSEX, ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE, COUNT_CORRECT) %>% 
+#           mutate( COUNT_CORRECT = as.integer(COUNT_CORRECT) )
+
+
+# CORRECT <-
+#    SURVEY %>% 
+#     select (BIRTHSEX, ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE,) %>% 
+#     mutate( COUNT_CORRECT = apply( . , 1, function(x) sum( "Correct" == x , na.rm= T )))
+
+
+
 CORRECT <-
-  
-  SURVEY %>% 
-  mutate(CORRECT = across(.cols =  ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE , .fns = str_count, "Correct")) %>%
-          rowwise() %>%
-          mutate(COUNT_CORRECT = across(.cols = contains("Correct"), .fns = sum)) %>% 
-          select (BIRTHSEX, ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE, COUNT_CORRECT) %>% 
-          mutate( COUNT_CORRECT = as.integer(COUNT_CORRECT) )
+   SURVEY %>% 
+    select (BIRTHSEX, ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE,) %>% 
+    mutate( COUNT_CORRECT = rowSums( . == "Correct" ))
+
 
 eov.ttest(CORRECT, COUNT_CORRECT, BIRTHSEX)  
 
@@ -1811,7 +1825,7 @@ ggbetweenstats( data= CORRECT,
 ##### PAIN_SCORE variable is created by turing six questions into numeric variables with binary values:
 
 - Sustained endoscopy-related injury (Yes = 1, No/NA = 0)
-- Tranisient pain experienced in hand (Yes = 1, No/NA = 0)
+- Transient pain experienced in hand (Yes = 1, No/NA = 0)
 - Transient pain experience in neck/shoulders (Yes = 1, No/NA = 0)
 - Transient pain experienced in back (Yes = 1, No/NA = 0)
 - Transient pain experienced in legs (Yes = 1, No/NA = 0)
