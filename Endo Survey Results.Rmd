@@ -1890,6 +1890,15 @@ ggbetweenstats( data= PAIN,
                 p.adjust.method = "none",
                 title = "Mean Pain/Injury Scores by Birth Sex")
 
+PAIN %>%
+ggplot(aes( x= PAIN_SCORE, y= stat(density), fill= BIRTHSEX))+
+geom_density( alpha=0.5, position = "identity" ) +
+scale_x_continuous(breaks = scales::breaks_width(1.0) ) +
+scale_y_continuous(breaks = scales::breaks_width(.1))+
+scale_fill_manual(values = c("red","darkgreen"), name ="Birth Sex", labels = c("Female","Male"))+
+xlab("Pain Score")+ ylab("Density")+
+ggtitle("Pain Score Density Curve by Sex") +
+theme_538()
 
 
 corr.test(  PAIN$BIRTHSEX2,PAIN$PAIN_SCORE, method= 'pearson')
