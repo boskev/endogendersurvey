@@ -2311,7 +2311,7 @@ anova(lm(PAIN_SCORE   ~ EQUIP_SCORE + BIRTHSEX + TRAINING_LEVEL , data = SCORES)
 
 - Confident Asking Nurses (Yes=1, default=0)
 - Confident Asking Assistants (Yes=1, default=0)
-- Frequency Asking Nurses (More than Twice=3, Twice=2, Once=1, default=0)
+- Frequency Asking Nurses (More than Twice=0, Twice=1, Once=2, default=2)
 - Recognized by ES Staff (Yes=1, default=0)
 - Recognized by Anesthetists (Yes=1, default=0)
 - Recognized by GI Attending (Yes=1, default=0)
@@ -2338,10 +2338,10 @@ RESPECT <-
           RESPECT_TECHS = case_when (COMFORTABLE_ASKING_TECHS == "Y" ~ 1,
                                  TRUE ~ 0),
           
-          RESPECT_NFREQ = case_when (NURSES_ASKING == "More than Twice" ~ 3,
-                                     NURSES_ASKING == "Twice" ~ 2,
-                                     NURSES_ASKING == "Once" ~ 1,
-                                     TRUE ~ 0),
+          RESPECT_NFREQ = case_when (NURSES_ASKING == "More than Twice" ~ 0,
+                                     NURSES_ASKING == "Twice" ~ 1,
+                                     NURSES_ASKING == "Once" ~ 2,
+                                     TRUE ~ 2),
           
           RESPECT_ESTAFF = case_when (RECOGNIZED_RESPECTED_ES_STAFF == "Y" ~ 1,
                                  TRUE ~ 0),
