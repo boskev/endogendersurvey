@@ -2315,7 +2315,7 @@ anova(lm(PAIN_SCORE   ~ EQUIP_SCORE + BIRTHSEX + TRAINING_LEVEL , data = SCORES)
 - Recognized by ES Staff (Yes=1, default=0)
 - Recognized by Anesthetists (Yes=1, default=0)
 - Recognized by GI Attending (Yes=1, default=0)
-- First Name Used No Permission (Yes=1, No=0)
+- First Name Used No Permission (Yes=0, No=1)
 
 
 <br>
@@ -2352,8 +2352,8 @@ RESPECT <-
           RESPECT_GIATT = case_when (RECOGNIZED_RESPECTED_GASTRO_ATTENDING == "Y" ~ 1,
                                  TRUE ~ 0),
   
-          RESPECT_FNAME =  case_when (FIRST_NAME_NO_PERMISSION == "Y" ~ 1,
-                                         TRUE ~ 0)) %>% 
+          RESPECT_FNAME =  case_when (FIRST_NAME_NO_PERMISSION == "Y" ~ 0,
+                                         TRUE ~ 1)) %>% 
   
   
   rowwise() %>% 
