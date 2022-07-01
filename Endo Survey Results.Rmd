@@ -102,7 +102,7 @@ SURVEY  <-
     mutate( TRAINING_LEVEL = recode_factor( TRAINING_LEVEL, 'First year fellow'= 'First Year', 
                                                             'Second year fellow'= 'Second Year', 
                                                             'Third year fellow' = 'Third Year', 
-                                                            'Advanced fellow' = "Avanced", .ordered = T) ) %>% 
+                                                            'Advanced fellow' = "Advanced", .ordered = T) ) %>% 
    mutate( HEIGHT2 = factor(HEIGHT, levels= c("< 5'", "5-5'3", "5'4-5'6", "5'7-5'9", "5'10-6'", "6'1-6'4", "> 6'4"))) %>% 
    mutate( PERFORMANCE_HOURS = factor(PERFORMANCE_HOURS),
            PERFORMANCE_HOURS = recode_factor(PERFORMANCE_HOURS, "< 10" = "< 10",
@@ -1817,8 +1817,112 @@ ggbetweenstats( data= CORRECT,
 
 ```
 
+***
+***
+
+#### QUICK CORRELATIONS & ASSOCIATIONS
 
 
+<br>
+  
+#### Task 1:  Produce a CORRELATION MATRIX that displays the high-level associations among Sex, Race, Age, Height and Glove Size with other key variables of interest
+
+
+```{r TASKS-CORRELATION-MATRIX }
+
+
+CORRMATRIX <-
+
+  SURVEY %>%
+  select (BIRTHSEX, RACE2, AGE2, TRAINING_LEVEL, HEIGHT2, GLOVE, EVER_INJURED, ERGO_OPTIMIZATION, TEACHER_SENSITIVITY_STATURE_HANDSIZE,
+          FIRST_NAME_NO_PERMISSION, EXPERIENCED_TRANSIENT_PAIN_HAND : EXPERIENCED_TRANSIENT_PAIN_FOOT ) %>% 
+  
+  na.omit()  %>% 
+  
+  mutate( SEX = case_when(
+                              # is.na(BIRTHSEX) ~ NA_real_,
+                              BIRTHSEX == "M" ~ 0,
+                                 TRUE ~ 1 ) ,
+          
+          RACE = case_when( RACE2 == "WHITE" ~ 0,
+                            TRUE  ~ 1),
+          
+          AGECAT = case_when( AGE2 == "< 30" ~ 1,
+                              AGE2 == "30-34" ~ 2,
+                              AGE2 == "35-40" ~3,
+                              TRUE ~ 4),
+          
+          TRNG_LEVEL = case_when( TRAINING_LEVEL == 'First Year' ~ 1,
+                                  TRAINING_LEVEL == 'Second Year' ~ 2,
+                                  TRAINING_LEVEL == 'Third Year' ~ 3,
+                                  TRUE  ~ 4) ,
+          
+          HEIGHT = case_when( HEIGHT2 == "< 5" ~ 1,
+                              HEIGHT2 == "5'1-5'3" ~ 2,
+                              HEIGHT2 == "5'4-5'6" ~ 3,
+                              HEIGHT2 == "5'7-5'9" ~ 4,
+                              HEIGHT2 == "5'10-6'" ~ 5,
+                              HEIGHT2 == "6'1-6'4" ~ 6,
+                                         TRUE ~ 7),
+          
+          INJURY = case_when(  EVER_INJURED== "Y" ~ 1,
+                                    TRUE ~ 0)  ,
+          
+          TPAIN =  case_when(     EXPERIENCED_TRANSIENT_PAIN_HAND == "Y" |
+                                   EXPERIENCED_TRANSIENT_PAIN_FOOT == "Y" |
+                                   EXPERIENCED_TRANSIENT_PAIN_HAND == "Y" |
+                                   EXPERIENCED_TRANSIENT_PAIN_LEG == "Y" |
+                                   EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER == "Y" ~ 1,
+                                   TRUE ~ 0),
+          
+          
+          ERGO_OPTIM =  case_when( ERGO_OPTIMIZATION == "Y" ~ 1,
+                                    TRUE ~ 0),
+                                   
+          SENSITIVE_TEACHER = case_when (TEACHER_SENSITIVITY_STATURE_HANDSIZE == "Y" ~ 1,
+                                          TRUE ~ 0),
+          
+          FNAME_NP =  case_when (FIRST_NAME_NO_PERMISSION == "Y" ~ 1,
+                                 TRUE ~ 0)) %>% 
+  
+  select( SEX, RACE, AGECAT, TRNG_LEVEL, HEIGHT, GLOVE, INJURY, TPAIN, ERGO_OPTIM, SENSITIVE_TEACHER, FNAME_NP)
+
+
+
+pairs.panels( CORRMATRIX, pch=21, stars=T,) 
+
+
+
+
+
+```
+
+
+
+###### There does not appear to be any association in this sample with HEIGHT or GLOVE and having sustained an injury or experienced any of the five specific transient pain types listed in the survey.  Does this change if we adjust the correlations based on sex?  Or race?
+
+```{r TASKS-CORRELATION-PARITALS }
+
+require(ppcor)
+
+#Partial Correlation:  HEIGHT + INJURY correlation adjusted for SEX and then RACE
+
+attach(CORRMATRIX)
+
+pcor.test( x=HEIGHT, y=INJURY, z=SEX, method= 'pearson' )
+pcor.test( x=HEIGHT, y=INJURY, z=RACE, method= 'pearson' )
+
+
+
+#Partial Correlation:  GLOVE + INJURY correlation adjusted for SEX and then RACE
+
+attach(CORRMATRIX)
+
+pcor.test( x=GLOVE, y=INJURY, z=SEX, method= 'pearson' )
+pcor.test( x=GLOVE, y=INJURY, z=RACE, method= 'pearson' )
+
+
+```
 
 
 
