@@ -1828,7 +1828,7 @@ ggbetweenstats( data= CORRECT,
 #### Task 1:  Produce a CORRELATION MATRIX that displays the high-level associations among Sex, Race, Age, Height and Glove Size with other key variables of interest
 
 
-```{r TASKS-CORRELATION-MATRIX }
+```{r TASKS-CORRELATION-MATRIX, fig.align='center', fig.dim= c(12,12) }
 
 
 CORRMATRIX <-
@@ -1923,6 +1923,134 @@ pcor.test( x=GLOVE, y=INJURY, z=RACE, method= 'pearson' )
 
 
 ```
+
+
+<br>
+  
+#### Task 2: How are the associations/correlations for certain variables affected if we statify them by Training Level?
+
+
+- Ergonomic Optimizaiton
+- Injury
+- Transient Pain
+- Sensitive Teachers
+- First Name No Permission
+
+
+<br>
+
+
+```{r TASKS-CORRELATIONS-TRAINING-LEVEL, fig.align='center', fig.dim= c(12,14)}
+
+require(ggcorrplot)
+
+#Paneled Correlation Matrices for each level of "Training Level" (4)
+
+
+CORRMATRIX %>%
+  mutate(TRNG_LEVEL = factor(TRNG_LEVEL),
+         TRNG_LEVEL = recode_factor(TRNG_LEVEL, '1'= 'First Yr', '2'= "Second Yr", '3'= "Third Yr", '4'="Advanced", .ordered=T)) %>%
+  select(TRNG_LEVEL, ERGO_OPTIM, INJURY, TPAIN, SENSITIVE_TEACHER, FNAME_NP) %>%
+  
+  grouped_ggcorrmat(
+    ## arguments relevant for `ggcorrmat`
+    data = . ,
+    
+    grouping.var = TRNG_LEVEL,
+    ## arguments relevant for `combine_plots`
+    plotgrid.args = list(nrow = 2),
+    annotation.args = list(
+      tag_levels = "1",
+      title = "Relationship between Variables across Training Level"
+    ),
+    p.adjust.method = "none"
+  )
+
+
+```
+
+##### There apprears to be a few slightly significant correlations that might be worth exploring with simple regression:
+
+- First Year: Transient Pain with both Ergo Optimization and Sensitive Teacher
+- Second Year: First Name & Ergo Optimization (???)
+- Advanced:  Transient Pain & Ergo Optimization
+
+<br>
+
+Let's explore further with few unadjusted/adjusted regressions where Transient Pain is the outcome and Ergo Optimization is the outcome:
+
+<br>
+
+
+```{r TASKS-CORRELATIONS-TRAINING-LEVEL-EXPLORATORY-REGRESSION1 }
+
+require(car)
+
+TLEVEL <-
+CORRMATRIX %>%
+  mutate(TRNG_LEVEL = factor(TRNG_LEVEL),
+         TRNG_LEVEL = recode_factor(TRNG_LEVEL, '1'= 'First Yr', '2'= "Second Yr", '3'= "Third Yr", '4'="Advanced", .ordered=F)) %>%
+  select(TRNG_LEVEL, ERGO_OPTIM, INJURY, TPAIN, SENSITIVE_TEACHER, FNAME_NP)
+  
+
+
+  #1. Does Ergonomic Optimization influence reports of Transient Pain, with and without adjusting for Training Level?
+
+  summary(lm( TPAIN ~ ERGO_OPTIM, data= TLEVEL))
+  summary(lm( TPAIN ~ ERGO_OPTIM + relevel(TRNG_LEVEL, ref="Advanced"), data= TLEVEL ))
+  car::Anova(lm( TPAIN ~ ERGO_OPTIM + TRNG_LEVEL, data= TLEVEL ), type="III")
+  
+```
+
+<br>
+
+- **Conclusion:**  Ergonomic Optimization is a significant effect before and after adjust for Training Level, which itself is *not* a significant effect. (Beta for EO decreases from -0.125 to -0.114, meaning that as Ergo Optimization increases, it causes Transient Pain reports to decline.) However, when compared to the reference category ("Advanced"), the impact on Second Year residents is a trend.
+
+
+<br>
+
+
+```{r TASKS-CORRELATIONS-TRAINING-LEVEL-EXPLORATORY-REGRESSION2 }
+
+
+#2. Does having a Sensitive Teacher with concern for your size/stature influence reports of Transient Pain, with and without adjusting for Training Level?
+  
+  
+  summary(lm( TPAIN ~ SENSITIVE_TEACHER, data= TLEVEL))
+  summary(lm( TPAIN ~ SENSITIVE_TEACHER +  relevel(TRNG_LEVEL, ref="Advanced"), data= TLEVEL ))
+  car::Anova(lm( TPAIN ~ SENSITIVE_TEACHER + TRNG_LEVEL, data= TLEVEL ), type="III")
+  
+```
+  
+<br>
+  
+- **Conclusion:**  Sensitive Teacher is a slightly significant effect before and after adjust for Training Level, which itself is *not* a significant effect. (Beta for ST increases slightly from -0.0925 to -0.0978, meaning that as Teacher Sensitivity increases, it causes Transient Pain reports to slightly decline.) However, when compared to the reference category ("Advanced"), the impact on Second Year residents is a very significant (p= 0.0248)
+
+<br>
+  
+ 
+ 
+```{r TASKS-CORRELATIONS-TRAINING-LEVEL-EXPLORATORY-REGRESSION3 } 
+
+
+  #3. Does having a Sensitive Teacher with concern for your size/stature influence the use/encouragment of Ergonomic Optimizaiton, with and without adjusting for Training Level?
+  
+  summary(lm( ERGO_OPTIM ~ SENSITIVE_TEACHER, data= TLEVEL))
+  summary(lm( ERGO_OPTIM ~ SENSITIVE_TEACHER +  relevel(TRNG_LEVEL, ref="Advanced"), data= TLEVEL ))
+  car::Anova(lm( ERGO_OPTIM ~ SENSITIVE_TEACHER +  TRNG_LEVEL, data= TLEVEL ), type="III")
+  
+```
+  
+<br>
+
+- **Conclusion:**  Sensitive Teacher is a highly significant effect before, and an extremely highly significant effect after adjusting for Training Level, which itself is a trend (almost significant). (Beta for ST increases slightly from +0.186 to +0.204, meaning that as Teacher Sensitivity increases, reports of Ergonomic Optimization also rise.)  When compared to the reference category ("Advanced"), *ALL* other training levels are significantly different (i.e., lower).  Does this suggest that teachers are more likely to be sensitive to ergonomics in the Endoscopy Suite when dealing with older trainees, or does it suggest that younger trainees don't really know what proper ergonomics should entail and how to rate their instructors on this metric?
+
+<br>
+
+<br>
+
+
+
 
 
 
@@ -2333,6 +2461,15 @@ pairs.panels(SCORES[-c(1:4)], pch=21, stars=T,)
 
 
 ```
+
+
+
+
+
+
+
+
+
 
 
 <br>
