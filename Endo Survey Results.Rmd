@@ -1837,27 +1837,30 @@ CORRMATRIX <-
   select (BIRTHSEX, RACE2, AGE2, TRAINING_LEVEL, HEIGHT2, GLOVE, EVER_INJURED, ERGO_OPTIMIZATION, TEACHER_SENSITIVITY_STATURE_HANDSIZE,
           FIRST_NAME_NO_PERMISSION, EXPERIENCED_TRANSIENT_PAIN_HAND : EXPERIENCED_TRANSIENT_PAIN_FOOT ) %>% 
   
-  na.omit()  %>% 
+  # na.omit()  %>% 
   
-  mutate( SEX = case_when(
-                              # is.na(BIRTHSEX) ~ NA_real_,
+  mutate( SEX = case_when(  is.na(BIRTHSEX) ~ NA_real_,
                               BIRTHSEX == "M" ~ 0,
                                  TRUE ~ 1 ) ,
           
-          RACE = case_when( RACE2 == "WHITE" ~ 0,
+          RACE = case_when( is.na(RACE2) ~ NA_real_,
+                            RACE2 == "WHITE" ~ 0,
                             TRUE  ~ 1),
           
-          AGECAT = case_when( AGE2 == "< 30" ~ 1,
+          AGECAT = case_when( is.na(AGE2) ~ NA_real_,
+                              AGE2 == "< 30" ~ 1,
                               AGE2 == "30-34" ~ 2,
                               AGE2 == "35-40" ~3,
                               TRUE ~ 4),
           
-          TRNG_LEVEL = case_when( TRAINING_LEVEL == 'First Year' ~ 1,
+          TRNG_LEVEL = case_when( is.na(TRAINING_LEVEL) ~ NA_real_,
+                                  TRAINING_LEVEL == 'First Year' ~ 1,
                                   TRAINING_LEVEL == 'Second Year' ~ 2,
                                   TRAINING_LEVEL == 'Third Year' ~ 3,
                                   TRUE  ~ 4) ,
           
-          HEIGHT = case_when( HEIGHT2 == "< 5" ~ 1,
+          HEIGHT = case_when( is.na(HEIGHT2) ~ NA_real_,
+                              HEIGHT2 == "< 5" ~ 1,
                               HEIGHT2 == "5'1-5'3" ~ 2,
                               HEIGHT2 == "5'4-5'6" ~ 3,
                               HEIGHT2 == "5'7-5'9" ~ 4,
@@ -1865,27 +1868,40 @@ CORRMATRIX <-
                               HEIGHT2 == "6'1-6'4" ~ 6,
                                          TRUE ~ 7),
           
-          INJURY = case_when(  EVER_INJURED== "Y" ~ 1,
+          INJURY = case_when(  is.na(EVER_INJURED) ~ NA_real_,
+                               EVER_INJURED== "Y" ~ 1,
                                     TRUE ~ 0)  ,
           
-          TPAIN =  case_when(     EXPERIENCED_TRANSIENT_PAIN_HAND == "Y" |
-                                   EXPERIENCED_TRANSIENT_PAIN_FOOT == "Y" |
-                                   EXPERIENCED_TRANSIENT_PAIN_HAND == "Y" |
-                                   EXPERIENCED_TRANSIENT_PAIN_LEG == "Y" |
-                                   EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER == "Y" ~ 1,
-                                   TRUE ~ 0),
+          TPAIN =  case_when(   is.na(EXPERIENCED_TRANSIENT_PAIN_BACK) |
+                                is.na(EXPERIENCED_TRANSIENT_PAIN_HAND) |
+                                is.na(EXPERIENCED_TRANSIENT_PAIN_FOOT) |
+                                is.na(EXPERIENCED_TRANSIENT_PAIN_HAND) |
+                                is.na(EXPERIENCED_TRANSIENT_PAIN_LEG) |
+                                is.na(EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER) ~ NA_real_,
+                                  
+                                EXPERIENCED_TRANSIENT_PAIN_BACK == "Y" |
+                                EXPERIENCED_TRANSIENT_PAIN_HAND == "Y" |
+                                EXPERIENCED_TRANSIENT_PAIN_FOOT == "Y" |
+                                EXPERIENCED_TRANSIENT_PAIN_HAND == "Y" |
+                                EXPERIENCED_TRANSIENT_PAIN_LEG == "Y" |
+                                EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER == "Y" ~ 1,
+                                TRUE ~ 0),
           
           
-          ERGO_OPTIM =  case_when( ERGO_OPTIMIZATION == "Y" ~ 1,
+          ERGO_OPTIM =  case_when( is.na(ERGO_OPTIMIZATION) ~ NA_real_,
+                                  ERGO_OPTIMIZATION == "Y" ~ 1,
                                     TRUE ~ 0),
                                    
-          SENSITIVE_TEACHER = case_when (TEACHER_SENSITIVITY_STATURE_HANDSIZE == "Y" ~ 1,
+          SENSITIVE_TEACHER = case_when (is.na(TEACHER_SENSITIVITY_STATURE_HANDSIZE) ~ NA_real_,
+                                         TEACHER_SENSITIVITY_STATURE_HANDSIZE == "Y" ~ 1,
                                           TRUE ~ 0),
           
-          FNAME_NP =  case_when (FIRST_NAME_NO_PERMISSION == "Y" ~ 1,
+          FNAME_NP =  case_when (is.na(FIRST_NAME_NO_PERMISSION) ~ NA_real_,
+                                 FIRST_NAME_NO_PERMISSION == "Y" ~ 1,
                                  TRUE ~ 0)) %>% 
   
   select( SEX, RACE, AGECAT, TRNG_LEVEL, HEIGHT, GLOVE, INJURY, TPAIN, ERGO_OPTIM, SENSITIVE_TEACHER, FNAME_NP)
+
 
 
 
@@ -1907,20 +1923,22 @@ require(ppcor)
 
 #Partial Correlation:  HEIGHT + INJURY correlation adjusted for SEX and then RACE
 
-attach(CORRMATRIX)
+CORRMATRIX_NOMISS <- CORRMATRIX %>% na.omit()
 
-pcor.test( x=HEIGHT, y=INJURY, z=SEX, method= 'pearson' )
+attach(CORRMATRIX_NOMISS)
+
+pcor.test( x=HEIGHT, y=INJURY, z=SEX, method= 'pearson')
 pcor.test( x=HEIGHT, y=INJURY, z=RACE, method= 'pearson' )
 
 
 
 #Partial Correlation:  GLOVE + INJURY correlation adjusted for SEX and then RACE
 
-attach(CORRMATRIX)
-
 pcor.test( x=GLOVE, y=INJURY, z=SEX, method= 'pearson' )
 pcor.test( x=GLOVE, y=INJURY, z=RACE, method= 'pearson' )
 
+
+detach(CORRMATRIX_NOMISS)
 
 ```
 
@@ -1971,9 +1989,9 @@ CORRMATRIX %>%
 
 ##### There apprears to be a few slightly significant correlations that might be worth exploring with simple regression:
 
-- First Year: Transient Pain with both Ergo Optimization and Sensitive Teacher
+- First Year: Transient Pain with Sensitive Teacher & wth Ergo Optimization (based on borderline p-value, not displayed)
 - Second Year: First Name & Ergo Optimization (???)
-- Advanced:  Transient Pain & Ergo Optimization
+- Advanced:  Transient Pain & Sensitive Teacher
 
 <br>
 
@@ -2004,7 +2022,7 @@ CORRMATRIX %>%
 
 <br>
 
-- **Conclusion:**  Ergonomic Optimization is a significant effect before and after adjust for Training Level, which itself is *not* a significant effect. (Beta for EO decreases from -0.125 to -0.114, meaning that as Ergo Optimization increases, it causes Transient Pain reports to decline.) However, when compared to the reference category ("Advanced"), the impact on Second Year residents is a trend.
+- **Conclusion:**  Ergonomic Optimization is a significant effect before and after adjust for Training Level, which itself is *not* a significant effect. (Beta for EO decreases from -0.108 to -0.104, meaning that as Ergo Optimization increases, it causes Transient Pain reports to decline.) 
 
 
 <br>
@@ -2024,7 +2042,7 @@ CORRMATRIX %>%
   
 <br>
   
-- **Conclusion:**  Sensitive Teacher is a slightly significant effect before and after adjust for Training Level, which itself is *not* a significant effect. (Beta for ST increases slightly from -0.0925 to -0.0978, meaning that as Teacher Sensitivity increases, it causes Transient Pain reports to slightly decline.) However, when compared to the reference category ("Advanced"), the impact on Second Year residents is a very significant (p= 0.0248)
+- **Conclusion:**  Despite being correlated with First Year trainees, Sensitive Teacher is *not* a significant effect before (p=0.195) or after adjust for Training Level (p=0.149), which itself is *not* a significant effect. 
 
 <br>
   
@@ -2043,7 +2061,7 @@ CORRMATRIX %>%
   
 <br>
 
-- **Conclusion:**  Sensitive Teacher is a highly significant effect before, and an extremely highly significant effect after adjusting for Training Level, which itself is a trend (almost significant). (Beta for ST increases slightly from +0.186 to +0.204, meaning that as Teacher Sensitivity increases, reports of Ergonomic Optimization also rise.)  When compared to the reference category ("Advanced"), *ALL* other training levels are significantly different (i.e., lower).  Does this suggest that teachers are more likely to be sensitive to ergonomics in the Endoscopy Suite when dealing with older trainees, or does it suggest that younger trainees don't really know what proper ergonomics should entail and how to rate their instructors on this metric?
+- **Conclusion:**  Sensitive Teacher is a highly significant effect before, and an extremely highly significant effect after adjusting for Training Level, which itself is an overall trend (almost significant, p=0.0596). (Beta for ST increases slightly from +0.191 to +0.204, meaning that as Teacher Sensitivity increases, reports of Ergonomic Optimization also rise.)  When compared to the reference category ("Advanced"), *ALL* other training levels are significantly different (i.e., lower).  Does this suggest that teachers are more likely to be sensitive to ergonomics in the Endoscopy Suite when dealing with older trainees, or does it suggest that younger trainees don't really know what proper ergonomics should entail and, therefore, how to rate their instructors on this metric?  (Does it take rising to the Advanced level before a trainee fully understands what constitutes "proper ergonomics?")
 
 <br>
 
