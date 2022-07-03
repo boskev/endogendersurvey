@@ -2035,6 +2035,11 @@ CORRMATRIX %>%
       contrast(tpain.eo.emmeans.unadj, list("Unadj OR: Ergo Optim =Y on Transient Pain =Y" = c(-1, 1)))
       contrast(tpain.eo.emmeans.unadj, list("Unadj OR: Ergo Optim =N on Transient Pain =Y" = c(1, -1)))
       summary(tpain.eo.glm.adj)
+      
+      #Before running OR test, determine whether the multilevel categorical variable TRNG_LEVEL is significant overall?
+      aod::wald.test(b = coef(tpain.eo.glm.adj), Sigma = vcov(tpain.eo.glm.adj), Terms = 3:5)
+
+      
       contrast(tpain.eo.emmeans.adj, list("Adj OR: Ergo Optim =N on Transient Pain =Y" = c(1, -1)))
   
 ```
@@ -2055,19 +2060,23 @@ CORRMATRIX %>%
   
 
 
-
-tpain.steach.glm.unadj <- glm( TPAIN ~ SENSITIVE_TEACHER, data= TLEVEL, family= binomial(link="logit"))
-tpain.steach.emmeans.unadj <- emmeans( tpain.steach.glm.unadj,  ~ c(SENSITIVE_TEACHER), type= "response")
-tpain.steach.glm.adj   <- glm( TPAIN ~ SENSITIVE_TEACHER + TRNG_LEVEL, data= TLEVEL, family= binomial(link="logit"))
-tpain.steach.emmeans.adj <- emmeans( tpain.steach.glm.adj,  ~ c(SENSITIVE_TEACHER), type= "response")
-
-
-summary(tpain.steach.glm.unadj)
-contrast(tpain.steach.emmeans.unadj, list("Unadj OR: Sensitive Teach =Y on Transient Pain =Y" = c(-1, 1)))
-contrast(tpain.steach.emmeans.unadj, list("Unadj OR: Sensitive Teach =N on Transient Pain =Y" = c(1, -1)))
-summary(tpain.steach.glm.adj)
-contrast(tpain.steach.emmeans.adj, list("Adj OR: Sensitive Teach =N on Transient Pain =Y" = c(1, -1)))
-confint(contrast(tpain.steach.emmeans.adj, list("Adj OR: Sensitive Teach =N on Transient Pain =Y" = c(1, -1))))
+    
+    tpain.steach.glm.unadj <- glm( TPAIN ~ SENSITIVE_TEACHER, data= TLEVEL, family= binomial(link="logit"))
+    tpain.steach.emmeans.unadj <- emmeans( tpain.steach.glm.unadj,  ~ c(SENSITIVE_TEACHER), type= "response")
+    tpain.steach.glm.adj   <- glm( TPAIN ~ SENSITIVE_TEACHER + TRNG_LEVEL, data= TLEVEL, family= binomial(link="logit"))
+    tpain.steach.emmeans.adj <- emmeans( tpain.steach.glm.adj,  ~ c(SENSITIVE_TEACHER), type= "response")
+    
+    
+    summary(tpain.steach.glm.unadj)
+    contrast(tpain.steach.emmeans.unadj, list("Unadj OR: Sensitive Teach =Y on Transient Pain =Y" = c(-1, 1)))
+    contrast(tpain.steach.emmeans.unadj, list("Unadj OR: Sensitive Teach =N on Transient Pain =Y" = c(1, -1)))
+    summary(tpain.steach.glm.adj)
+  
+            
+    #Before running OR test, determine whether the multilevel categorical variable TRNG_LEVEL is significant overall?
+    aod::wald.test(b = coef(tpain.steach.glm.adj), Sigma = vcov(tpain.steach.glm.adj), Terms = 3:5)
+    
+    contrast(tpain.steach.emmeans.adj, list("Adj OR: Sensitive Teach =N on Transient Pain =Y" = c(1, -1)))
 
   
 ```
@@ -2096,15 +2105,19 @@ confint(contrast(tpain.steach.emmeans.adj, list("Adj OR: Sensitive Teach =N on T
     contrast(eo.steach.emmeans.unadj, list("Unadj OR: Sensitive Teach =Y on Ergo Optim =Y" = c(-1, 1)))
     contrast(eo.steach.emmeans.unadj, list("Unadj OR: Sensitive Teach =N on Ergo Optim =Y" = c(1, -1)))
     summary(eo.steach.glm.adj)
+    
+    #Before running OR test, determine whether the multilevel categorical variable TRNG_LEVEL is significant overall?
+    aod::wald.test(b = coef(eo.steach.glm.adj), Sigma = vcov(eo.steach.glm.adj), Terms = 3:5)
+
     contrast(eo.steach.emmeans.adj, list("Adj OR: Sensitive Teach =Y on Ergo Optim =Y" = c(-1, 1)))
   
 ```
   
 <br>
 
-- **Conclusion:**  Sensitive Teacher is a highly significant effect before, and an extremely highly significant effect after adjusting for Training Level. Beta for ST increases slightly from +0.9312 to +1.03915, meaning that as Teacher Sensitivity increases, reports of Ergonomic Optimization also rise.  (The Odds Ratio in the adjusted model rose from 2.54 to 2.83, p= 0.0008.  In other words, subjects who reported that their Endoscopy Suite environment was ergonomically optimized were 2.83 times more likely to have had instructors who were sensitive to their physical size/stature.)
+- **Conclusion:**  Sensitive Teacher is a highly significant effect before, and an extremely highly significant effect after adjusting for Training Level. Training Level itself is *not* a significant effect.  (The model summary shows that there is significance among three levels of TRNG_LEVEL *when compared to the reference category, "Advanced.") Beta for ST increases slightly from +0.9312 to +1.03915, meaning that as Teacher Sensitivity increases, reports of Ergonomic Optimization also rise.  (The Odds Ratio in the adjusted model rose from 2.54 to 2.83, p= 0.0008.  In other words, subjects who reported that their Endoscopy Suite environment was ergonomically optimized were 2.83 times more likely to have had instructors who were sensitive to their physical size/stature.)
 
-When compared to the reference category ("Advanced"), *ALL* other training levels were significantly different (i.e., lower Beta weights).  Does this suggest that teachers are more likely to be sensitive to ergonomics when dealing with older trainees, or does it suggest that younger trainees don't really know what proper ergonomics should entail and, therefore, don't know how to rate their instructors on this metric?  (Does it take rising to the Advanced level before a trainee fully understands what constitutes "proper ergonomics?")
+- When compared to the reference category ("Advanced"), *ALL* other training levels were significantly different (i.e., lower Beta weights).  Does this suggest that teachers are more likely to be sensitive to ergonomics when dealing with older trainees, or does it suggest that younger trainees don't really know what proper ergonomics should entail and, therefore, don't know how to rate their instructors on this metric?  (Does it take rising to the Advanced level before a trainee fully understands what constitutes "proper ergonomics?")
 
 <br>
 
