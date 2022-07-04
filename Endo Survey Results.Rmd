@@ -2220,7 +2220,7 @@ CORRMATRIX %>%
   
   <br>
  
-```{r TASKS-CORRELATIONS-FNAME_NOPERM-EXPLORATORY-REGRESSION3 } 
+```{r TASKS-CORRELATIONS-FNAME_NOPERM-EXPLORATORY-REGRESSION4 } 
 
 
 
@@ -2232,14 +2232,17 @@ CORRMATRIX %>%
         CORRMATRIX %>% 
         select( SEX, AGECAT, RACE, HEIGHT, TRNG_LEVEL, FNAME_NP) %>% 
         mutate( HEIGHT = factor(HEIGHT),
-                HEIGHT = relevel(HEIGHT, ref="5"))
+                HEIGHT = relevel(HEIGHT, ref="5"),
+                AGECAT = factor(AGECAT),
+                AGECAT = relevel(AGECAT, ref="4"))
     
     levels(FNAME$HEIGHT)
+    levels(FNAME$AGECAT)
     
     fname.height.glm.unadj <- glm( FNAME_NP ~ HEIGHT, data= FNAME, family= binomial(link="logit"))
     fname.height.emmeans.unadj <- emmeans( fname.height.glm.unadj,  ~ c(HEIGHT), type= "response")
     fname.height.glm.adj   <- glm( FNAME_NP ~ HEIGHT + SEX , data= FNAME, family= binomial(link="logit"))
-    fnmae.height..emmeans.adj <- emmeans( fname.height.glm.adj,  ~ c(HEIGHT), type= "response")
+    fname.height.emmeans.adj <- emmeans( fname.height.glm.adj,  ~ c(HEIGHT, SEX), type= "response")
     
     
     summary(fname.height.glm.unadj)
@@ -2255,15 +2258,26 @@ CORRMATRIX %>%
 
     
     summary(fname.height.glm.adj)
+    #summary(fname.height.emmeans.adj)
+    
     
     #Determine whether the multilevel categorical variable HEIGHT is significant overall in the ADJUSTED model?
     aod::wald.test(b = coef(fname.height.glm.adj), Sigma = vcov(fname.height.glm.adj), Terms = 2:6)
+    
     
     
     # Just for fun, adjust only for SEX
      
     fname.sex.glm.unadj <- glm( FNAME_NP ~ SEX , data= FNAME, family= binomial(link="logit"))
     fname.sex.emmeans.unadj <- emmeans( fname.sex.glm.unadj,  ~ c(SEX), type= "response")
+    
+    
+    summary(fname.sex.glm.unadj)
+    
+    #Confirm that Sex is not significant (trend with  0.10 > p-value > 0.05)
+    aod::wald.test(b = coef(fname.sex.glm.unadj), Sigma = vcov(fname.sex.glm.unadj), Terms = 2:2)
+
+  
     contrast(fname.sex.emmeans.unadj, list("Unadj OR: Females vs. Males FNAME_NP =Y" =   c(-1, 1)))
     
     
