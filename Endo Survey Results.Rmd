@@ -2090,7 +2090,11 @@ CORRMATRIX %>%
 Let's explore further with few unadjusted/adjusted regressions where Transient Pain is the outcome and Ergo Optimization is the outcome:
 
 <br>
+<br>
 
+- **1. Does Ergonomic Optimization influence reports of Transient Pain, with and without adjusting for Training Level?**
+
+<br>
 
 ```{r TASKS-CORRELATIONS-TRAINING-LEVEL-EXPLORATORY-REGRESSION1 }
 
@@ -2105,7 +2109,7 @@ CORRMATRIX %>%
   
 
 
-  #1. Does Ergonomic Optimization influence reports of Transient Pain, with and without adjusting for Training Level?
+
 
       tpain.eo.glm.unadj <- glm( TPAIN ~ ERGO_OPTIM, data= TLEVEL, family= binomial(link="logit"))
       tpain.eo.emmeans.unadj <- emmeans( tpain.eo.glm.unadj,  ~ c(ERGO_OPTIM), type= "response")
@@ -2132,12 +2136,16 @@ CORRMATRIX %>%
 
 
 <br>
+<br>
 
+-  **2. Does having a Sensitive Teacher with concern for your size/stature influence reports of Transient Pain, with and without adjusting for Training Level?**
+
+<br>
 
 ```{r TASKS-CORRELATIONS-TRAINING-LEVEL-EXPLORATORY-REGRESSION2 }
 
 
-#2. Does having a Sensitive Teacher with concern for your size/stature influence reports of Transient Pain, with and without adjusting for Training Level?
+
   
   
 
@@ -2167,14 +2175,16 @@ CORRMATRIX %>%
   
 - **Conclusion:**  Sensitive Teacher is *not* a significant effect before (p=0.198) or after adjust for Training Level (p=0.149), which itself is *not* a significant effect. (In the adjusted model, the odds of experiencing Transient Pain if one did *not* have a Sensitive Teacher was 2.0, but with an insignificant p-value, cl=[0.781, 5.11])
 
-<br>
   
+<br>
+<br>
+
+- **3. Does having a Sensitive Teacher with concern for your size/stature influence the use/encouragement of Ergonomic Optimization, with and without adjusting for Training Level?**
  
- 
+<br>
+
 ```{r TASKS-CORRELATIONS-TRAINING-LEVEL-EXPLORATORY-REGRESSION3 } 
 
-
-  #3. Does having a Sensitive Teacher with concern for your size/stature influence the use/encouragement of Ergonomic Optimization, with and without adjusting for Training Level?
   
     
     eo.steach.glm.unadj <- glm( ERGO_OPTIM ~ SENSITIVE_TEACHER, data= TLEVEL, family= binomial(link="logit"))
@@ -2203,13 +2213,17 @@ CORRMATRIX %>%
 
 
 <br>
+<br>
   
- 
+  
+- **4. First Name-No Permission does not appear to be correlated with Sex, but there does appear to be some correlation to Height Band.  Is it significant?**
+  
+  <br>
  
 ```{r TASKS-CORRELATIONS-FNAME_NOPERM-EXPLORATORY-REGRESSION3 } 
 
 
-  #4. First Name-No Permission does not appear to be correlated with Sex, but there does appear to be some correlation to Height Band.  Is it significant?
+
 
   # Since height is a multilevel categorical variable, use the median Male height as the reference, 5, or 5'10-6'
   
