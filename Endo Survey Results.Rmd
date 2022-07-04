@@ -60,6 +60,7 @@ SURVEY  <-
    select( RECORD_ID, BIRTHSEX, RACE_SOUTHASIAN:RACE_OTHER, AGE, TRAINING_LEVEL, HEIGHT, GLOVE, GLOVE_SIZE_AVAILABLE, PERFORMANCE_HOURS, TEACHER_GENDER_PREFERENCE,
            FEMALE_TRAINERS, MALE_TRAINERS, EVER_INJURED, EXPERIENCED_TRANSIENT_PAIN_NO, EXPERIENCED_TRANSIENT_PAIN_HAND, EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER,
            EXPERIENCED_TRANSIENT_PAIN_BACK, EXPERIENCED_TRANSIENT_PAIN_LEG, EXPERIENCED_TRANSIENT_PAIN_FOOT, GROWING_PAINS,
+           FELLOWSHIP_PREGNANCY, starts_with( c("PREGNANCY", "POSTPARTUM")),
            FELLOWSHIP_FORMAL_ERGO_TRAINING, INFORMAL_TRAINING, TRAINING_TECHNIQUES_POSTURAL, TRAINING_TECHNIQUES_BEDHEIGHT, TRAINING_TECHNIQUES_BEDANGLE,
            TRAINING_TECHNIQUES_MONITORHEIGHT, TRAINING_TECHNIQUES_MUSCULOSKELETAL, TRAINING_TECHNIQUES_EXERCISE_STRETCHING, TRAINING_TECHNIQUES_DIAL_EXTENDERS,
            TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE, ERGO_TRAINING_BUDGET, ERGO_FEEDBACK, ERGO_FEEDBACK_BY_WHOM, ERGO_OPTIMIZATION, GLOVE_SIZE_AVAILABLE,
@@ -135,6 +136,11 @@ SURVEY  <-
   mutate( EXPERIENCED_TRANSIENT_PAIN_BACK = factor(EXPERIENCED_TRANSIENT_PAIN_BACK)) %>% 
   mutate( EXPERIENCED_TRANSIENT_PAIN_LEG = factor(EXPERIENCED_TRANSIENT_PAIN_LEG)) %>% 
   mutate( EXPERIENCED_TRANSIENT_PAIN_FOOT = factor(EXPERIENCED_TRANSIENT_PAIN_FOOT))  %>% 
+  
+  mutate( FELLOWSHIP_PREGNANCY = factor(FELLOWSHIP_PREGNANCY),
+          PREGNANCY_ERGO_DIFFICULTY = factor(PREGNANCY_ERGO_DIFFICULTY),
+          PREGNANCY_ERGO_INJURY = factor( PREGNANCY_ERGO_INJURY),
+          POSTPARTUM_ERGO_INJURY = factor( POSTPARTUM_ERGO_INJURY)) %>% 
   
   mutate( GROWING_PAINS = factor(GROWING_PAINS)) %>% 
   mutate( FELLOWSHIP_FORMAL_ERGO_TRAINING = factor(FELLOWSHIP_FORMAL_ERGO_TRAINING)) %>% 
@@ -1871,7 +1877,7 @@ CORRMATRIX <-
           
           HEIGHT = case_when( is.na(HEIGHT2) ~ NA_real_,
                               HEIGHT2 == "< 5" ~ 1,
-                              HEIGHT2 == "5'1-5'3" ~ 2,
+                              HEIGHT2 == "5-5'3" ~ 2,
                               HEIGHT2 == "5'4-5'6" ~ 3,
                               HEIGHT2 == "5'7-5'9" ~ 4,
                               HEIGHT2 == "5'10-6'" ~ 5,
@@ -1923,9 +1929,11 @@ pairs.panels( CORRMATRIX, pch=21, stars=T,)
 
 ```
 
-
+<br>
 
 ###### There does not appear to be any association in this sample with HEIGHT or GLOVE and having sustained an injury or experienced any of the five specific transient pain types listed in the survey.  Does this change if we adjust the correlations based on sex?  Or race?
+
+<br>
 
 ```{r TASKS-CORRELATION-PARITALS }
 
@@ -1955,7 +1963,81 @@ detach(CORRMATRIX_NOMISS)
 
 <br>
   
-#### Task 2: How are the associations/correlations for certain variables affected if we statify them by Training Level?
+#### Task 2: Are Ergonomic Difficulties reported among respondents who were PREGNANT during their fellowship associated at all with GLOVE or HEIGHT ?
+
+
+- Total N for subjects who were pregnant during fellowship = 23
+- Only one (1) subject reported an Ergonomic Injury during her fellowship, so meaningful analysis along this metric could not be performed
+
+
+<br>
+
+
+```{r TASKS-CORRELATIONS-PREGNANCY, fig.align='center', fig.dim= c(12,12)}
+
+
+#Ergonomic Difficulty during Pregnancy?
+
+CrossTable(SURVEY$PREGNANCY_ERGO_DIFFICULTY, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=F, fisher=F)  
+CrossTable(SURVEY$PREGNANCY_ERGO_INJURY, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=F, fisher=F) 
+CrossTable(SURVEY$POSTPARTUM_ERGO_INJURY, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=F, fisher=F) 
+
+
+#Correlation Matrix to view "associations" with Glove Size and Height
+
+
+PREGNANCY  <-
+  
+  SURVEY %>%
+  filter( FELLOWSHIP_PREGNANCY == "Y") %>% 
+  select (BIRTHSEX, RACE2, AGE2, TRAINING_LEVEL, HEIGHT2, GLOVE, PREGNANCY_ERGO_DIFFICULTY ) %>% 
+  
+  mutate( SEX = case_when(  is.na(BIRTHSEX) ~ NA_real_,
+                            BIRTHSEX == "M" ~ 0,
+                            TRUE ~ 1 ) ,
+          
+          RACE = case_when( is.na(RACE2) ~ NA_real_,
+                            RACE2 == "WHITE" ~ 0,
+                            TRUE  ~ 1),
+          
+          AGECAT = case_when( is.na(AGE2) ~ NA_real_,
+                              AGE2 == "< 30" ~ 1,
+                              AGE2 == "30-34" ~ 2,
+                              AGE2 == "35-40" ~3,
+                              TRUE ~ 4),
+          
+          TRNG_LEVEL = case_when( is.na(TRAINING_LEVEL) ~ NA_real_,
+                                  TRAINING_LEVEL == 'First Year' ~ 1,
+                                  TRAINING_LEVEL == 'Second Year' ~ 2,
+                                  TRAINING_LEVEL == 'Third Year' ~ 3,
+                                  TRUE  ~ 4) ,
+          
+          HEIGHT = case_when( is.na(HEIGHT2) ~ NA_real_,
+                              HEIGHT2 == "< 5" ~ 1,
+                              HEIGHT2 == "5-5'3" ~ 2,
+                              HEIGHT2 == "5'4-5'6" ~ 3,
+                              HEIGHT2 == "5'7-5'9" ~ 4,
+                              HEIGHT2 == "5'10-6'" ~ 5,
+                              HEIGHT2 == "6'1-6'4" ~ 6,
+                              TRUE ~ 7),
+          
+          ERGO_DIFF = case_when( is.na(PREGNANCY_ERGO_DIFFICULTY) ~ NA_real_,
+                                 PREGNANCY_ERGO_DIFFICULTY == 'N' ~ 0,
+                                  TRUE  ~ 1) ) %>% 
+  select( SEX, RACE, AGECAT, TRNG_LEVEL, ERGO_DIFF, GLOVE, HEIGHT)
+
+
+pairs.panels( PREGNANCY[c(-1,-2)] , pch=21, stars=T) 
+
+
+
+```
+
+
+
+<br>
+  
+#### Task 3: How are the associations/correlations for certain variables affected if we statify them by Training Level?
 
 
 - Ergonomic Optimizaiton
@@ -2118,6 +2200,67 @@ CORRMATRIX %>%
 - **Conclusion:**  Sensitive Teacher is a highly significant effect before, and an extremely highly significant effect after adjusting for Training Level. Training Level itself is *not* a significant effect.  (The model summary shows that there is significance among three levels of TRNG_LEVEL *when compared to the reference category, "Advanced.") Beta for ST increases slightly from +0.9312 to +1.03915, meaning that as Teacher Sensitivity increases, reports of Ergonomic Optimization also rise.  (The Odds Ratio in the adjusted model rose from 2.54 to 2.83, p= 0.0008.  In other words, subjects who reported that their Endoscopy Suite environment was ergonomically optimized were 2.83 times more likely to have had instructors who were sensitive to their physical size/stature.)
 
 - When compared to the reference category ("Advanced"), *ALL* other training levels were significantly different (i.e., lower Beta weights).  Does this suggest that teachers are more likely to be sensitive to ergonomics when dealing with older trainees, or does it suggest that younger trainees don't really know what proper ergonomics should entail and, therefore, don't know how to rate their instructors on this metric?  (Does it take rising to the Advanced level before a trainee fully understands what constitutes "proper ergonomics?")
+
+
+<br>
+  
+ 
+ 
+```{r TASKS-CORRELATIONS-FNAME_NOPERM-EXPLORATORY-REGRESSION3 } 
+
+
+  #4. First Name-No Permission does not appear to be correlated with Sex, but there does appear to be some correlation to Height Band.  Is it significant?
+
+  # Since height is a multilevel categorical variable, use the median Male height as the reference, 5, or 5'10-6'
+  
+    
+    FNAME <-
+        CORRMATRIX %>% 
+        select( SEX, AGECAT, RACE, HEIGHT, TRNG_LEVEL, FNAME_NP) %>% 
+        mutate( HEIGHT = factor(HEIGHT),
+                HEIGHT = relevel(HEIGHT, ref="5"))
+    
+    levels(FNAME$HEIGHT)
+    
+    fname.height.glm.unadj <- glm( FNAME_NP ~ HEIGHT, data= FNAME, family= binomial(link="logit"))
+    fname.height.emmeans.unadj <- emmeans( fname.height.glm.unadj,  ~ c(HEIGHT), type= "response")
+    fname.height.glm.adj   <- glm( FNAME_NP ~ HEIGHT + SEX , data= FNAME, family= binomial(link="logit"))
+    fnmae.height..emmeans.adj <- emmeans( fname.height.glm.adj,  ~ c(HEIGHT), type= "response")
+    
+    
+    summary(fname.height.glm.unadj)
+    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height2 (5-5'3) on FNAME_NP =Y relative to 5'10-6'" =   c(-1, 1, 0, 0, 0, 0)))
+    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height3 (5'4-5'6) on FNAME_NP =Y relative to 5'10-6'" = c(-1, 0, 1, 0, 0, 0)))
+    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height4 (5'7-5'9) on FNAME_NP =Y relative to 5'10-6'" = c(-1, 0, 0, 1, 0, 0)))
+    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height6 (6'-6'4) on FNAME_NP =Y relative to 5'10-6'" = c(-1, 0, 0, 0, 1, 0)))
+    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height7 (< 6'4) on FNAME_NP =Y relative to 5'10-6'" = c(-1, 0, 0, 0, 0, 1)))
+
+    
+    #Determine whether the multilevel categorical variable HEIGHT is significant overall in the UNADJUSTED model?
+    aod::wald.test(b = coef(fname.height.glm.unadj), Sigma = vcov(fname.height.glm.unadj), Terms = 2:6)
+
+    
+    summary(fname.height.glm.adj)
+    
+    #Determine whether the multilevel categorical variable HEIGHT is significant overall in the ADJUSTED model?
+    aod::wald.test(b = coef(fname.height.glm.adj), Sigma = vcov(fname.height.glm.adj), Terms = 2:6)
+    
+    
+    # Just for fun, adjust only for SEX
+     
+    fname.sex.glm.unadj <- glm( FNAME_NP ~ SEX , data= FNAME, family= binomial(link="logit"))
+    fname.sex.emmeans.unadj <- emmeans( fname.sex.glm.unadj,  ~ c(SEX), type= "response")
+    contrast(fname.sex.emmeans.unadj, list("Unadj OR: Females vs. Males FNAME_NP =Y" =   c(-1, 1)))
+    
+    
+    
+```
+  
+<br>
+
+- **Conclusion:**  When compared to the median Male height (HEIGHT=5, or 5'10-6'), the odds of the subjects' first name being used without permission decreases as the reference height is approached.  Subjects who were taller, however, had mixed results:  Ones who were one band above the reference height (6'-6'4), had reduced odds of being disrespected in this manner; but the tallest subjects (HEIGHT=7, or > 6'4) had the worst odds ratio of all, 3.5, a group that is singularly comprised of males (n=2).  Unfortunately, none of these results was statistically significant.
+
+- Even after adjusting for SEX, the significance of HEIGHT in the model did not improve (in fact, it worsened, likely because the variables HEIGHT and SEX are highly correlated). An unadjusetd model where SEX replaced HEIGHT as the predictor variable, yielded good results, but still not significant (p= 0.0938).  Adjusting for RACE (not shown) did not improve the model.
 
 <br>
 
