@@ -1535,7 +1535,7 @@ plot_xtab(SURVEY$TRAINING_LEVEL, SURVEY$FIRST_NAME_NO_PERMISSION, margin = "row"
 
 
 
-#### Question 1:  Distribution of MANDAOTRY ERGO TRAINING by BIRTH SEX
+#### Question 1:  Distribution of MANDATORY ERGO TRAINING by BIRTH SEX
 
 
 <br>
