@@ -2227,15 +2227,15 @@ CORRMATRIX %>%
 
   # Since height is a multilevel categorical variable, use the median Male height as the reference, 5, or 5'10-6'
   
-    
-    FNAME <-
-        CORRMATRIX %>% 
-        select( SEX, AGECAT, RACE, HEIGHT, TRNG_LEVEL, FNAME_NP) %>% 
-        mutate( HEIGHT = factor(HEIGHT),
-                HEIGHT = relevel(HEIGHT, ref="5"),
-                AGECAT = factor(AGECAT),
-                AGECAT = relevel(AGECAT, ref="4"))
-    
+
+FNAME <-
+    CORRMATRIX %>% 
+    select( SEX, AGECAT, RACE, HEIGHT, TRNG_LEVEL, FNAME_NP) %>% 
+    mutate( HEIGHT = factor(HEIGHT),
+            HEIGHT = relevel(HEIGHT, ref="5"),
+            AGECAT = recode_factor(AGECAT, '1'='1', '2'='1', '3'='2', '4'='2'),
+            AGECAT = relevel(AGECAT, ref="2"))
+
     levels(FNAME$HEIGHT)
     levels(FNAME$AGECAT)
     
