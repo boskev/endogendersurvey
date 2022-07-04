@@ -2281,6 +2281,10 @@ CORRMATRIX %>%
     contrast(fname.sex.emmeans.unadj, list("Unadj OR: Females vs. Males FNAME_NP =Y" =   c(-1, 1)))
     
     
+    #Use sjPlots to display resutls for all three models side-by-side: Height Only,  Height + Sex, Sex Only
+    
+    tab_model(fname.height.glm.unadj, fname.height.glm.adj, fname.sex.glm.unadj, title= "First Name - No Permission Logistic Models <br> ([Model 1] Height Only <> [Model 2] Height + Sex <> [Model 3] Sex Only) <br>.")
+    
     
 ```
   
