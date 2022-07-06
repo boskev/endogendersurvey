@@ -2352,7 +2352,7 @@ FNAME <-
 
 - Even after adjusting for SEX, the significance of HEIGHT in the model did not improve (in fact, it worsened, likely because the variables HEIGHT and SEX are highly correlated). An unadjusetd model where SEX replaced HEIGHT as the predictor variable, yielded good results, but still not significant (p= 0.0938).  
 
-- If the Height Category is collapsed into two groups -- shorter than 5'7" and those how are 5'7" and above, there does appear to be some significance -- even if controlled separately for Training Level and Race.  Only controlling for Sex knocks this predictor out of sigificance, likely because the HEIGHT and SEX are so highly correlated.
+- If the Height Category is collapsed into two groups -- shorter than 5'7" and those who are 5'7" and above, there does appear to be some significance -- even if controlled separately for Training Level and Race.  Only controlling for Sex knocks this predictor out of sigificance, likely because the HEIGHT and SEX are so highly correlated.
 
 
 
