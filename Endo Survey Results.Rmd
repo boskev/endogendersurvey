@@ -1537,7 +1537,7 @@ plot_xtab(SURVEY$TRAINING_LEVEL, SURVEY$FIRST_NAME_NO_PERMISSION, margin = "row"
 
 plot_xtab(SURVEY$HEIGHT2, SURVEY$FIRST_NAME_NO_PERMISSION, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          title = "First Name Used No Permission by Training Level",
+          title = "First Name Used No Permission by Height Band",
           axis.titles = "Height Band", 
           legend.title= "First Name Used No Permission?",
           geom.colors = c("#006cc5","#cbcccb"), 
