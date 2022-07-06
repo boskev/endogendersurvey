@@ -2237,7 +2237,7 @@ CORRMATRIX %>%
   
   <br>
  
-```{r TASKS-CORRELATIONS-FNAME_NOPERM-EXPLORATORY-REGRESSION4 } 
+```{r TASKS-CORRELATIONS-FNAME_NOPERM-EXPLORATORY-REGRESSION4 , fig.dim= c(12,6) } 
 
 
 
@@ -2245,13 +2245,24 @@ CORRMATRIX %>%
   # Since height is a multilevel categorical variable, use the median Male height as the reference, 5, or 5'10-6'
   
 
+
+
 FNAME <-
     CORRMATRIX %>% 
     select( SEX, AGECAT, RACE, HEIGHT, TRNG_LEVEL, FNAME_NP) %>% 
-    mutate( HEIGHT = factor(HEIGHT),
+    mutate( SEX = factor(SEX),
+            RACE = factor(RACE),
+            HEIGHT = factor(HEIGHT),
             HEIGHT = relevel(HEIGHT, ref="5"),
+            HTCAT = factor(HEIGHT),
+            HTCAT = recode_factor(HEIGHT, '1'='0', '2'='0', '3'='0', .default = '1'),
+            HTCAT = relevel(HTCAT, ref='1'),
             AGECAT = recode_factor(AGECAT, '1'='1', '2'='1', '3'='2', '4'='2'),
-            AGECAT = relevel(AGECAT, ref="2"))
+            AGECAT = relevel(AGECAT, ref="2"),
+            
+            TRNG_LEVEL = factor(TRNG_LEVEL),
+            TRNG_LEVEL = relevel(TRNG_LEVEL, ref="4"))
+
 
     levels(FNAME$HEIGHT)
     levels(FNAME$AGECAT)
@@ -2298,9 +2309,39 @@ FNAME <-
     contrast(fname.sex.emmeans.unadj, list("Unadj OR: Females vs. Males FNAME_NP =Y" =   c(-1, 1)))
     
     
+    
+    
+    
     #Use sjPlots to display resutls for all three models side-by-side: Height Only,  Height + Sex, Sex Only
     
-    tab_model(fname.height.glm.unadj, fname.height.glm.adj, fname.sex.glm.unadj, title= "First Name - No Permission Logistic Models <br> ([Model 1] Height Only <> [Model 2] Height + Sex <> [Model 3] Sex Only) <br>.")
+    tab_model(fname.height.glm.unadj, fname.height.glm.adj, fname.sex.glm.unadj, title= "First Name - No Permission Logistic Models with Height Bands as Given<br>.",
+              dv.labels= c('Height Cat Unadj','Height Cat Adj Sex', 'Sex Unadj'))
+    
+    
+    #Run additional on the collapsed Height Cat variable and see what happens
+    
+        
+    fname.htcat.glm.unadj <- glm( FNAME_NP ~ HTCAT   , data= FNAME, family= binomial(link="logit"))
+    fname.htcat.emmeans.unadj <- emmeans( fname.htcat.glm.unadj,  ~ c(HTCAT), type= "response")
+    
+    pairs(fname.htcat.emmeans.unadj)
+    contrast(fname.htcat.emmeans.unadj, list("Unadj OR: Height < 5'7 on FNAME_NP =Y relative to 5'7+ " =   c(-1, 1)))
+    
+    fname.htcat.glm.adj <- glm( FNAME_NP ~ HTCAT+ TRNG_LEVEL , data= FNAME, family= binomial(link="logit"))
+    fname.htcat.emmeans.adj <- emmeans( fname.htcat.glm.adj,  ~ c(HTCAT), type= "response")
+    
+    fname.htcat.glm.adj2 <- glm( FNAME_NP ~ HTCAT+ RACE , data= FNAME, family= binomial(link="logit"))
+    fname.htcat.emmeans.adj2 <- emmeans
+    
+    fname.htcat.glm.adj3 <- glm( FNAME_NP ~ HTCAT+ SEX , data= FNAME, family= binomial(link="logit"))
+    fname.htcat.emmeans.adj3 <- emmeans( fname.htcat.glm.adj,  ~ c(HTCAT), type= "response")
+
+
+    tab_model(fname.htcat.glm.unadj, fname.htcat.glm.adj, fname.htcat.glm.adj2,
+              title= "First Name - No Permission Logistic Models with Height Bands Collapsed (2) <br>.",
+              dv.labels= c('Height Cat Unadj','Height Cat Adj Training Level', 'Height Cat Adj Race'))
+
+    
     
     
 ```
@@ -2309,7 +2350,11 @@ FNAME <-
 
 - **Conclusion:**  When compared to the median Male height (HEIGHT=5, or 5'10-6'), the odds of the subjects' first name being used without permission decreases as the reference height is approached.  Subjects who were taller, however, had mixed results:  Ones who were one band above the reference height (6'-6'4), had reduced odds of being disrespected in this manner; but the tallest subjects (HEIGHT=7, or > 6'4) had the worst odds ratio of all, 3.5, a group that is singularly comprised of males (n=2).  Unfortunately, none of these results was statistically significant.
 
-- Even after adjusting for SEX, the significance of HEIGHT in the model did not improve (in fact, it worsened, likely because the variables HEIGHT and SEX are highly correlated). An unadjusetd model where SEX replaced HEIGHT as the predictor variable, yielded good results, but still not significant (p= 0.0938).  Adjusting for RACE (not shown) did not improve the model.
+- Even after adjusting for SEX, the significance of HEIGHT in the model did not improve (in fact, it worsened, likely because the variables HEIGHT and SEX are highly correlated). An unadjusetd model where SEX replaced HEIGHT as the predictor variable, yielded good results, but still not significant (p= 0.0938).  
+
+- If the Height Category is collapsed into two groups -- shorter than 5'7" and those how are 5'7" and above, there does appear to be some significance -- even if controlled separately for Training Level and Race.  Only controlling for Sex knocks this predictor out of sigificance, likely because the HEIGHT and SEX are so highly correlated.
+
+
 
 <br>
 
