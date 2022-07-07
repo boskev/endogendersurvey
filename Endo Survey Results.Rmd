@@ -1867,7 +1867,7 @@ The appropriate tack here would be to run a series of "point biserial correlatio
 CORRMATRIX <-
 
   SURVEY %>%
-  select (BIRTHSEX, RACE2, AGE2, TRAINING_LEVEL, HEIGHT2, GLOVE, EVER_INJURED, ERGO_OPTIMIZATION, TEACHER_SENSITIVITY_STATURE_HANDSIZE,
+  select (BIRTHSEX, RACE2, AGE2, TRAINING_LEVEL, PERFORMANCE_HOURS, HEIGHT2, GLOVE, EVER_INJURED, ERGO_OPTIMIZATION, TEACHER_SENSITIVITY_STATURE_HANDSIZE,
           FIRST_NAME_NO_PERMISSION, EXPERIENCED_TRANSIENT_PAIN_HAND : EXPERIENCED_TRANSIENT_PAIN_FOOT ) %>% 
   
   # na.omit()  %>% 
@@ -1891,6 +1891,11 @@ CORRMATRIX <-
                                   TRAINING_LEVEL == 'Second Year' ~ 2,
                                   TRAINING_LEVEL == 'Third Year' ~ 3,
                                   TRUE  ~ 4) ,
+          
+          PERF_HRS = case_when( is.na(PERFORMANCE_HOURS) ~ NA_real_,
+                          PERFORMANCE_HOURS == '< 10' ~ 1,
+                          PERFORMANCE_HOURS == '10-20' ~ 2,
+                          TRUE  ~ 3) ,
           
           HEIGHT = case_when( is.na(HEIGHT2) ~ NA_real_,
                               HEIGHT2 == "< 5" ~ 1,
@@ -1933,7 +1938,7 @@ CORRMATRIX <-
                                  FIRST_NAME_NO_PERMISSION == "Y" ~ 1,
                                  TRUE ~ 0)) %>% 
   
-  select( SEX, RACE, AGECAT, TRNG_LEVEL, HEIGHT, GLOVE, INJURY, TPAIN, ERGO_OPTIM, SENSITIVE_TEACHER, FNAME_NP)
+  select( SEX, RACE, AGECAT, TRNG_LEVEL, PERF_HRS, HEIGHT, GLOVE, INJURY, TPAIN, ERGO_OPTIM, SENSITIVE_TEACHER, FNAME_NP)
 
 
 
