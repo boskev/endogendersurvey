@@ -34,6 +34,15 @@ This is a brief workflow highlighting the exploratory analysis of survey data mi
 ***
 ***
 
+
+#### <span style="color:red"> [Click here for the latest version of the Summary Tables (downloadable Word document)](https://github.com/boskev/endogendersurvey/blob/main/Ergonomics%20Study%20Tables%207-5-22%20Full%20Cohort.docx)</span>
+
+
+<br>
+
+***
+***
+
 ```{r IMPORT, eval=FALSE, include=FALSE}
 
 GENDER_DIFF_DATA_LABELS <- read_excel("/Volumes/EDrive/Kevin/Data by Project/Misc/Rabinowitz Endoscopy Survey 2 (Gender Differences)/GENDER_DIFF_DATA_LABELS.xlsx")
