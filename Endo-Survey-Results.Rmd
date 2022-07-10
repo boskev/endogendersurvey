@@ -1,0 +1,3022 @@
+---
+title:     "Endoscopy Gender Survey Preliminary Results"
+author:     "Kevin Williams"
+requestor:    "Loren Rabinowitz"
+date:       "June 12, 2021"
+output: 
+  html_document:
+    theme: default
+    
+    
+knit: (function(inputFile, encoding) {
+          rmarkdown::render(inputFile,
+                        encoding= encoding,
+                        output_file='Endo-Survey-Results.html') })
+
+
+# knit: (function(inputFile, encoding) { rmarkdown::render(inputFile, encoding = encoding, output_file = 'Endo-Survey-Results.html' ) })
+
+---
+
+```{r SETUP-KNITR, setup, include=FALSE}
+      knitr::opts_chunk$set(echo = TRUE)
+
+```
+  
+<br>
+
+## Introduction
+
+This is a brief workflow highlighting the exploratory analysis of survey data mined to assist in the writing of the manuscript, ***"Gender Disparities Persist in Endoscopy Suite"*** **(Rabinowitz, et al.)**. Where appropriate, samples of the exact R syntax used will be displayed, along with the corresponding output (tabular data, graphical plots, maps, etc.).
+
+<br>
+
+***
+***
+
+
+#### <span style="color:red"> [Click here for the latest version of the Summary Tables (downloadable Word document)](https://github.com/boskev/endogendersurvey/blob/main/Ergonomics%20Study%20Tables%207-5-22%20Full%20Cohort.docx)</span>
+
+
+<br>
+
+***
+***
+
+```{r IMPORT, eval=FALSE, include=FALSE}
+
+GENDER_DIFF_DATA_LABELS <- read_excel("/Volumes/EDrive/Kevin/Data by Project/Misc/Rabinowitz Endoscopy Survey 2 (Gender Differences)/GENDER_DIFF_DATA_LABELS.xlsx")
+
+```
+
+
+#### DATA CLEAN-UP
+
+<br>
+
+
+```{r FACTOR-PHASE-VARIABLE}
+
+
+require(broom)
+require(dplyr)
+
+SURVEY  <-
+    GENDER_DIFF_DATA_LABELS %>% 
+    filter( COMPLETE != "Incomplete" &
+            BIRTHSEX != "OTHER" &
+            !is.na(BIRTHSEX) ) %>% 
+   select( RECORD_ID, BIRTHSEX, RACE_SOUTHASIAN:RACE_OTHER, AGE, TRAINING_LEVEL, HEIGHT, GLOVE, GLOVE_SIZE_AVAILABLE, PERFORMANCE_HOURS, TEACHER_GENDER_PREFERENCE,
+           FEMALE_TRAINERS, MALE_TRAINERS, EVER_INJURED, EXPERIENCED_TRANSIENT_PAIN_NO, EXPERIENCED_TRANSIENT_PAIN_HAND, EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER,
+           EXPERIENCED_TRANSIENT_PAIN_BACK, EXPERIENCED_TRANSIENT_PAIN_LEG, EXPERIENCED_TRANSIENT_PAIN_FOOT, GROWING_PAINS,
+           FELLOWSHIP_PREGNANCY, starts_with( c("PREGNANCY", "POSTPARTUM")),
+           FELLOWSHIP_FORMAL_ERGO_TRAINING, INFORMAL_TRAINING, TRAINING_TECHNIQUES_POSTURAL, TRAINING_TECHNIQUES_BEDHEIGHT, TRAINING_TECHNIQUES_BEDANGLE,
+           TRAINING_TECHNIQUES_MONITORHEIGHT, TRAINING_TECHNIQUES_MUSCULOSKELETAL, TRAINING_TECHNIQUES_EXERCISE_STRETCHING, TRAINING_TECHNIQUES_DIAL_EXTENDERS,
+           TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE, ERGO_TRAINING_BUDGET, ERGO_FEEDBACK, ERGO_FEEDBACK_BY_WHOM, ERGO_OPTIMIZATION, GLOVE_SIZE_AVAILABLE,
+           DIAL_EXTENDERS_AVAILABLE, DIAL_EXTENDERS_ENCOURAGED, DIAL_EXTENDERS_FEMALEATT, DIAL_EXTENDERS_MALEATT, PEDI_COLONOSCOPES_AVAILABLE,
+           LEAD_APRONS_DONTKNOW,  LEAD_APRONS_LW_ONEPIECE, LEAD_APRONS_LW_TWOPIECE, LEAD_APRONS_STANDARD_ONEPIECE, LEAD_APRONS_STANDARD_TWOPIECE,
+           LEAD_APRONS_DOUBLE, LEAD_APRONS_THYROID, LEAD_APRONS_MATERNALDOS, LEAD_APRONS_FETALDOS,
+           ERGO_FORMAL_TIMEOUT_PRIOR, ERGO_INFORMAL_TIMEOUT_PRIOR, MONITORS_ADJUSTABLE, TEACHER_SENSITIVITY_STATURE_HANDSIZE,
+           TEACHER_SENSITIVITY_BY_GENDER, TACTILE_INSTRUCTION_FROM_MALES, TACTILE_INSTRUCTION_FROM_FEMALES,
+           COMFORTABLE_ASKING_NURSES, ASK_NURSES_ONCE, ASK_NURSES_TWICE, ASK_NURSES_MORE,
+           COMFORTABLE_ASKING_TECHS, MALE_ATTENDINGS_ASKING, FEMALE_ATTENDINGS_ASKING,
+           RECOGNIZED_RESPECTED_ES_STAFF, RECOGNIZED_RESPECTED_ANESTHETISTS, RECOGNIZED_RESPECTED_GASTRO_ATTENDING, FIRST_NAME_NO_PERMISSION, 
+           ERGO_TRAINING_MANDATORY, ERGO_OPTIMIZAITON_BUDGET_REQUIRED, EXPERIENCE_IMPROVED_DIAL_EXTENDERS, EXPERIENCE_IMPROVED_PEDI_COLONOSCOPES, EXPERIENCE_IMPROVED_APRONS,
+           ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED,
+           ERGONOMIC_IMPORTANCE, MITIGATING_MUSCLE_STRAIN, BED_POSITION, ENDO_TRAINER_POSITION, WHEN_DISABILITY_INSURANCE) %>% 
+  
+    mutate(AGE2 = ifelse( AGE %in% c('< 30', '30-34', '35-40'), AGE, '> 40' )) %>% 
+  
+  
+    mutate( RACE = ifelse( RACE_HISPANIC == "Y", "HISPANIC",
+                   ifelse( RACE_WHITE == "Y", "WHITE",
+                   ifelse( RACE_BLACK == "Y", "BLACK",
+                   ifelse (RACE_SOUTHASIAN == "Y", "ASIAN SOUTH",
+                   ifelse (RACE_EASTASIAN == "Y", "ASIAN EAST",
+                   ifelse (RACE_NATIVEAMER == "Y", "OTHER",
+                   ifelse (RACE_PACIFICISLAND == "Y", "OTHER",
+                   ifelse (RACE_OTHER == "Y", "OTHER", "OTHER" )))))))),
+            RACE = factor(RACE, levels= c('ASIAN EAST', 'ASIAN SOUTH', 'BLACK', 'HISPANIC', 'WHITE', 'OTHER'))) %>%
+  
+    mutate( BIRTHSEX = factor( BIRTHSEX,  levels= c("F","M") ))  %>% 
+    mutate (AGE2 = factor(AGE2, levels = c('< 30', '30-34', '35-40', '> 40'))) %>%  
+
+    mutate (RACE2 = case_when( RACE != "WHITE" ~ 'NON-WHITE',
+                               TRUE ~ 'WHITE'),
+            RACE2 = factor(RACE2, levels = c("WHITE", "NON-WHITE"))) %>% 
+            
+
+                           
+                           
+    mutate( TRAINING_LEVEL = factor (TRAINING_LEVEL, levels= c('First year fellow','Second year fellow', 'Third year fellow', 'Advanced fellow'))) %>% 
+    mutate( TRAINING_LEVEL = recode_factor( TRAINING_LEVEL, 'First year fellow'= 'First Year', 
+                                                            'Second year fellow'= 'Second Year', 
+                                                            'Third year fellow' = 'Third Year', 
+                                                            'Advanced fellow' = "Advanced", .ordered = T) ) %>% 
+   mutate( HEIGHT2 = factor(HEIGHT, levels= c("< 5'", "5-5'3", "5'4-5'6", "5'7-5'9", "5'10-6'", "6'1-6'4", "> 6'4"))) %>% 
+   mutate( PERFORMANCE_HOURS = factor(PERFORMANCE_HOURS),
+           PERFORMANCE_HOURS = recode_factor(PERFORMANCE_HOURS, "< 10" = "< 10",
+                                                               "10-20" = "10-20",
+                                                               "21-30" = "21-30",
+                                                               "31-40" = "31-40",
+                                                               .default = "> 40")) %>% 
+  
+  mutate(TEACHER_GENDER_PREFERENCE = factor(TEACHER_GENDER_PREFERENCE),
+         TEACHER_GENDER_PREFERENCE = recode_factor(TEACHER_GENDER_PREFERENCE, "Yes" = "Yes",
+                                                                      .default = "No")) %>% 
+  
+  mutate( FEMALE_TRAINERS = factor(FEMALE_TRAINERS),
+          FEMALE_TRAINERS = recode_factor(FEMALE_TRAINERS, 'None' = 'None',
+                                                           '1-2' = '1-2',
+                                                           '3-5' = '3-5',
+                                                           '6-10' = '6-10',
+                                                           .default = '> 10' )) %>% 
+  mutate( MALE_TRAINERS = factor(MALE_TRAINERS),
+          MALE_TRAINERS = recode_factor(MALE_TRAINERS, 'None' = 'None',
+                                                           '1-2' = '1-2',
+                                                           '3-5' = '3-5',
+                                                           '6-10' = '6-10',
+                                                          .default = "> 10") ) %>% 
+  
+  mutate( EVER_INJURED = factor(EVER_INJURED)) %>% 
+  mutate( EXPERIENCED_TRANSIENT_PAIN_NO = factor(EXPERIENCED_TRANSIENT_PAIN_NO)) %>% 
+  mutate( EXPERIENCED_TRANSIENT_PAIN_HAND = factor(EXPERIENCED_TRANSIENT_PAIN_HAND)) %>% 
+  mutate( EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER = factor(EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER)) %>% 
+  mutate( EXPERIENCED_TRANSIENT_PAIN_BACK = factor(EXPERIENCED_TRANSIENT_PAIN_BACK)) %>% 
+  mutate( EXPERIENCED_TRANSIENT_PAIN_LEG = factor(EXPERIENCED_TRANSIENT_PAIN_LEG)) %>% 
+  mutate( EXPERIENCED_TRANSIENT_PAIN_FOOT = factor(EXPERIENCED_TRANSIENT_PAIN_FOOT))  %>% 
+  
+  mutate( FELLOWSHIP_PREGNANCY = factor(FELLOWSHIP_PREGNANCY),
+          PREGNANCY_ERGO_DIFFICULTY = factor(PREGNANCY_ERGO_DIFFICULTY),
+          PREGNANCY_ERGO_INJURY = factor( PREGNANCY_ERGO_INJURY),
+          POSTPARTUM_ERGO_INJURY = factor( POSTPARTUM_ERGO_INJURY)) %>% 
+  
+  mutate( GROWING_PAINS = factor(GROWING_PAINS)) %>% 
+  mutate( FELLOWSHIP_FORMAL_ERGO_TRAINING = factor(FELLOWSHIP_FORMAL_ERGO_TRAINING)) %>% 
+  mutate( INFORMAL_TRAINING = factor(INFORMAL_TRAINING)) %>% 
+  mutate( TRAINING_TECHNIQUES_POSTURAL = factor(TRAINING_TECHNIQUES_POSTURAL)) %>% 
+  mutate( TRAINING_TECHNIQUES_BEDHEIGHT = factor(TRAINING_TECHNIQUES_BEDHEIGHT)) %>% 
+  mutate( TRAINING_TECHNIQUES_BEDANGLE = factor(TRAINING_TECHNIQUES_BEDANGLE)) %>% 
+  mutate( TRAINING_TECHNIQUES_MONITORHEIGHT = factor(TRAINING_TECHNIQUES_MONITORHEIGHT)) %>% 
+  mutate( TRAINING_TECHNIQUES_MUSCULOSKELETAL = factor(TRAINING_TECHNIQUES_MUSCULOSKELETAL)) %>% 
+  mutate( TRAINING_TECHNIQUES_EXERCISE_STRETCHING = factor(TRAINING_TECHNIQUES_EXERCISE_STRETCHING)) %>% 
+  mutate( TRAINING_TECHNIQUES_DIAL_EXTENDERS = factor(TRAINING_TECHNIQUES_DIAL_EXTENDERS)) %>% 
+  mutate( TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE = factor(TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE)) %>% 
+  
+  mutate( ERGO_TRAINING_BUDGET = factor(ERGO_TRAINING_BUDGET),
+          ERGO_TRAINING_BUDGET = recode_factor(ERGO_TRAINING_BUDGET, 'Y' = 'Y',
+                                                                     'N' = 'N',
+                                                                     "Don't know" = 'DK', .ordered= T)) %>% 
+  
+
+  mutate( ERGO_FEEDBACK = factor(ERGO_FEEDBACK),
+          ERGO_FEEDBACK = recode_factor(ERGO_FEEDBACK, 'Never' = 'Never',
+                                                       'Rarely' = 'Rarely',
+                                                       'Sometimes' = 'Sometimes',
+                                                        'Often' = 'Often', .ordered = T )) %>% 
+            
+  mutate( ERGO_FEEDBACK_BY_WHOM = factor(ERGO_FEEDBACK_BY_WHOM),
+          ERGO_FEEDBACK_BY_WHOM = recode_factor(ERGO_FEEDBACK_BY_WHOM, 'I do not or rarely receive ergonomic feedback' = "Do not/rarely received feedback",
+                                                                     'Mostly male endoscopy teachers' = 'Mostly male teachers',
+                                                                     'Mostly female endoscopy teachers' = 'Mostly female teachers',
+                                                                     'Both male and female endoscopy teachers equally' = 'Both equally' , .ordered = T)) %>% 
+  
+  
+  mutate( ERGO_OPTIMIZATION = factor(ERGO_OPTIMIZATION),
+          ERGO_OPTIMIZATION = recode_factor(ERGO_OPTIMIZATION, 'Y' = 'Y',
+                                                                     'N' = 'N',
+                                                                     "Don't know" = 'DK', .ordered= T)) %>% 
+  
+  mutate( GLOVE_SIZE_AVAILABLE = factor(GLOVE_SIZE_AVAILABLE)) %>% 
+  
+  mutate( DIAL_EXTENDERS_AVAILABLE = factor(DIAL_EXTENDERS_AVAILABLE),
+          DIAL_EXTENDERS_AVAILABLE = recode_factor(DIAL_EXTENDERS_AVAILABLE, 'Y' = 'Y',
+                                                                             'N' = 'N',
+                                                                             "Don't know" = 'DK', .ordered= T)) %>% 
+  
+  mutate( DIAL_EXTENDERS_ENCOURAGED = factor(DIAL_EXTENDERS_ENCOURAGED),
+          DIAL_EXTENDERS_ENCOURAGED = recode_factor(DIAL_EXTENDERS_ENCOURAGED, 'Y' = 'Y',
+                                                                                 'N' = 'N',
+                                                                                 "Don't use" = 'DU', .ordered= T)) %>% 
+  
+  
+
+  mutate( DIAL_EXTENDERS_FEMALEATT = factor(DIAL_EXTENDERS_FEMALEATT),
+          DIAL_EXTENDERS_FEMALEATT = recode_factor(DIAL_EXTENDERS_FEMALEATT, 'Not Likely' = 'Not Likely',
+                                                                             'Somewhat Likely' = 'Somewhat Likely',
+                                                                             'Sometimes' = 'Sometimes',
+                                                                             'Verly Likely' = 'Very Likely',
+                                                                             'NA' = 'NA', .ordered = T )) %>% 
+
+  mutate( DIAL_EXTENDERS_MALEATT = factor(DIAL_EXTENDERS_MALEATT),
+          DIAL_EXTENDERS_MALEATT = recode_factor(DIAL_EXTENDERS_MALEATT, 'Not Likely' = 'Not Likely',
+                                                                             'Somewhat Likely' = 'Somewhat Likely',
+                                                                             'Sometimes' = 'Sometimes',
+                                                                             'Verly Likely' = 'Very Likely',
+                                                                             'NA' = 'NA', .ordered = T ))  %>% 
+    mutate( PEDI_COLONOSCOPES_AVAILABLE = factor(PEDI_COLONOSCOPES_AVAILABLE),
+          PEDI_COLONOSCOPES_AVAILABLE = recode_factor(PEDI_COLONOSCOPES_AVAILABLE, 'Y' = 'Y',
+                                                                                   'N' = 'N',
+                                                                                   "Don't know" = 'DK', .ordered= T)) %>% 
+  
+   mutate( LEAD_APRONS_DONTKNOW = factor(LEAD_APRONS_DONTKNOW),
+          LEAD_APRONS_DONTKNOW = recode_factor(LEAD_APRONS_DONTKNOW, 'N' = 'Aware',
+                                                                     'Y' = 'Not Aware',.ordered= T)) %>% 
+  
+   mutate( TEACHER_SENSITIVITY_BY_GENDER = factor(TEACHER_SENSITIVITY_BY_GENDER),
+          TEACHER_SENSITIVITY_BY_GENDER = recode_factor(TEACHER_SENSITIVITY_BY_GENDER, 'Male' = 'Male',
+                                                           'Female' = 'Female',
+                                                           'Both equally' = 'Both Equally',
+                                                           'I have not had female endoscopy teachers' = 'Never had female teacher',
+                                                           'Not sure' = 'Not Sure', .ordered= T ))  %>% 
+  
+   mutate( TACTILE_INSTRUCTION_FROM_MALES = factor(TACTILE_INSTRUCTION_FROM_MALES),
+          TACTILE_INSTRUCTION_FROM_MALES = recode_factor(TACTILE_INSTRUCTION_FROM_MALES, 'No' = 'No',
+                                                                                         'Yes, rarely' = 'Rarely',
+                                                                                         'Yes, often' = 'Often', .ordered= T)) %>% 
+  
+   mutate( TACTILE_INSTRUCTION_FROM_FEMALES = factor(TACTILE_INSTRUCTION_FROM_FEMALES),
+          TACTILE_INSTRUCTION_FROM_FEMALES = recode_factor(TACTILE_INSTRUCTION_FROM_FEMALES, 'No' = 'No',
+                                                                                         'Yes, rarely' = 'Rarely',
+                                                                                         'Yes, often' = 'Often', .ordered= T)) %>% 
+  
+   mutate( NURSES_ASKING = ifelse( ASK_NURSES_MORE == "Y", "More than Twice",
+                           ifelse( ASK_NURSES_TWICE == "Y", "Twice",
+                           ifelse( ASK_NURSES_ONCE == "Y", "Once", NA))),
+           
+           NURSES_ASKING = factor(NURSES_ASKING),
+           NURSES_ASKING = recode_factor(NURSES_ASKING, "Once" = "Once",
+                                                        "Twice" = "Twice",
+                                                        "More than Twicce" = "More than Twice", .ordered=T),
+  
+           MALE_ATTENDINGS_ASKING = factor(MALE_ATTENDINGS_ASKING),
+           MALE_ATTENDINGS_ASKING = recode_factor(MALE_ATTENDINGS_ASKING, "Once" = "Once",
+                                                                          "Twice" = "Twice",
+                                                                           "More than Twice" = "More than Twice", .ordered=T),
+
+           FEMALE_ATTENDINGS_ASKING = factor(FEMALE_ATTENDINGS_ASKING),
+           FEMALE_ATTENDINGS_ASKING = recode_factor(FEMALE_ATTENDINGS_ASKING, "Once" = "Once",
+                                                                             "Twice" = "Twice",
+                                                                             "More than twice" = "More than Twice",
+                                                                             "Not applicable, I do not work with any female attendings" = "Don't work with FemAtt", .ordered=T)) %>% 
+  
+   mutate( ERGO_TRAINING_MANDATORY = factor(ERGO_TRAINING_MANDATORY),
+           ERGO_TRAINING_MANDATORY = recode_factor(ERGO_TRAINING_MANDATORY, 'Y' = 'Y',
+                                                                              'N' = 'N',
+                                                                            "Don't know" = 'DK', .ordered= T) ,
+    
+           ERGO_OPTIMIZAITON_BUDGET_REQUIRED = factor(ERGO_OPTIMIZAITON_BUDGET_REQUIRED),
+           ERGO_OPTIMIZAITON_BUDGET_REQUIRED = recode_factor(ERGO_OPTIMIZAITON_BUDGET_REQUIRED, 'Y' = 'Y',
+                                                                              'N' = 'N',
+                                                                            "Don't know" = 'DK', .ordered= T),
+                 
+                                                
+          EXPERIENCE_IMPROVED_DIAL_EXTENDERS = factor(EXPERIENCE_IMPROVED_DIAL_EXTENDERS),
+           EXPERIENCE_IMPROVED_DIAL_EXTENDERS = recode_factor(EXPERIENCE_IMPROVED_DIAL_EXTENDERS, 'Y' = 'Y',
+                                                                              'N' = 'N',
+                                                                            "Don't know" = 'DK', .ordered= T),
+     
+           EXPERIENCE_IMPROVED_PEDI_COLONOSCOPES = factor(EXPERIENCE_IMPROVED_PEDI_COLONOSCOPES),
+           EXPERIENCE_IMPROVED_PEDI_COLONOSCOPES = recode_factor(EXPERIENCE_IMPROVED_PEDI_COLONOSCOPES, 'Y' = 'Y',
+                                                                              'N' = 'N',
+                                                                            "Don't know" = 'DK', .ordered= T) ,
+     
+           EXPERIENCE_IMPROVED_APRONS = factor(EXPERIENCE_IMPROVED_APRONS),
+           EXPERIENCE_IMPROVED_APRONS = recode_factor(EXPERIENCE_IMPROVED_APRONS, 'Y' = 'Y',
+                                                                              'N' = 'N',
+                                                                            "Don't know" = 'DK', .ordered= T),
+     
+           ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED = factor(ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED),
+           ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED = recode_factor(ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED, 'Y' = 'Y',
+                                                                              'N' = 'N',
+                                                                            "Don't know" = 'DK', .ordered= T))  %>% 
+  
+  
+   mutate( ERGONOMIC_IMPORTANCE = factor(ERGONOMIC_IMPORTANCE),
+           ERGONOMIC_IMPORTANCE = recode_factor(ERGONOMIC_IMPORTANCE, 'Both A and C' = 'Correct',
+                                                                       .default = 'Incorrect', .ordered= T) ,
+    
+           MITIGATING_MUSCLE_STRAIN = factor(MITIGATING_MUSCLE_STRAIN),
+           MITIGATING_MUSCLE_STRAIN = recode_factor(MITIGATING_MUSCLE_STRAIN, 'All of the above' = 'Correct',
+                                                                       .default = 'Incorrect', .ordered= T) ,
+    
+           BED_POSITION = factor(BED_POSITION),
+           BED_POSITION = recode_factor(BED_POSITION, '10 cm below elbow height' = 'Correct',
+                                                                       .default = 'Incorrect', .ordered= T) ,
+    
+           ENDO_TRAINER_POSITION = factor(ENDO_TRAINER_POSITION),
+           ENDO_TRAINER_POSITION = recode_factor(ENDO_TRAINER_POSITION, 'At the foot of the bed, on the same side of the trainee.' = 'Correct',
+                                                                       .default = 'Incorrect', .ordered= T) ,
+    
+           WHEN_DISABILITY_INSURANCE = factor(WHEN_DISABILITY_INSURANCE),
+           WHEN_DISABILITY_INSURANCE = recode_factor(WHEN_DISABILITY_INSURANCE, 'During training' = 'Correct',
+                                                                       .default = 'Incorrect', .ordered= T) ) 
+   
+   
+```
+  
+
+<br>
+
+Here's a glimpse of the structure of the resulting dataset `SURVEY`:
+  
+  
+```{r GLIMPSE-1 }
+  
+glimpse(SURVEY)
+
+```
+
+
+***
+***
+
+#### DEMOGRAPHIC DATA
+
+
+<br>
+  
+#### Question 1:  Distribution of RACE x AGE
+
+<br>
+
+  
+```{r CROSSTAB-BIRTHSEX-AGE }
+  
+
+#Female/Male Totals
+
+sqldf("select BIRTHSEX,
+              count(RECORD_ID) as N
+       from SURVEY 
+       where BIRTHSEX in ('F','M') 
+       group by 1")
+
+
+#Chi-Square Test of Proportions
+
+fcount <- length(SURVEY$BIRTHSEX[SURVEY$BIRTHSEX =="F"])
+mcount <- length(SURVEY$BIRTHSEX[SURVEY$BIRTHSEX =="M"])
+fcount
+mcount
+
+females_males = c(fcount, mcount )
+chisq.test(females_males, p= c(1/2, 1/2))
+
+
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$AGE2, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Age Distribution by Birth Sex",
+          axis.titles = c('Respondents Age Bands'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+SUBSET2 <-
+SURVEY %>% 
+  filter( !is.na(AGE2)) %>% 
+  mutate(BIRTHSEX = recode_factor( BIRTHSEX, "M" = "MALES", "F" = "FEMALES", .ordered=T))
+
+
+ggplot(  SUBSET2, aes(x= AGE2)) + facet_grid( SUBSET2$BIRTHSEX ) +  
+  geom_bar(aes(fill= BIRTHSEX) ) +
+  stat_count(geom="text", aes(label=..count..), vjust= -.1) + 
+  scale_fill_manual( values = c( "MALES"="darkgrey", "FEMALES"="#006cc5"), guide = "none" )+
+  theme_538()  +
+  xlab("Age Bands")+ ylab("Counts") 
+
+
+#Alternative View, if Birth Sex by Age is desired 
+
+
+CrossTable(SURVEY$AGE, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
+```
+
+<br>
+
+***
+
+#### Question 2:  Distribution of RACE x BIRTHSEX
+
+<br>
+
+  
+  
+```{r CROSSTAB-BIRTHSEX-RACE }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$RACE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Race Distribution by Birth Sex",
+          axis.titles = c('Race Categories '), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+SUBSET2 <-
+SURVEY %>% 
+  filter( !is.na(RACE)) %>% 
+  mutate(BIRTHSEX = recode_factor( BIRTHSEX, "M" = "MALES", "F" = "FEMALES", .ordered=T))
+
+
+ggplot(  SUBSET2, aes(x= RACE)) + facet_grid( SUBSET2$BIRTHSEX ) +  
+  geom_bar(aes(fill= BIRTHSEX) ) +
+  stat_count(geom="text", aes(label=..count..), vjust= -.05) + 
+  scale_fill_manual( values = c( "MALES"="darkgrey", "FEMALES"="#006cc5"), guide = "none" )+
+  theme_538()  +
+  xlab("Race/Ethnicity Categories")+ ylab("Counts") 
+
+
+#Alternative View, if Birth Sex by Race is desired 
+
+
+CrossTable(SURVEY$RACE, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r = T, prop.t=F, chisq=T, fisher=F)  #rows then/over columns
+
+
+```
+
+<br>
+
+***
+
+#### Question 3:  Distribution of TRAINING LEVEL x BIRTHSEX
+
+<br>
+
+  
+  
+```{r CROSSTAB-BIRTHSEX-TRAINING }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$TRAINING_LEVEL, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Training Levels by Birth Sex",
+          axis.titles = c('Training Levels'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+#Alternative View, if Birth Sex by Training Level is desired 
+
+
+CrossTable(SURVEY$TRAINING_LEVEL, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=F)  #rows then/over columns
+
+
+```
+
+
+<br>
+
+***
+
+#### Question 4:  Distribution of HEIGHT2 x BIRTHSEX
+
+<br>
+
+  
+  
+```{r CROSSTAB-BIRTHSEX-HEIGHT }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$HEIGHT2, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Height Bands by Birth Sex",
+          axis.titles = c('Height Bands'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+SUBSET2 <-
+SURVEY %>% 
+  filter( !is.na(HEIGHT2)) %>% 
+  mutate(BIRTHSEX = recode_factor( BIRTHSEX, "M" = "MALES", "F" = "FEMALES", .ordered=T))
+
+
+ggplot(  SUBSET2, aes(x= HEIGHT2)) + facet_grid( SUBSET2$BIRTHSEX ) +  
+  geom_bar(aes(fill= BIRTHSEX) ) +
+  stat_count(geom="text", aes(label=..count..), vjust= -.3) + 
+  scale_fill_manual( values = c( "MALES"="darkgrey", "FEMALES"="#006cc5"), guide = "none" )+
+  theme_538()  +
+  xlab("Height Bands")+ ylab("Counts") 
+
+
+
+#Alternative View, if Birth Sex by Height is desired 
+
+
+
+CrossTable(SURVEY$HEIGHT2, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r = F, prop.t=F, chisq=T, fisher=F)  #rows then/over columns
+
+
+```
+
+<br>
+
+***
+
+#### Question 5:  Distribution of GLOVE SIZE x BIRTHSEX
+
+<br>
+
+  
+  
+```{r CROSSTAB-BIRTHSEX-GLOVE2 }
+  
+require(ggstatsplot)
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$GLOVE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Glove Size by Birth Sex",
+          axis.titles = c('Glove Sizes'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+#Alternative View, if Birth Sex by Glove Size is desired 
+
+
+CrossTable(SURVEY$GLOVE, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T)  #rows then/over columns
+
+
+#Median Glove Size - Sex Difference
+
+
+  SURVEY %>% 
+  group_by( BIRTHSEX) %>% 
+  summarize( GLOVE_MEDIAN = median(GLOVE, na.rm=T))
+
+  
+ggbetweenstats( data= SURVEY,
+                x = BIRTHSEX,
+                y = GLOVE,
+                type="nonparametric",
+                p.adjust.method = "none")
+
+
+
+  SURVEY %>% 
+      filter( !is.na(GLOVE) ) %>% 
+  ggplot(aes( x=GLOVE, y= stat(density), fill= BIRTHSEX))+
+  geom_density( alpha=0.5, position = "identity" ) + 
+  scale_x_continuous(breaks = scales::breaks_width(0.5) ) +
+    scale_y_continuous(breaks = scales::breaks_width(.25))+
+    scale_fill_manual(values = c("red","darkgreen"), name ="Birth Sex", labels = c("Female","Male"))+
+  xlab("Glove Size")+ ylab("Density")+
+  ggtitle("Glove Size Density Curve by Sex",  subtitle = "Shows F/M distributions are almost identical, just off by one full size") +
+  theme_538()
+
+```
+
+<br> 
+
+***
+
+#### Question 6:  Distribution of AVG ENDOSCOPY HOURS x BIRTHSEX
+
+<br>
+
+  
+  
+```{r CROSSTAB-BIRTHSEX-PERFORMANCE_HOURS }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$PERFORMANCE_HOURS, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Performance Hours by Birth Sex",
+          axis.titles = c('Performance Hour Bands'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+#Alternative View, if Birth Sex by Performance Hours is desired 
+
+
+CrossTable(SURVEY$PERFORMANCE_HOURS, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
+```
+
+<br>
+
+***
+
+#### Question 7:  Distribution of TEACHER SEX PEREFERENCE x BIRTHSEX
+
+<br>
+
+
+```{r CROSSTAB-BIRTHSEX-TEACHER-PREFERENCE }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TEACHER_GENDER_PREFERENCE,  margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE,
+          title = "Teacher Sex Preference by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Teacher Sex Pref?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+```
+
+<br>
+
+***
+
+#### Question 8A & 8B:  Distribution of NUMBER OF TEACHERS BY SEX x BIRTHSEX
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-TEACHER-SEX }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$FEMALE_TRAINERS, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Number of Female Trainers by Birth Sex",
+          axis.titles = c('Approx. Female Trainers'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+#Alternative View, if Birth Sex by Number of Female Trainers is desired 
+
+CrossTable(SURVEY$FEMALE_TRAINERS, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
+
+plot_xtab(SURVEY$MALE_TRAINERS, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Number of Male Trainers by Birth Sex",
+          axis.titles = c('Approx. Male Trainers'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+#Alternative View, if Birth Sex by Number of Male Trainers is desired 
+
+CrossTable(SURVEY$MALE_TRAINERS, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+```
+
+<br>
+
+***
+
+#### Question 9A & 9B:  Endoscopy-Related Injury or Transient Pain Immediately Following Session
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-INJURY_GENERAL }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab(SURVEY$BIRTHSEX,SURVEY$EVER_INJURED,  margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Ever Endo Injured by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Ever Injured?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$EXPERIENCED_TRANSIENT_PAIN_NO, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "NEVER Experienced Transient Pain after Session by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Never Transient Pain?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+```
+
+<br>
+
+***
+
+#### Question 10A-10E:  Transient Pain Immediately Following Session - Specific Body Part
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-INJURY_SPECIFIC }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+plot_xtab( SURVEY$BIRTHSEX, SURVEY$EXPERIENCED_TRANSIENT_PAIN_HAND, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Transient Pain in Hand after Procedure by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Hand Pain?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Transient Pain in Neck/Shoulder after Procedure by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Neck/Should Pain?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+plot_xtab(SURVEY$BIRTHSEX,SURVEY$EXPERIENCED_TRANSIENT_PAIN_BACK,  margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Transient Pain in Back after Procedure by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Back Pain?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$EXPERIENCED_TRANSIENT_PAIN_LEG, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Transient Pain in Leg after Procedure by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Leg Pain?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$EXPERIENCED_TRANSIENT_PAIN_FOOT,  margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Transient Pain in Foot after Procedure by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Foot Pain?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+
+```
+<br>
+
+***
+
+#### Question 11:  Told Injuries were "Growing Pains" x BIRTHSEX
+###### (Exclude all respondents who did **not** report having been injured)
+
+<br>
+
+  
+  
+```{r CROSSTAB-BIRTHSEX-GROWING-PAINS }
+  
+
+#SJPlot cross tabulation with Chi-Square/df
+  
+
+SUBSET <-  sqldf( "select BIRTHSEX,
+                          GROWING_PAINS
+                  from SURVEY
+                  where GROWING_PAINS != 'NA' ")
+
+SUBSET <- SUBSET %>% 
+    mutate(GROWING_PAINS = recode_factor( GROWING_PAINS, "N" = "N",
+                                                         "Y" = "Y")) %>% droplevels()
+
+          
+
+plot_xtab(SUBSET$BIRTHSEX, SUBSET$GROWING_PAINS, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Told Injuries were Growing Pains by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Growing Pains?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+***
+***
+
+
+#### ENDOSCOPIC SUITE ENVIRONMENT
+
+#### Question 1A & 1B:  Distribution of FORMAL TRAINING & INFORMAL TRAINING by BIRTH SEX
+
+<br>
+
+  
+```{r CROSSTAB-BIRTHSEX-TRAINING-TYPES }
+  
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$FELLOWSHIP_FORMAL_ERGO_TRAINING, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Formal Ergo Training by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Formal Ergo Traiing?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab( SURVEY$BIRTHSEX, SURVEY$INFORMAL_TRAINING,margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Informal Ergo Training by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Informal Ergo Training?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+<br>
+
+***
+
+
+#### Question 2A-2H:  Distribution of TECHNIQUES DISCUSSED DURING TRAINING by BIRTH SEX
+
+
+<br>
+
+
+  
+```{r CROSSTAB-BIRTHSEX-SPECIFIC-TRAINING-TECHNIQUES }
+  
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TRAINING_TECHNIQUES_POSTURAL, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Training on Postural Awareness by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Training Postural Awareness?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TRAINING_TECHNIQUES_BEDHEIGHT, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Training on Bed Height Adjustments by Birth Sex",
+          axis.titles = "Birth Sex",  
+          legend.title= "Training Bed Height?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TRAINING_TECHNIQUES_BEDANGLE, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Training on Bed Angle Adjustments by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Training Bed Angle?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TRAINING_TECHNIQUES_MONITORHEIGHT, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Training on Monitor Height Adjustments by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Training Monitor Height?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TRAINING_TECHNIQUES_MUSCULOSKELETAL, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Training on Musculoskeletal Maneuvers by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Training Musculoskeletal?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TRAINING_TECHNIQUES_EXERCISE_STRETCHING, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Training on Exercise/Stretching by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Training Exer/Stretch?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab( SURVEY$BIRTHSEX, SURVEY$TRAINING_TECHNIQUES_DIAL_EXTENDERS,margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Training on Dial Extenders by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Training Dial Ext?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Training on Pediatric Colonoscopes by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Traiing Pedi Coloscope?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+```
+
+<br>
+
+***
+
+#### Question 3:  Distribution of BUDGET ALLOTMENT by BIRTH SEX
+
+<br>
+
+  
+```{r CROSSTAB-BIRTHSEX-TRAINING-BUDGET }
+  
+
+plot_xtab(SURVEY$ERGO_TRAINING_BUDGET, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Ergonomic Training Budget by Birth Sex",
+          axis.titles = c('Ergonomic Training Budget?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+#Alternative View, if Birth Sex by Ergo Training Budget is desired 
+
+
+CrossTable(SURVEY$ERGO_TRAINING_BUDGET, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
+
+```
+
+
+<br>
+
+***
+
+#### Question 4A & 4B:  Distribution of FEEBACK FREQUENCY & FEEDBACK BY WHOM by BIRTH SEX
+
+
+<br>
+
+
+  
+```{r CROSSTAB-BIRTHSEX-ERGO-FEEDBACK }
+  
+
+plot_xtab(SURVEY$ERGO_FEEDBACK, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Ergo Feedback Frequency by Birth Sex",
+          axis.titles = c('How Frequently Ergo Feedback?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+#Alternative View, if Birth Sex by Ergo Feedback Frequency is desired 
+
+
+CrossTable(SURVEY$ERGO_FEEDBACK, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
+
+plot_xtab(SURVEY$ERGO_FEEDBACK_BY_WHOM, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Who Provides Ergo Feedback by Birth Sex",
+          axis.titles = c('Who Provides Feedback?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+#Alternative View, if Birth Sex by Ergo Feedback by Whom is desired 
+
+
+CrossTable(SURVEY$ERGO_FEEDBACK_BY_WHOM, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+```
+
+
+<br>
+
+***
+
+#### Question 5A - 5G:  Distribution of EQUIPMENT OPITIMIZATOIN & AVAILABILITY by BIRTH SEX
+
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-EQUIPMENT-OPTIMIZATION-AVAILABILITY }
+  
+
+plot_xtab( SURVEY$BIRTHSEX, SURVEY$ERGO_OPTIMIZATION, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Ergonomically Optimized Equipment by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Ergo Optimization?",
+          geom.colors = c("#006cc5", "lightblue", "#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$GLOVE_SIZE_AVAILABLE, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Glove Size Availability by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Glove Size Avail?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$DIAL_EXTENDERS_AVAILABLE, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Dial Extender Availability by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Dial Ext Avail?",
+          geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+
+SUBSET <-  sqldf( "select BIRTHSEX,
+                          DIAL_EXTENDERS_ENCOURAGED
+                  from SURVEY
+                  where DIAL_EXTENDERS_ENCOURAGED != 'DU' ")
+
+SUBSET <- SUBSET %>% 
+    mutate(DIAL_EXTENDERS_ENCOURAGED = recode_factor( DIAL_EXTENDERS_ENCOURAGED, "N" = "N",
+                                                         "Y" = "Y")) %>% droplevels()
+
+
+
+plot_xtab(SUBSET$BIRTHSEX, SUBSET$DIAL_EXTENDERS_ENCOURAGED, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Dial Extenders Encouraged by Birth Sex - (Includes only subjects who use Dial Extenders)",
+          axis.titles = "Birth Sex", 
+          legend.title= "Dial Ext Encouraged?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+
+
+SUBSET <-  sqldf( "select BIRTHSEX,
+                          DIAL_EXTENDERS_FEMALEATT
+                  from SURVEY
+                  where DIAL_EXTENDERS_FEMALEATT != 'NA' ")
+
+SUBSET <- SUBSET %>% 
+    mutate(DIAL_EXTENDERS_FEMALEATT = recode_factor( DIAL_EXTENDERS_FEMALEATT, "N" = "N",
+                                                         "Y" = "Y")) %>% droplevels()
+
+
+
+plot_xtab(SUBSET$BIRTHSEX, SUBSET$DIAL_EXTENDERS_FEMALEATT, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Dial Extenders Encouraged with Female Att by Birth Sex - (Includes only subjects who use Dial Extenders)",
+          axis.titles = "Birth Sex", 
+          legend.title= "Dial Ext FemAtt?",
+          geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+
+SUBSET <-  sqldf( "select BIRTHSEX,
+                          DIAL_EXTENDERS_MALEATT
+                  from SURVEY
+                  where DIAL_EXTENDERS_MALEATT != 'NA' ")
+
+SUBSET <- SUBSET %>% 
+    mutate(DIAL_EXTENDERS_MALEATT = recode_factor( DIAL_EXTENDERS_MALEATT, "N" = "N",
+                                                         "Y" = "Y")) %>% droplevels()
+
+
+
+plot_xtab(SUBSET$BIRTHSEX, SUBSET$DIAL_EXTENDERS_MALEATT, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Dial Extenders Encouraged with Male Att by Birth Sex - (Includes only subjects who use Dial Extenders)",
+          axis.titles = "Birth Sex", 
+          legend.title= "Dial Ext MaleAtt?",
+          geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+
+
+plot_xtab(SURVEY$PEDI_COLONOSCOPES_AVAILABLE, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Pediatric Colonoscopes by Birth Sex",
+          axis.titles = c('Pedi Colonoscopes Available?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+#Alternative View, if Birth Sex by Pedi Colonoscopes is desired 
+
+
+CrossTable(SURVEY$PEDI_COLONOSCOPES_AVAILABLE, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
+```
+
+
+
+<br>
+
+***
+
+#### Question 6A - 6I:  Distribution of TYPE OF LEAD APRON AVAILABILITY by BIRTH SEX
+
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-LEAD-APRON-AVAILABILITY }
+  
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_DONTKNOW, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Don't Know Whether Lead Aprons Available at Institution by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Aware of Lead Aprons?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab( SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_LW_ONEPIECE,margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Lead Aprons LW One-Piece Available at Institution by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Lead Aprons LW 1P?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_LW_TWOPIECE, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Lead Aprons LW Two-Piece Available at Institution by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Lead Aprons LW 2P?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_STANDARD_ONEPIECE, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Lead Aprons SW One-Piece Available at Institution by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Lead Aprons Std 1P?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_STANDARD_TWOPIECE, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Lead Aprons SW Two-Piece Available at Institution by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Lead Aprons Std 2P?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_DOUBLE, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Lead Aprons Double Lead (Maternity) Available at Institution by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Lead Aprons Double?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_THYROID, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Lead Aprons Thyroid Shield Available at Institution by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Lead Aprons Thyroid?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_MATERNALDOS, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Lead Aprons Maternal Dosimeter Available at Institution by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Lead Aprons Maternal?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_FETALDOS, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Lead Aprons Fetal Dosimeter Available at Institution by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Lead Aprons Fetal?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+```
+
+
+
+
+
+<br>
+
+***
+
+#### Question 7A - 7G:  Distribution of ERGONOMIC CONSIDERATIONS by BIRTH SEX
+
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-ERGO-CONSIDERATIONS }
+  
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$ERGO_FORMAL_TIMEOUT_PRIOR, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Formal Ergo Timeouts at Institution by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Formal Ergo Timeout?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+CrossTable(SURVEY$ERGO_FORMAL_TIMEOUT_PRIOR, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=T) 
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$ERGO_INFORMAL_TIMEOUT_PRIOR, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Informal Ergo Timeouts at Institution by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Informal Ergo Timeout?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab( SURVEY$BIRTHSEX, SURVEY$MONITORS_ADJUSTABLE,margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Monitors Easily Adjustable at Institution by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Monitors Easily Adjust?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TEACHER_SENSITIVITY_STATURE_HANDSIZE, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Teachers Train with Sensitivity to Stature/Hand Size by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Teacher Sensitivity to Stature?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$TEACHER_SENSITIVITY_BY_GENDER, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Sex of Sensitive Teachers by Birth Sex",
+          axis.titles = c('Male or Female Teachers More Sensitive?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+#Alternative View, if Birth Sex by Male or Female Teacher more Sensitive is desired 
+
+CrossTable(SURVEY$TEACHER_SENSITIVITY_BY_GENDER, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
+
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TACTILE_INSTRUCTION_FROM_MALES, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Tactile Instruction from Male Teachers by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Tactile Instruction from Males?",
+          geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$TACTILE_INSTRUCTION_FROM_FEMALES, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Tactile Instruction from Females Teachers by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Tactile Instruction from Females?",
+          geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+
+
+<br>
+
+***
+
+#### Question 8A - 8I:  Distribution of RESPECT-ORIENTED ANSWERS by BIRTH SEX
+
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-RESPECT }
+  
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$COMFORTABLE_ASKING_NURSES,  margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Comfortable Asking Nurses for Help by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Comfortable Asking Nurses?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+SUBSET <-  sqldf( "select BIRTHSEX,
+                          COMFORTABLE_ASKING_TECHS
+                  from SURVEY
+                  where COMFORTABLE_ASKING_TECHS != 'NA' ")
+
+SUBSET <- SUBSET %>% 
+    mutate(COMFORTABLE_ASKING_TECHS = recode_factor( COMFORTABLE_ASKING_TECHS, "N" = "N",
+                                                         "Y" = "Y")) %>% droplevels()
+
+
+
+plot_xtab(SUBSET$BIRTHSEX, SUBSET$COMFORTABLE_ASKING_TECHS, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Comfortable Asking Techs for Help by Birth Sex (Includes only respondents with Techs)",
+          axis.titles = "Birth Sex", 
+          legend.title= "Comfortable Asking Techs?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab( SURVEY$BIRTHSEX, SURVEY$NURSES_ASKING, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Times Asking Nurses for Help by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Times Asking Nurses?",
+          geom.colors = c("#006cc5", "lightblue", "#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$MALE_ATTENDINGS_ASKING, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Times Male Attending Asking Nurses for Help by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Times Asking MaleAtt?",
+          geom.colors = c("#006cc5", "lightblue", "#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+CrossTable(SURVEY$MALE_ATTENDINGS_ASKING, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=T)
+
+
+plot_xtab(SURVEY$FEMALE_ATTENDINGS_ASKING, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Times Female Attending Asking Nurses for Help by Birth Sex",
+          axis.titles = c('Times Female Att Asking Nurses?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+CrossTable(SURVEY$FEMALE_ATTENDINGS_ASKING, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=T)  
+
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$RECOGNIZED_RESPECTED_ES_STAFF, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Recognized/Respected by ES Staff by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Recog by ES Staff?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$RECOGNIZED_RESPECTED_ANESTHETISTS, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Recognized/Respected by Anesthetists by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Recog by Anesthetists?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+plot_xtab( SURVEY$BIRTHSEX, SURVEY$RECOGNIZED_RESPECTED_GASTRO_ATTENDING,margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Recognized/Respected by Gastro Attending by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Recog by Gastro Att?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$FIRST_NAME_NO_PERMISSION,  margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "First Name Used No Permission by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "First Name No Permission?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+#Is there a RACE difference on this question ?
+
+
+plot_xtab(SURVEY$RACE2, SURVEY$FIRST_NAME_NO_PERMISSION, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "First Name Used No Permission by Race (Broad)",
+          axis.titles = "Binary Race Category", 
+          legend.title= "First Name Used No Permission?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+#Is there a TRAINING LEVEL difference on this question ?
+
+
+plot_xtab(SURVEY$TRAINING_LEVEL, SURVEY$FIRST_NAME_NO_PERMISSION, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "First Name Used No Permission by Training Level",
+          axis.titles = "Binary Race Category", 
+          legend.title= "First Name Used No Permission?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+#Is there a HEIGHT BAND difference on this question ?
+
+
+plot_xtab(SURVEY$HEIGHT2, SURVEY$FIRST_NAME_NO_PERMISSION, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "First Name Used No Permission by Height Band",
+          axis.titles = "Height Band", 
+          legend.title= "First Name Used No Permission?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+```
+
+
+
+***
+***
+
+
+#### FUTURE DESIRES FOR ENDOSCOPY SUITE
+
+
+
+
+#### Question 1:  Distribution of MANDATORY ERGO TRAINING by BIRTH SEX
+
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-FUTURE-ENDO-TRAINING }
+  
+plot_xtab(SURVEY$ERGO_TRAINING_MANDATORY, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Should Ergo Training be Mandatory by Birth Sex",
+          axis.titles = c('Mandatory Ergo Training?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+#Alternative View, if Birth Sex by Ergo Training be Mandatory is desired 
+
+CrossTable(SURVEY$ERGO_TRAINING_MANDATORY, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T , prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
+```
+
+***
+
+#### Question 2:  Distribution of ERGO BUDGET FOR OPTIMIZATION by BIRTH SEX
+
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-FUTURE-ENDO-OPTO-BUDGET }
+  
+plot_xtab(SURVEY$ERGO_OPTIMIZAITON_BUDGET_REQUIRED, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Should Budget Include Ergo Optimiation by Birth Sex",
+          axis.titles = c('Budget Should Include Ergo Opti?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+#Alternative View, if Birth Sex by Ergo Optimization Budget be Mandatory is desired 
+
+CrossTable(SURVEY$ERGO_OPTIMIZAITON_BUDGET_REQUIRED, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
+```
+
+***
+
+#### Question 3:  Distribution of INCREASED AVAILABILITY OF DIAL EXTENDERS by BIRTH SEX
+
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-FUTURE-DIAL-EXTENDERS }
+  
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$EXPERIENCE_IMPROVED_DIAL_EXTENDERS, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Increased Availability of Dial Extenders by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Increase Avail Dial Ext?",
+          geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+
+***
+
+#### Question 4:  Distribution of INCREASED AVAILABILITY OF PEDI COLONSCOPES by BIRTH SEX
+
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-FUTURE-PEDI-COLONOSCOPOES }
+  
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$EXPERIENCE_IMPROVED_PEDI_COLONOSCOPES, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Increased Availability of Pedi Colonoscopes by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Increase Avail Pediscopes?",
+          geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+***
+
+#### Question 5:  Distribution of INCREASED AVAILABILITY OF LEAD APRONS by BIRTH SEX
+
+
+<br>
+```{r CROSSTAB-BIRTHSEX-FUTURE-LEAD-APRONS }
+  
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$EXPERIENCE_IMPROVED_APRONS, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Increased Availability of Lead Aprons by Birth Sex",
+          axis.titles = "Birth Sex", 
+          legend.title= "Improve Aprons?",
+          geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+
+***
+
+#### Question 6:  Distribution of ERGO TRAINING REQUIRED FOR TEACHERS by BIRTH SEX
+
+
+<br>
+```{r CROSSTAB-BIRTHSEX-FUTURE-MANDATOR-TEACHER-TRAINING }
+  
+plot_xtab(SURVEY$ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED, SURVEY$BIRTHSEX, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Formal Ergo Training Required for Teachers by Birth Sex",
+          axis.titles = c('Ergo Training Required for Teachers?'), 
+          legend.title= "Birth Sex",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+#Alternative View, if Birth Sex by Formal Teacher Training Mandatory is desired 
+
+CrossTable(SURVEY$ENDO_TEACHERS_FORMAL_TRAINING_REQUIRED, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
+
+
+```
+
+
+***
+***
+
+
+#### ERGONOMIC KNOWLEDGE
+
+#### Question 1: Importance of Ergonomics in Relation to ERI
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-KNOWLEDGE-ERGO }
+  
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$ERGONOMIC_IMPORTANCE, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Importance of Ergonomics in Relation to ERI",
+          axis.titles = "Birth Sex", 
+          legend.title= "Ergo Importance Response",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+***
+
+#### Question 2: Mitigation Stategies to Reduce Muscle Strain Risk
+
+<br>
+
+  
+```{r CROSSTAB-BIRTHSEX-KNOWLEDGE-MUSCLE-STRAIN }
+  
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$MITIGATING_MUSCLE_STRAIN, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Mitigation Strategies to Reduce Muscle Strain Risk",
+          axis.titles = "Birth Sex", 
+          legend.title= "Muscle Strain Response",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+***
+
+
+#### Question 3: Mitigation Stategies to Reduce Muscle Strain Risk
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-KNOWLEDGE-BED-POSITION }
+  
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$BED_POSITION, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Bed Position in Relation to the Elbow",
+          axis.titles = "Birth Sex", 
+          legend.title= "Bed Position Response",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+```
+
+***
+
+#### Question 4: Best Position for Endoscopy Trainer
+
+<br>
+
+  
+```{r CROSSTAB-BIRTHSEX-KNOWLEDGE-TRAINER-POSITION }
+  
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$ENDO_TRAINER_POSITION, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Best Position for Endoscopy Trainer",
+          axis.titles = "Birth Sex", 
+          legend.title= "Trainer Position Response",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+```
+
+***
+
+#### Question 5: Best Time to Explore Disability Insurance
+
+<br>
+
+
+  
+```{r CROSSTAB-BIRTHSEX-KNOWLEDGE-DISABILITY-INSURANCE }
+  
+
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$WHEN_DISABILITY_INSURANCE, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Best Time to Explore Disability Insurance",
+          axis.titles = "Birth Sex", 
+          legend.title= "When Disab Ins Response",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+
+# CORRECT <-
+#   
+#   SURVEY %>% 
+#   mutate(CORRECT = across(.cols =  ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE , .fns = str_count, "Correct")) %>%
+#           rowwise() %>%
+#           mutate(COUNT_CORRECT = across(.cols = contains("Correct"), .fns = sum)) %>% 
+#           select (BIRTHSEX, ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE, COUNT_CORRECT) %>% 
+#           mutate( COUNT_CORRECT = as.integer(COUNT_CORRECT) )
+
+
+# CORRECT <-
+#    SURVEY %>%
+#     select (BIRTHSEX, ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE,) %>%
+#     mutate( COUNT_CORRECT = apply( . , 1, function(x) sum( x== "Correct", na.rm= T )))
+
+
+
+CORRECT <-
+   SURVEY %>% 
+    select (BIRTHSEX, ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE,) %>% 
+    mutate( COUNT_CORRECT = rowSums( . == "Correct" ))
+
+
+eov.ttest(CORRECT, COUNT_CORRECT, BIRTHSEX)  
+
+
+ggbetweenstats( data= CORRECT,
+                x = BIRTHSEX,
+                y = COUNT_CORRECT,
+                type="parametric",
+                p.adjust.method = "none",
+                title = "Mean Scores by Birth Sex")
+
+
+```
+
+***
+***
+
+#### QUICK CORRELATIONS & ASSOCIATIONS
+
+
+<br>
+
+#### <span style="color:red"> A WARNING ABOUT THE FOLLOWING CORRELATIONAL DATA
+<br>
+The appropriate tack here would be to run a series of "point biserial correlations," which are correlations between a categorical data (structured as T/F, 0/1, or ordinal, such as Low-Medium-High or Freshman-Sophomore-Junior-Senior) against a **continuous variable**.  In our data, the *only* continuous variable is GLOVE (glove size), so therefore, only the correlations where our demographic categorical data is compared to GLOVE (e.g., BIRTHSEX, AGEBAND, TRNG_LEVEL, HEIGHT_BAND) are statistically valid.  For other categorical variables that we have coerced into a binary numeric -- EVER_INJURED, TRANSIENT_PAIN_XXXX, ERGO_OPTIM -- any correlations against *other* categorical variables would technically be statistically inappropriate to run, and should certainly never be reported.  For our purposes here, these "correlations" should be used only to guide us to perform other, more appropriate statistical tests (such as logistic regression, which is a natural extension of the Chi-Square analyses run previously).
+</span>
+
+<br>
+<br>
+
+
+  
+#### Task 1:  Produce a CORRELATION MATRIX that displays the high-level associations among Sex, Race, Age, Height and Glove Size with other key variables of interest
+
+
+```{r TASKS-CORRELATION-MATRIX, fig.align='center', fig.dim= c(12,12) }
+
+
+CORRMATRIX <-
+
+  SURVEY %>%
+  select (BIRTHSEX, RACE2, AGE2, TRAINING_LEVEL, PERFORMANCE_HOURS, HEIGHT2, GLOVE, EVER_INJURED, ERGO_OPTIMIZATION, TEACHER_SENSITIVITY_STATURE_HANDSIZE,
+          FIRST_NAME_NO_PERMISSION, EXPERIENCED_TRANSIENT_PAIN_HAND : EXPERIENCED_TRANSIENT_PAIN_FOOT ) %>% 
+  
+  # na.omit()  %>% 
+  
+  mutate( SEX = case_when(  is.na(BIRTHSEX) ~ NA_real_,
+                              BIRTHSEX == "M" ~ 0,
+                                 TRUE ~ 1 ) ,
+          
+          RACE = case_when( is.na(RACE2) ~ NA_real_,
+                            RACE2 == "WHITE" ~ 0,
+                            TRUE  ~ 1),
+          
+          AGECAT = case_when( is.na(AGE2) ~ NA_real_,
+                              AGE2 == "< 30" ~ 1,
+                              AGE2 == "30-34" ~ 2,
+                              AGE2 == "35-40" ~3,
+                              TRUE ~ 4),
+          
+          TRNG_LEVEL = case_when( is.na(TRAINING_LEVEL) ~ NA_real_,
+                                  TRAINING_LEVEL == 'First Year' ~ 1,
+                                  TRAINING_LEVEL == 'Second Year' ~ 2,
+                                  TRAINING_LEVEL == 'Third Year' ~ 3,
+                                  TRUE  ~ 4) ,
+          
+          PERF_HRS = case_when( is.na(PERFORMANCE_HOURS) ~ NA_real_,
+                          PERFORMANCE_HOURS == '< 10' ~ 1,
+                          PERFORMANCE_HOURS == '10-20' ~ 2,
+                          TRUE  ~ 3) ,
+          
+          HEIGHT = case_when( is.na(HEIGHT2) ~ NA_real_,
+                              HEIGHT2 == "< 5" ~ 1,
+                              HEIGHT2 == "5-5'3" ~ 2,
+                              HEIGHT2 == "5'4-5'6" ~ 3,
+                              HEIGHT2 == "5'7-5'9" ~ 4,
+                              HEIGHT2 == "5'10-6'" ~ 5,
+                              HEIGHT2 == "6'1-6'4" ~ 6,
+                                         TRUE ~ 7),
+          
+          INJURY = case_when(  is.na(EVER_INJURED) ~ NA_real_,
+                               EVER_INJURED== "Y" ~ 1,
+                                    TRUE ~ 0)  ,
+          
+          TPAIN =  case_when(   is.na(EXPERIENCED_TRANSIENT_PAIN_BACK) |
+                                is.na(EXPERIENCED_TRANSIENT_PAIN_HAND) |
+                                is.na(EXPERIENCED_TRANSIENT_PAIN_FOOT) |
+                                is.na(EXPERIENCED_TRANSIENT_PAIN_HAND) |
+                                is.na(EXPERIENCED_TRANSIENT_PAIN_LEG) |
+                                is.na(EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER) ~ NA_real_,
+                                  
+                                EXPERIENCED_TRANSIENT_PAIN_BACK == "Y" |
+                                EXPERIENCED_TRANSIENT_PAIN_HAND == "Y" |
+                                EXPERIENCED_TRANSIENT_PAIN_FOOT == "Y" |
+                                EXPERIENCED_TRANSIENT_PAIN_HAND == "Y" |
+                                EXPERIENCED_TRANSIENT_PAIN_LEG == "Y" |
+                                EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER == "Y" ~ 1,
+                                TRUE ~ 0),
+          
+          
+          ERGO_OPTIM =  case_when( is.na(ERGO_OPTIMIZATION) ~ NA_real_,
+                                  ERGO_OPTIMIZATION == "Y" ~ 1,
+                                    TRUE ~ 0),
+                                   
+          SENSITIVE_TEACHER = case_when (is.na(TEACHER_SENSITIVITY_STATURE_HANDSIZE) ~ NA_real_,
+                                         TEACHER_SENSITIVITY_STATURE_HANDSIZE == "Y" ~ 1,
+                                          TRUE ~ 0),
+          
+          FNAME_NP =  case_when (is.na(FIRST_NAME_NO_PERMISSION) ~ NA_real_,
+                                 FIRST_NAME_NO_PERMISSION == "Y" ~ 1,
+                                 TRUE ~ 0)) %>% 
+  
+  select( SEX, RACE, AGECAT, TRNG_LEVEL, PERF_HRS, HEIGHT, GLOVE, INJURY, TPAIN, ERGO_OPTIM, SENSITIVE_TEACHER, FNAME_NP)
+
+
+
+
+pairs.panels( CORRMATRIX, pch=21, stars=T,) 
+
+
+
+
+
+```
+
+<br>
+
+###### There does not appear to be any association in this sample with HEIGHT or GLOVE and having sustained an injury or experienced any of the five specific transient pain types listed in the survey.  Does this change if we adjust the correlations based on sex?  Or race?
+
+<br>
+
+```{r TASKS-CORRELATION-PARITALS }
+
+require(ppcor)
+
+#Partial Correlation:  HEIGHT + INJURY correlation adjusted for SEX and then RACE
+
+CORRMATRIX_NOMISS <- CORRMATRIX %>% na.omit()
+
+attach(CORRMATRIX_NOMISS)
+
+pcor.test( x=HEIGHT, y=INJURY, z=SEX, method= 'pearson')
+pcor.test( x=HEIGHT, y=INJURY, z=RACE, method= 'pearson' )
+
+
+
+#Partial Correlation:  GLOVE + INJURY correlation adjusted for SEX and then RACE
+
+pcor.test( x=GLOVE, y=INJURY, z=SEX, method= 'pearson' )
+pcor.test( x=GLOVE, y=INJURY, z=RACE, method= 'pearson' )
+
+
+detach(CORRMATRIX_NOMISS)
+
+```
+
+
+<br>
+  
+#### Task 2: Are Ergonomic Difficulties reported among respondents who were PREGNANT during their fellowship associated at all with GLOVE or HEIGHT ?
+
+
+- Total N for subjects who were pregnant during fellowship = 23
+- Only one (1) subject reported an Ergonomic Injury during her fellowship, so meaningful analysis along this metric could not be performed
+
+
+<br>
+
+
+```{r TASKS-CORRELATIONS-PREGNANCY, fig.align='center', fig.dim= c(12,12)}
+
+
+#Ergonomic Difficulty during Pregnancy?
+
+CrossTable(SURVEY$PREGNANCY_ERGO_DIFFICULTY, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=F, fisher=F)  
+CrossTable(SURVEY$PREGNANCY_ERGO_INJURY, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=F, fisher=F) 
+CrossTable(SURVEY$POSTPARTUM_ERGO_INJURY, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=F, fisher=F) 
+
+
+#Correlation Matrix to view "associations" with Glove Size and Height
+
+
+PREGNANCY  <-
+  
+  SURVEY %>%
+  filter( FELLOWSHIP_PREGNANCY == "Y") %>% 
+  select (BIRTHSEX, RACE2, AGE2, TRAINING_LEVEL, HEIGHT2, GLOVE, PREGNANCY_ERGO_DIFFICULTY ) %>% 
+  
+  mutate( SEX = case_when(  is.na(BIRTHSEX) ~ NA_real_,
+                            BIRTHSEX == "M" ~ 0,
+                            TRUE ~ 1 ) ,
+          
+          RACE = case_when( is.na(RACE2) ~ NA_real_,
+                            RACE2 == "WHITE" ~ 0,
+                            TRUE  ~ 1),
+          
+          AGECAT = case_when( is.na(AGE2) ~ NA_real_,
+                              AGE2 == "< 30" ~ 1,
+                              AGE2 == "30-34" ~ 2,
+                              AGE2 == "35-40" ~3,
+                              TRUE ~ 4),
+          
+          TRNG_LEVEL = case_when( is.na(TRAINING_LEVEL) ~ NA_real_,
+                                  TRAINING_LEVEL == 'First Year' ~ 1,
+                                  TRAINING_LEVEL == 'Second Year' ~ 2,
+                                  TRAINING_LEVEL == 'Third Year' ~ 3,
+                                  TRUE  ~ 4) ,
+          
+          HEIGHT = case_when( is.na(HEIGHT2) ~ NA_real_,
+                              HEIGHT2 == "< 5" ~ 1,
+                              HEIGHT2 == "5-5'3" ~ 2,
+                              HEIGHT2 == "5'4-5'6" ~ 3,
+                              HEIGHT2 == "5'7-5'9" ~ 4,
+                              HEIGHT2 == "5'10-6'" ~ 5,
+                              HEIGHT2 == "6'1-6'4" ~ 6,
+                              TRUE ~ 7),
+          
+          ERGO_DIFF = case_when( is.na(PREGNANCY_ERGO_DIFFICULTY) ~ NA_real_,
+                                 PREGNANCY_ERGO_DIFFICULTY == 'N' ~ 0,
+                                  TRUE  ~ 1) ) %>% 
+  select( SEX, RACE, AGECAT, TRNG_LEVEL, ERGO_DIFF, GLOVE, HEIGHT)
+
+
+pairs.panels( PREGNANCY[c(-1,-2)] , pch=21, stars=T) 
+
+
+
+```
+
+
+
+<br>
+  
+#### Task 3: How are the associations/correlations for certain variables affected if we statify them by Training Level?
+
+
+- Ergonomic Optimizaiton
+- Injury
+- Transient Pain
+- Sensitive Teachers
+- First Name No Permission
+
+
+<br>
+
+
+```{r TASKS-CORRELATIONS-TRAINING-LEVEL, fig.align='center', fig.dim= c(12,14)}
+
+require(ggcorrplot)
+
+#Paneled Correlation Matrices for each level of "Training Level" (4)
+
+
+CORRMATRIX %>%
+  mutate(TRNG_LEVEL = factor(TRNG_LEVEL),
+         TRNG_LEVEL = recode_factor(TRNG_LEVEL, '1'= 'First Yr', '2'= "Second Yr", '3'= "Third Yr", '4'="Advanced", .ordered=T)) %>%
+  select(TRNG_LEVEL, ERGO_OPTIM, INJURY, TPAIN, SENSITIVE_TEACHER, FNAME_NP) %>%
+  
+  grouped_ggcorrmat(
+    ## arguments relevant for `ggcorrmat`
+    data = . ,
+    
+    grouping.var = TRNG_LEVEL,
+    ## arguments relevant for `combine_plots`
+    plotgrid.args = list(nrow = 2),
+    annotation.args = list(
+      tag_levels = "1",
+      title = "Relationship among Key Variables across Training Level"
+    ),
+    p.adjust.method = "none"
+  )
+
+
+```
+
+##### There apprears to be a few slightly significant "correlations" that might be worth exploring with simple logistic regression:
+
+- First Year: Transient Pain with Sensitive Teacher & wth Ergo Optimization (based on borderline p-value, not displayed)
+- Second Year: First Name & Ergo Optimization (???)
+- Advanced:  Transient Pain & Sensitive Teacher
+
+<br>
+
+Let's explore further with few unadjusted/adjusted regressions where Transient Pain is the outcome and Ergo Optimization is the outcome:
+
+<br>
+<br>
+
+- **1. Does Ergonomic Optimization influence reports of Transient Pain, with and without adjusting for Training Level?**
+
+<br>
+
+```{r TASKS-CORRELATIONS-TRAINING-LEVEL-EXPLORATORY-REGRESSION1 }
+
+require(car)
+
+TLEVEL <-
+CORRMATRIX %>%
+  mutate(TRNG_LEVEL = factor(TRNG_LEVEL),
+         TRNG_LEVEL = recode_factor(TRNG_LEVEL, '1'= 'First Yr', '2'= "Second Yr", '3'= "Third Yr", '4'="Advanced", .ordered=F),
+         TRNG_LEVEL =  relevel(TRNG_LEVEL, ref= "Advanced")) %>%
+  select(TRNG_LEVEL, ERGO_OPTIM, INJURY, TPAIN, SENSITIVE_TEACHER, FNAME_NP)
+  
+
+
+
+
+      tpain.eo.glm.unadj <- glm( TPAIN ~ ERGO_OPTIM, data= TLEVEL, family= binomial(link="logit"))
+      tpain.eo.emmeans.unadj <- emmeans( tpain.eo.glm.unadj,  ~ c(ERGO_OPTIM), type= "response")
+      tpain.eo.glm.adj   <- glm( TPAIN ~ ERGO_OPTIM + TRNG_LEVEL, data= TLEVEL, family= binomial(link="logit"))
+      tpain.eo.emmeans.adj <- emmeans( tpain.eo.glm.adj,  ~ c(ERGO_OPTIM), type= "response")
+      
+      
+      summary(tpain.eo.glm.unadj)
+      contrast(tpain.eo.emmeans.unadj, list("Unadj OR: Ergo Optim =Y on Transient Pain =Y" = c(-1, 1)))
+      contrast(tpain.eo.emmeans.unadj, list("Unadj OR: Ergo Optim =N on Transient Pain =Y" = c(1, -1)))
+      summary(tpain.eo.glm.adj)
+      
+      #Before running OR test, determine whether the multilevel categorical variable TRNG_LEVEL is significant overall?
+      aod::wald.test(b = coef(tpain.eo.glm.adj), Sigma = vcov(tpain.eo.glm.adj), Terms = 3:5)
+
+      
+      contrast(tpain.eo.emmeans.adj, list("Adj OR: Ergo Optim =N on Transient Pain =Y" = c(1, -1)))
+  
+```
+
+<br>
+
+- **Conclusion:**  Ergonomic Optimization is a significant effect before and after adjust for Training Level, which itself is *not* a significant effect. (The Odds Ratio in the adjusted model fell from 3.15 to 3.05, p= 0.0165.  In other words, subjects who reported that their Endoscopy Suite environment was not ergonomically optimized were 3.05 times more likely to also report having experienced Transient Pain in one of the several body parts highlghted in the survey.)
+
+
+<br>
+<br>
+
+-  **2. Does having a Sensitive Teacher with concern for your size/stature influence reports of Transient Pain, with and without adjusting for Training Level?**
+
+<br>
+
+```{r TASKS-CORRELATIONS-TRAINING-LEVEL-EXPLORATORY-REGRESSION2 }
+
+
+
+  
+  
+
+
+    
+    tpain.steach.glm.unadj <- glm( TPAIN ~ SENSITIVE_TEACHER, data= TLEVEL, family= binomial(link="logit"))
+    tpain.steach.emmeans.unadj <- emmeans( tpain.steach.glm.unadj,  ~ c(SENSITIVE_TEACHER), type= "response")
+    tpain.steach.glm.adj   <- glm( TPAIN ~ SENSITIVE_TEACHER + TRNG_LEVEL, data= TLEVEL, family= binomial(link="logit"))
+    tpain.steach.emmeans.adj <- emmeans( tpain.steach.glm.adj,  ~ c(SENSITIVE_TEACHER), type= "response")
+    
+    
+    summary(tpain.steach.glm.unadj)
+    contrast(tpain.steach.emmeans.unadj, list("Unadj OR: Sensitive Teach =Y on Transient Pain =Y" = c(-1, 1)))
+    contrast(tpain.steach.emmeans.unadj, list("Unadj OR: Sensitive Teach =N on Transient Pain =Y" = c(1, -1)))
+    summary(tpain.steach.glm.adj)
+  
+            
+    #Before running OR test, determine whether the multilevel categorical variable TRNG_LEVEL is significant overall?
+    aod::wald.test(b = coef(tpain.steach.glm.adj), Sigma = vcov(tpain.steach.glm.adj), Terms = 3:5)
+    
+    contrast(tpain.steach.emmeans.adj, list("Adj OR: Sensitive Teach =N on Transient Pain =Y" = c(1, -1)))
+
+  
+```
+  
+<br>
+  
+- **Conclusion:**  Sensitive Teacher is *not* a significant effect before (p=0.198) or after adjust for Training Level (p=0.149), which itself is *not* a significant effect. (In the adjusted model, the odds of experiencing Transient Pain if one did *not* have a Sensitive Teacher was 2.0, but with an insignificant p-value, cl=[0.781, 5.11])
+
+  
+<br>
+<br>
+
+- **3. Does having a Sensitive Teacher with concern for your size/stature influence the use/encouragement of Ergonomic Optimization, with and without adjusting for Training Level?**
+ 
+<br>
+
+```{r TASKS-CORRELATIONS-TRAINING-LEVEL-EXPLORATORY-REGRESSION3 } 
+
+  
+    
+    eo.steach.glm.unadj <- glm( ERGO_OPTIM ~ SENSITIVE_TEACHER, data= TLEVEL, family= binomial(link="logit"))
+    eo.steach.emmeans.unadj <- emmeans( eo.steach.glm.unadj,  ~ c(SENSITIVE_TEACHER), type= "response")
+    eo.steach.glm.adj   <- glm( ERGO_OPTIM ~ SENSITIVE_TEACHER + TRNG_LEVEL, data= TLEVEL, family= binomial(link="logit"))
+    eo.steach.emmeans.adj <- emmeans( eo.steach.glm.adj,  ~ c(SENSITIVE_TEACHER), type= "response")
+    
+    
+    summary(eo.steach.glm.unadj)
+    contrast(eo.steach.emmeans.unadj, list("Unadj OR: Sensitive Teach =Y on Ergo Optim =Y" = c(-1, 1)))
+    contrast(eo.steach.emmeans.unadj, list("Unadj OR: Sensitive Teach =N on Ergo Optim =Y" = c(1, -1)))
+    summary(eo.steach.glm.adj)
+    
+    #Before running OR test, determine whether the multilevel categorical variable TRNG_LEVEL is significant overall?
+    aod::wald.test(b = coef(eo.steach.glm.adj), Sigma = vcov(eo.steach.glm.adj), Terms = 3:5)
+
+    contrast(eo.steach.emmeans.adj, list("Adj OR: Sensitive Teach =Y on Ergo Optim =Y" = c(-1, 1)))
+  
+```
+  
+<br>
+
+- **Conclusion:**  Sensitive Teacher is a highly significant effect before, and an extremely highly significant effect after adjusting for Training Level. Training Level itself is *not* a significant effect.  (The model summary shows that there is significance among three levels of TRNG_LEVEL *when compared to the reference category, "Advanced.") Beta for ST increases slightly from +0.9312 to +1.03915, meaning that as Teacher Sensitivity increases, reports of Ergonomic Optimization also rise.  (The Odds Ratio in the adjusted model rose from 2.54 to 2.83, p= 0.0008.  In other words, subjects who reported that their Endoscopy Suite environment was ergonomically optimized were 2.83 times more likely to have had instructors who were sensitive to their physical size/stature.)
+
+- When compared to the reference category ("Advanced"), *ALL* other training levels were significantly different (i.e., lower Beta weights).  Does this suggest that teachers are more likely to be sensitive to ergonomics when dealing with older trainees, or does it suggest that younger trainees don't really know what proper ergonomics should entail and, therefore, don't know how to rate their instructors on this metric?  (Does it take rising to the Advanced level before a trainee fully understands what constitutes "proper ergonomics?")
+
+
+<br>
+<br>
+  
+  
+- **4. First Name-No Permission does not appear to be correlated with Sex, but there does appear to be some correlation to Height Band.  Is it significant?**
+  
+  <br>
+ 
+```{r TASKS-CORRELATIONS-FNAME_NOPERM-EXPLORATORY-REGRESSION4 , fig.dim= c(12,6) } 
+
+
+
+
+  # Since height is a multilevel categorical variable, use the median Male height as the reference, 5, or 5'10-6'
+  
+
+
+
+FNAME <-
+    CORRMATRIX %>% 
+    select( SEX, AGECAT, RACE, HEIGHT, TRNG_LEVEL, FNAME_NP) %>% 
+    mutate( SEX = factor(SEX),
+            RACE = factor(RACE),
+            HEIGHT = factor(HEIGHT),
+            HEIGHT = relevel(HEIGHT, ref="5"),
+            HTCAT = factor(HEIGHT),
+            HTCAT = recode_factor(HEIGHT, '1'='0', '2'='0', '3'='0', .default = '1'),
+            HTCAT = relevel(HTCAT, ref='1'),
+            AGECAT = recode_factor(AGECAT, '1'='1', '2'='1', '3'='2', '4'='2'),
+            AGECAT = relevel(AGECAT, ref="2"),
+            
+            TRNG_LEVEL = factor(TRNG_LEVEL),
+            TRNG_LEVEL = relevel(TRNG_LEVEL, ref="4"))
+
+
+    levels(FNAME$HEIGHT)
+    levels(FNAME$AGECAT)
+    
+    fname.height.glm.unadj <- glm( FNAME_NP ~ HEIGHT, data= FNAME, family= binomial(link="logit"))
+    fname.height.emmeans.unadj <- emmeans( fname.height.glm.unadj,  ~ c(HEIGHT), type= "response")
+    fname.height.glm.adj   <- glm( FNAME_NP ~ HEIGHT + SEX , data= FNAME, family= binomial(link="logit"))
+    fname.height.emmeans.adj <- emmeans( fname.height.glm.adj,  ~ c(HEIGHT, SEX), type= "response")
+    
+    
+    summary(fname.height.glm.unadj)
+    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height2 (5-5'3) on FNAME_NP =Y relative to 5'10-6'" =   c(-1, 1, 0, 0, 0, 0)))
+    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height3 (5'4-5'6) on FNAME_NP =Y relative to 5'10-6'" = c(-1, 0, 1, 0, 0, 0)))
+    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height4 (5'7-5'9) on FNAME_NP =Y relative to 5'10-6'" = c(-1, 0, 0, 1, 0, 0)))
+    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height6 (6'-6'4) on FNAME_NP =Y relative to 5'10-6'" = c(-1, 0, 0, 0, 1, 0)))
+    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height7 (< 6'4) on FNAME_NP =Y relative to 5'10-6'" = c(-1, 0, 0, 0, 0, 1)))
+
+    
+    #Determine whether the multilevel categorical variable HEIGHT is significant overall in the UNADJUSTED model?
+    aod::wald.test(b = coef(fname.height.glm.unadj), Sigma = vcov(fname.height.glm.unadj), Terms = 2:6)
+
+    
+    summary(fname.height.glm.adj)
+    #summary(fname.height.emmeans.adj)
+    
+    
+    #Determine whether the multilevel categorical variable HEIGHT is significant overall in the ADJUSTED model?
+    aod::wald.test(b = coef(fname.height.glm.adj), Sigma = vcov(fname.height.glm.adj), Terms = 2:6)
+    
+    
+    
+    # Just for fun, adjust only for SEX
+     
+    fname.sex.glm.unadj <- glm( FNAME_NP ~ SEX , data= FNAME, family= binomial(link="logit"))
+    fname.sex.emmeans.unadj <- emmeans( fname.sex.glm.unadj,  ~ c(SEX), type= "response")
+    
+    
+    summary(fname.sex.glm.unadj)
+    
+    #Confirm that Sex is not significant (trend with  0.10 > p-value > 0.05)
+    aod::wald.test(b = coef(fname.sex.glm.unadj), Sigma = vcov(fname.sex.glm.unadj), Terms = 2:2)
+
+  
+    contrast(fname.sex.emmeans.unadj, list("Unadj OR: Females vs. Males FNAME_NP =Y" =   c(-1, 1)))
+    
+    
+    
+    
+    
+    #Use sjPlots to display resutls for all three models side-by-side: Height Only,  Height + Sex, Sex Only
+    
+    tab_model(fname.height.glm.unadj, fname.height.glm.adj, fname.sex.glm.unadj, title= "First Name - No Permission Logistic Models with Height Bands as Given<br>.",
+              dv.labels= c('Height Cat Unadj','Height Cat Adj Sex', 'Sex Unadj'))
+    
+    
+    #Run additional on the collapsed Height Cat variable and see what happens
+    
+        
+    fname.htcat.glm.unadj <- glm( FNAME_NP ~ HTCAT   , data= FNAME, family= binomial(link="logit"))
+    fname.htcat.emmeans.unadj <- emmeans( fname.htcat.glm.unadj,  ~ c(HTCAT), type= "response")
+    
+    pairs(fname.htcat.emmeans.unadj)
+    contrast(fname.htcat.emmeans.unadj, list("Unadj OR: Height < 5'7 on FNAME_NP =Y relative to 5'7+ " =   c(-1, 1)))
+    
+    fname.htcat.glm.adj <- glm( FNAME_NP ~ HTCAT+ TRNG_LEVEL , data= FNAME, family= binomial(link="logit"))
+    fname.htcat.emmeans.adj <- emmeans( fname.htcat.glm.adj,  ~ c(HTCAT), type= "response")
+    
+    fname.htcat.glm.adj2 <- glm( FNAME_NP ~ HTCAT+ RACE , data= FNAME, family= binomial(link="logit"))
+    fname.htcat.emmeans.adj2 <- emmeans
+    
+    fname.htcat.glm.adj3 <- glm( FNAME_NP ~ HTCAT+ SEX , data= FNAME, family= binomial(link="logit"))
+    fname.htcat.emmeans.adj3 <- emmeans( fname.htcat.glm.adj,  ~ c(HTCAT), type= "response")
+
+
+    tab_model(fname.htcat.glm.unadj, fname.htcat.glm.adj, fname.htcat.glm.adj2,
+              title= "First Name - No Permission Logistic Models with Height Bands Collapsed (2) <br>.",
+              dv.labels= c('Height Cat Unadj','Height Cat Adj Training Level', 'Height Cat Adj Race'))
+
+    
+    
+    
+```
+  
+<br>
+
+- **Conclusion:**  When compared to the median Male height (HEIGHT=5, or 5'10-6'), the odds of the subjects' first name being used without permission decreases as the reference height is approached.  Subjects who were taller, however, had mixed results:  Ones who were one band above the reference height (6'-6'4), had reduced odds of being disrespected in this manner; but the tallest subjects (HEIGHT=7, or > 6'4) had the worst odds ratio of all, 3.5, a group that is singularly comprised of males (n=2).  Unfortunately, none of these results was statistically significant.
+
+- Even after adjusting for SEX, the significance of HEIGHT in the model did not improve (in fact, it worsened, likely because the variables HEIGHT and SEX are highly correlated). An unadjusetd model where SEX replaced HEIGHT as the predictor variable, yielded good results, but still not significant (p= 0.0938).  
+
+- If the Height Category is collapsed into two groups -- shorter than 5'7" and those who are 5'7" and above, there does appear to be some significance -- even if controlled separately for Training Level and Race.  Only controlling for Sex knocks this predictor out of sigificance, likely because the HEIGHT and SEX are so highly correlated.
+
+
+
+<br>
+
+<br>
+
+
+
+
+
+
+***
+***
+
+#### PLAYGROUND (FOR TESTING IDEAS)
+
+
+<br>
+  
+#### Question 1:  Is it useful to know a "Pain Score"?
+##### PAIN_SCORE variable is created by turing six questions into numeric variables with binary values:
+
+- Sustained endoscopy-related injury (Yes = 1, No/NA = 0)
+- Transient pain experienced in hand (Yes = 1, No/NA = 0)
+- Transient pain experience in neck/shoulders (Yes = 1, No/NA = 0)
+- Transient pain experienced in back (Yes = 1, No/NA = 0)
+- Transient pain experienced in legs (Yes = 1, No/NA = 0)
+- Transient pain experienced in feet (Yes = 1, No/NA = 0)
+
+
+<br>
+
+```{r PLAYGROUND-PAIN-SCORE}
+
+PAIN <-
+
+SURVEY %>% 
+    mutate( BIRTHSEX2 = case_when( BIRTHSEX == "M" ~ 0,
+                                      TRUE ~ 1 ),
+      
+            PAIN_INJ = case_when (EVER_INJURED == 'Y' ~ 1,
+                                  TRUE ~ 0 ),
+            
+            PAIN_HAND = case_when (EXPERIENCED_TRANSIENT_PAIN_HAND == "Y" ~ 1,
+                                   TRUE ~ 0),
+
+            PAIN_NECK = case_when (EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER == "Y" ~ 1,
+                                   TRUE ~ 0),
+
+            PAIN_BACK = case_when (EXPERIENCED_TRANSIENT_PAIN_BACK == "Y" ~ 1,
+                                   TRUE ~ 0),
+
+            PAIN_LEG = case_when (EXPERIENCED_TRANSIENT_PAIN_LEG == "Y" ~ 1,
+                                   TRUE ~ 0),
+
+            PAIN_FOOT = case_when (EXPERIENCED_TRANSIENT_PAIN_FOOT == "Y" ~ 1,
+                                   TRUE ~ 0)) %>% 
+            rowwise() %>% 
+            mutate(PAIN_SCORE = sum(PAIN_INJ+ PAIN_HAND+ PAIN_NECK+ PAIN_BACK + PAIN_LEG+ PAIN_FOOT)) %>% 
+  
+    select( RECORD_ID, BIRTHSEX, BIRTHSEX2, RACE, RACE2, TRAINING_LEVEL, EVER_INJURED, starts_with("PAIN_") )
+
+
+
+# Test for normality of distribution (will be sensitive to outliers)
+shapiro.test(PAIN$PAIN_SCORE)
+
+
+# Group Means & Standard Deviations
+PAIN %>% 
+  group_by(BIRTHSEX) %>% 
+  summarize( PAINMEAN = mean(PAIN_SCORE),
+             PAINSD = sd(PAIN_SCORE))
+
+
+# Welch's T-test
+
+eov.ttest(PAIN, PAIN_SCORE, BIRTHSEX)
+
+
+# Violin Plot to explore differences between sexes
+ggbetweenstats( data= PAIN,
+                x = BIRTHSEX,
+                y = PAIN_SCORE,
+                type="parametric",
+                p.adjust.method = "none",
+                title = "Mean Pain/Injury Scores by Birth Sex")
+
+PAIN %>%
+ggplot(aes( x= PAIN_SCORE, y= stat(density), fill= BIRTHSEX))+
+geom_density( alpha=0.5, position = "identity" ) +
+scale_x_continuous(breaks = scales::breaks_width(1.0) ) +
+scale_y_continuous(breaks = scales::breaks_width(.1))+
+scale_fill_manual(values = c("red","darkgreen"), name ="Birth Sex", labels = c("Female","Male"))+
+xlab("Pain Score")+ ylab("Density")+
+ggtitle("Pain Score Density Curve by Sex") +
+theme_538()
+
+
+corr.test(  PAIN$BIRTHSEX2,PAIN$PAIN_SCORE, method= 'pearson')
+
+
+
+```
+
+
+<br>
+  
+#### Question 2:  Is it useful to know a "Training Score"?
+##### TRNG_SCORE variable is created by turing the questions into numeric variables with di- or polychotomous values:
+
+- Formal Ergo Training (Yes=1, No=0)
+- Informal Ergo Training, (Yes=1, No=0)
+- Posture Awareness (Yes=1, No=0)
+- Bed Height Adjustment (Yes=1, No=0)
+- Bed Angle Position (Yes=1, No=0)
+- Monitor Height Adjustment (Yes=1, No=0)
+- Special Maneuvers/Injury Avoidance (Yes=1, No=0)
+- Strength-Building Exercises (Yes=1, No=0)
+- Use of Dial Extenders (Yes=1, defaut=0)
+- Use of Pedi Colonoscopes (Yes=1, No=0)
+- Ergo Feedback from Teachers (Often=3, Sometimes=2, Rarely=1, Never=0)
+- Equipment optimizatIon (Yes=1, default=0)
+- Glove Size Available (Yes=1, default=0)
+- Dial Extenders Available (Yes=1, default=0)
+- Encouraged to Use Dial Ext (Yes=1, default=0)
+- Pediatric Colonoscopes Available (Yes=1, default=0)
+- Well-fitted Aprons Available (Yes=1, default=0)
+- Formal Ergo Time-Out (Yes=1, No=0)
+- Informal Ergo Time-Out (Yes=1, No=0)
+- Monitors Easily Adjustable (Yes=1, No=0)
+- Teachers Sensitivity During Training (Yes=1, No=0)
+- Received Tactile Instruction from Males (Yes=1, No=0)
+- Received Tactile Instruction from Females (Yes=1, default=0)
+
+<br>
+
+```{r PLAYGROUND-TRAINING-SCORE }
+
+
+
+# CREATE TRAINING INDEX 
+
+TRAINING <-
+  
+  SURVEY %>% 
+  mutate( BIRTHSEX2 = case_when( BIRTHSEX == "M" ~ 0,
+                                 TRUE ~ 1 ),
+          
+          TRNG_FORMAL = case_when (FELLOWSHIP_FORMAL_ERGO_TRAINING == 'Y' ~ 1,
+                                TRUE ~ 0 ),
+          
+          TRNG_INFORMAL = case_when (INFORMAL_TRAINING == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+          TRNG_POSTURAL = case_when (TRAINING_TECHNIQUES_POSTURAL == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+          TRNG_BEDHT = case_when (TRAINING_TECHNIQUES_BEDHEIGHT == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+          TRNG_BEDANG = case_when (TRAINING_TECHNIQUES_BEDANGLE == "Y" ~ 1,
+                                TRUE ~ 0),
+          
+          TRNG_MONITOR = case_when (TRAINING_TECHNIQUES_MONITORHEIGHT == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+          TRNG_MANEUVERS = case_when (TRAINING_TECHNIQUES_MUSCULOSKELETAL == "Y" ~ 1,
+                                    TRUE ~ 0) ,
+
+          TRNG_EXERCISE = case_when (TRAINING_TECHNIQUES_EXERCISE_STRETCHING == "Y" ~ 1,
+                                    TRUE ~ 0),
+          
+          TRNG_DIALEXT= case_when (TRAINING_TECHNIQUES_DIAL_EXTENDERS == "Y" ~ 1,
+                                   TRUE ~ 0),
+          
+          TRNG_PEDISCOPE= case_when (TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE == "Y" ~ 1,
+                                   TRUE ~ 0),
+          
+          TRNG_FEEDBACK= case_when (ERGO_FEEDBACK == "Often" ~ 3,
+                                    ERGO_FEEDBACK == "Sometimes" ~ 2,
+                                    ERGO_FEEDBACK == "Rarely" ~ 1,
+                                    TRUE ~ 0),
+          
+          TRNG_OPTIM= case_when (ERGO_OPTIMIZATION == "Y" ~ 1,
+                                 ERGO_OPTIMIZATION == "N" ~ 0,
+                                TRUE ~ 0),
+          
+          TRNG_GLOVE_AVAIL = case_when (GLOVE_SIZE_AVAILABLE == "Y" ~ 1,
+                                 TRUE ~ 0),
+          TRNG_DIALEXT_AVAIL= case_when (DIAL_EXTENDERS_AVAILABLE == "Y" ~ 1,
+                                        TRUE ~ 0),
+          TRNG_DIALEXT_ENC= case_when (DIAL_EXTENDERS_ENCOURAGED == "Y" ~ 1,
+                                                                    TRUE ~ 0),
+          TRNG_PEDISCOPE_AVAIL = case_when (PEDI_COLONOSCOPES_AVAILABLE == "Y" ~ 1,
+                                        TRUE ~ 0),
+          TRNG_FITTED_APRON_AVAIL = case_when (LEAD_APRONS_DONTKNOW == "Aware" ~ 1,
+                                            TRUE ~ 0),
+          
+          TRNG_TO_FORMAL= case_when (ERGO_FORMAL_TIMEOUT_PRIOR == "Y" ~ 1,
+                                            TRUE ~ 0),
+          TRNG_TO_INFORMAL= case_when (ERGO_INFORMAL_TIMEOUT_PRIOR == "Y" ~ 1,
+                                     TRUE ~ 0),
+
+          TRNG_MONITORS_EASYADJ = case_when (MONITORS_ADJUSTABLE == "Y" ~ 1,
+                                     TRUE ~ 0),
+          
+          TRNG_TRAINERS_SENSITIVITY = case_when (TEACHER_SENSITIVITY_STATURE_HANDSIZE == "Y" ~ 1,
+                                                  TRUE ~ 0),
+          
+          
+          TRNG_TACTILE_MALES = case_when (TACTILE_INSTRUCTION_FROM_MALES == "Often" ~ 2,
+                                          TACTILE_INSTRUCTION_FROM_MALES == "Rarely" ~ 1,
+                                                 TRUE ~ 0),
+          TRNG_TACTILE_FEMALES = case_when (TACTILE_INSTRUCTION_FROM_FEMALES == "Often" ~ 2,
+                                          TACTILE_INSTRUCTION_FROM_FEMALES == "Rarely" ~ 1,
+                                          TRUE ~ 0))  %>% 
+  rowwise() %>% 
+  mutate(RECORD_ID, TRNG_SCORE = sum(TRNG_FORMAL+ TRNG_INFORMAL+ TRNG_POSTURAL+ TRNG_BEDHT+ +TRNG_BEDANG+ TRNG_MONITOR+ TRNG_MANEUVERS+ TRNG_EXERCISE+ TRNG_DIALEXT+
+                          TRNG_PEDISCOPE+ TRNG_FEEDBACK+ TRNG_OPTIM+ TRNG_GLOVE_AVAIL+ TRNG_DIALEXT_AVAIL+ TRNG_DIALEXT_ENC+ TRNG_PEDISCOPE_AVAIL+
+                          TRNG_FITTED_APRON_AVAIL+ TRNG_TO_FORMAL+ TRNG_TO_INFORMAL+ TRNG_MONITORS_EASYADJ + TRNG_TRAINERS_SENSITIVITY+
+                          TRNG_TACTILE_MALES+ TRNG_TACTILE_FEMALES)) %>% 
+  
+  select( BIRTHSEX, BIRTHSEX2, RACE, RACE2, TRAINING_LEVEL, starts_with("TRNG_") )
+
+
+
+
+
+
+
+TRAINING %>% 
+  group_by(BIRTHSEX) %>% 
+  summarize( TRNGMEAN = mean(TRNG_SCORE),
+             TRNGSD = sd(TRNG_SCORE))
+
+
+shapiro.test(TRAINING$TRNG_SCORE)
+
+eov.ttest(TRAINING, TRNG_SCORE, BIRTHSEX)
+
+ggbetweenstats( data= TRAINING,
+                x = BIRTHSEX,
+                y = TRNG_SCORE,
+                type="parametric",
+                p.adjust.method = "none",
+                title = "Mean Training Scores by Birth Sex")
+
+corr.test(  TRAINING$BIRTHSEX2,TRAINING$TRNG_SCORE, method= 'pearson', ci=T)
+
+```
+
+
+
+<br>
+  
+#### Question 3:  Since Training Score was insignificant (almost identical results for each sex), was it calculated too broadly?  What happens if we focus on a subset of those questions, ones that are more specifically related to "equipment ergonomics/availability," since something has to be driving the sex differences observed in the Pain/Injury score?  For example:
+
+
+- Equipment optimization (Yes=1, default=0)
+- Glove Size Available (Yes=1, default=0)
+- Dial Extenders Available (Yes=1, default=0)
+- Encouraged to Use Dial Ext (Yes=1, default=0)
+- Pediatric Colonoscopes Available (Yes=1, default=0)
+- Well-fitted Aprons Available (Yes=1, default=0)
+- Monitors Easily Adjustable (Yes=1, No=0)
+- Teachers Sensitivity During Training (Yes=1, No=0)
+
+
+<br>
+
+
+```{r PLAYGROUND-TRAINING-EQUIPMENT-SCORE }
+
+
+TRAINING <-
+  
+  SURVEY %>% 
+  mutate( BIRTHSEX2 = case_when( BIRTHSEX == "M" ~ 0,
+                                 TRUE ~ 1 ),
+          
+         # AGE2 = factor(AGE2, levels=rev(levels(AGE2))),
+          
+          AGENUM  = case_when (AGE2 == "< 30" ~ 1,
+                               AGE2 == "30-34" ~2,
+                               AGE2 == "35-40" ~3,
+                               TRUE ~ 4),
+          
+          TRNG_FORMAL = case_when (FELLOWSHIP_FORMAL_ERGO_TRAINING == 'Y' ~ 1,
+                                TRUE ~ 0 ),
+          
+          TRNG_INFORMAL = case_when (INFORMAL_TRAINING == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+          TRNG_POSTURAL = case_when (TRAINING_TECHNIQUES_POSTURAL == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+          TRNG_BEDHT = case_when (TRAINING_TECHNIQUES_BEDHEIGHT == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+          TRNG_BEDANG = case_when (TRAINING_TECHNIQUES_BEDANGLE == "Y" ~ 1,
+                                TRUE ~ 0),
+          
+          TRNG_MONITOR = case_when (TRAINING_TECHNIQUES_MONITORHEIGHT == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+          TRNG_MANEUVERS = case_when (TRAINING_TECHNIQUES_MUSCULOSKELETAL == "Y" ~ 1,
+                                    TRUE ~ 0) ,
+
+          TRNG_EXERCISE = case_when (TRAINING_TECHNIQUES_EXERCISE_STRETCHING == "Y" ~ 1,
+                                    TRUE ~ 0),
+          
+          TRNG_DIALEXT= case_when (TRAINING_TECHNIQUES_DIAL_EXTENDERS == "Y" ~ 1,
+                                   TRUE ~ 0),
+          
+          TRNG_PEDISCOPE= case_when (TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE == "Y" ~ 1,
+                                   TRUE ~ 0),
+          
+          TRNG_FEEDBACK= case_when (ERGO_FEEDBACK == "Often" ~ 3,
+                                    ERGO_FEEDBACK == "Sometimes" ~ 2,
+                                    ERGO_FEEDBACK == "Rarely" ~ 1,
+                                    TRUE ~ 0),
+          
+          TRNG_OPTIM= case_when (ERGO_OPTIMIZATION == "Y" ~ 1,
+                                 ERGO_OPTIMIZATION == "N" ~ 0,
+                                TRUE ~ 0),
+          
+          TRNG_GLOVE_AVAIL = case_when (GLOVE_SIZE_AVAILABLE == "Y" ~ 1,
+                                 TRUE ~ 0),
+          TRNG_DIALEXT_AVAIL= case_when (DIAL_EXTENDERS_AVAILABLE == "Y" ~ 1,
+                                        TRUE ~ 0),
+          TRNG_DIALEXT_ENC= case_when (DIAL_EXTENDERS_ENCOURAGED == "Y" ~ 1,
+                                                                    TRUE ~ 0),
+          TRNG_PEDISCOPE_AVAIL = case_when (PEDI_COLONOSCOPES_AVAILABLE == "Y" ~ 1,
+                                        TRUE ~ 0),
+          TRNG_FITTED_APRON_AVAIL = case_when (LEAD_APRONS_DONTKNOW == "Aware" ~ 1,
+                                            TRUE ~ 0),
+          
+          TRNG_TO_FORMAL= case_when (ERGO_FORMAL_TIMEOUT_PRIOR == "Y" ~ 1,
+                                            TRUE ~ 0),
+          TRNG_TO_INFORMAL= case_when (ERGO_INFORMAL_TIMEOUT_PRIOR == "Y" ~ 1,
+                                     TRUE ~ 0),
+
+          TRNG_MONITORS_EASYADJ = case_when (MONITORS_ADJUSTABLE == "Y" ~ 1,
+                                     TRUE ~ 0),
+          
+          TRNG_TRAINERS_SENSITIVITY = case_when (TEACHER_SENSITIVITY_STATURE_HANDSIZE == "Y" ~ 1,
+                                                  TRUE ~ 0),
+          
+          
+          TRNG_TACTILE_MALES = case_when (TACTILE_INSTRUCTION_FROM_MALES == "Often" ~ 2,
+                                          TACTILE_INSTRUCTION_FROM_MALES == "Rarely" ~ 1,
+                                                 TRUE ~ 0),
+          TRNG_TACTILE_FEMALES = case_when (TACTILE_INSTRUCTION_FROM_FEMALES == "Often" ~ 2,
+                                          TACTILE_INSTRUCTION_FROM_FEMALES == "Rarely" ~ 1,
+                                          TRUE ~ 0))  %>% 
+  rowwise() %>% 
+  mutate(TRNG_SCORE = sum(TRNG_FORMAL+ TRNG_INFORMAL+ TRNG_POSTURAL+ TRNG_BEDHT+ +TRNG_BEDANG+ TRNG_MONITOR+ TRNG_MANEUVERS+ TRNG_EXERCISE+ TRNG_DIALEXT+
+                          TRNG_PEDISCOPE+ TRNG_FEEDBACK+ TRNG_OPTIM+ TRNG_GLOVE_AVAIL+ TRNG_DIALEXT_AVAIL+ TRNG_DIALEXT_ENC+ TRNG_PEDISCOPE_AVAIL+
+                          TRNG_FITTED_APRON_AVAIL+ TRNG_TO_FORMAL+ TRNG_TO_INFORMAL+ TRNG_MONITORS_EASYADJ + TRNG_TRAINERS_SENSITIVITY+
+                          TRNG_TACTILE_MALES+ TRNG_TACTILE_FEMALES),
+                          
+          TRNG_SCORE2 = sum(TRNG_FORMAL+ TRNG_INFORMAL+ TRNG_POSTURAL+ TRNG_BEDHT+ +TRNG_BEDANG+ TRNG_MONITOR+ TRNG_MANEUVERS+ TRNG_EXERCISE+ TRNG_DIALEXT+
+                              TRNG_PEDISCOPE+ TRNG_FEEDBACK+ TRNG_TO_FORMAL+ TRNG_TO_INFORMAL+  TRNG_TRAINERS_SENSITIVITY+
+                              TRNG_TACTILE_MALES+ TRNG_TACTILE_FEMALES) ,
+         
+          EQUIP_SCORE = sum(TRNG_OPTIM+ TRNG_GLOVE_AVAIL+ TRNG_DIALEXT_AVAIL+ TRNG_DIALEXT_ENC+ TRNG_PEDISCOPE_AVAIL+
+                              TRNG_FITTED_APRON_AVAIL + TRNG_TRAINERS_SENSITIVITY+ TRNG_MONITORS_EASYADJ
+                              )) %>% 
+  
+
+  select( RECORD_ID, BIRTHSEX, BIRTHSEX2, AGE2, AGENUM, RACE, RACE2, TRAINING_LEVEL, starts_with("TRNG_"), starts_with("EQUIP_") )
+
+
+
+
+
+TRAINING %>% 
+  group_by(BIRTHSEX) %>% 
+  summarize( EQUIPM = mean(EQUIP_SCORE),
+             EQUIPSD = sd(EQUIP_SCORE))
+
+
+shapiro.test(TRAINING$EQUIP_SCORE)
+
+eov.ttest(TRAINING, EQUIP_SCORE, BIRTHSEX)
+
+ggbetweenstats( data= TRAINING,
+                x = BIRTHSEX,
+                y = EQUIP_SCORE,
+                type="parametric",
+                p.adjust.method = "none",
+                title = "Mean Equip/Ergo Scores by Birth Sex")
+
+
+SCORES <- sqldf( " select a.RECORD_ID,
+                          a.BIRTHSEX,
+                          b.TRAINING_LEVEL,
+                          b.AGE2,
+                          a.BIRTHSEX2,
+                          b.AGENUM as AGE,
+                          a.PAIN_SCORE,
+                          b.TRNG_SCORE,
+                          b.EQUIP_SCORE
+                 
+                  from  PAIN as a left join TRAINING as b on (a.RECORD_ID = b.RECORD_ID) ")
+
+
+
+#CORRELATION MATRIX
+
+pairs.panels(SCORES[-c(1:4)], pch=21, stars=T,) 
+
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+#### Simple Regressions to Predict Pain Score (Likelihood to Sustain Pain/Injury)
+
+
+<br>
+
+```{r PLAYGROUND-SIMPLE-REGRESSIONS }
+
+# BIRTHSEX predicting PAIN_SCORE
+
+summary(lm(PAIN_SCORE ~ BIRTHSEX , data = SCORES))
+
+# BIRTHSEX predicting PAIN_SCORE when controlled for EQUIP_SCORE
+
+summary(lm(PAIN_SCORE ~  BIRTHSEX + EQUIP_SCORE , data = SCORES))
+
+
+# BIRTHSEX predicting PAIN_SCORE when controlled for EQUIP_SCORE & AGEBAND
+
+
+summary(lm(PAIN_SCORE ~  BIRTHSEX + EQUIP_SCORE + AGE2 , data = SCORES))
+anova(lm(PAIN_SCORE ~ BIRTHSEX + EQUIP_SCORE + AGE2 , data = SCORES))
+
+
+
+
+# COMPARE how M/F PAIN_SCORE means differ in unadjusted and fully adjusted model
+
+
+library(emmeans)
+
+#unadjusted model
+pscore.unadj <- emmeans(lm(PAIN_SCORE ~ BIRTHSEX , data = SCORES), specs=  "BIRTHSEX")
+summary(pscore.unadj)
+contrast(pscore.unadj, list(FvM = c(1,-1)))
+
+
+
+#fully adjusted model
+pscore.adj <- emmeans(lm(PAIN_SCORE ~ BIRTHSEX + EQUIP_SCORE + AGE2 , data = SCORES), specs=  "BIRTHSEX")
+summary(pscore.adj)
+contrast(pscore.adj, list(FvM = c(1,-1)))
+
+
+
+#Compare all combinations of BIRTHSEX-AGE2 to see if any sliver is significantly different (after Benjamini-Hochberg correction for multiple comparisons)
+
+pscore.adj2 <- emmeans(lm(PAIN_SCORE ~ BIRTHSEX + EQUIP_SCORE + AGE2 , data = SCORES), specs=  c("BIRTHSEX","AGE2"))
+summary(pscore.adj2)
+pairs(pscore.adj2, adjust="bh", type="response")
+
+#FINDING:  
+#In the fully-adjusted model, of the 28 possible SEX/AGEBAND combinations, the one that is statistically significant - and survives a correction for multiple comparisons - is "Males < 30" versus "Females 30-34." Here the Females' mean is 1.327 points higher than the Males', p=0.0292.  (The F-M differential for entire adjusted model was only 0.388 points.)
+
+
+#Since Females 30-34 have the highest adjusted Pain Score, how does that score compare to the mean Pain Score of ALL OTHER RESPONDENTS?
+
+
+# Mean for Females 30-34
+contrast( pscore.adj2, list(F3034 = c(0,0,1,0,0,0,0,0)))
+
+#Mean for Everyone Else
+contrast( pscore.adj2, list(OTHERS = c(1/7, 1/7, 0, 1/7, 1/7, 1/7, 1/7, 1/7)))
+
+#Contast Females 30-34 relative to all other respondents
+contrast( pscore.adj2, list("Females 30-34 rel to Others" = c(-1/7, -1/7, 1, -1/7, -1/7, -1/7, -1/7, -1/7)))
+
+
+
+
+# EQUIP_SCORE predicting PAIN_SCORE when controlled for BIRTHSEX & TRAINING_LEVEL & AGEBAND
+# Should Equipment Score be the "outcome of interest"? (In other words, EQUIP_SCORE observed after controlling for Sex and Training Level ... or Age?) 
+
+summary(lm(PAIN_SCORE ~ EQUIP_SCORE + BIRTHSEX + TRAINING_LEVEL  , data = SCORES))
+anova(lm(PAIN_SCORE   ~ EQUIP_SCORE + BIRTHSEX + TRAINING_LEVEL , data = SCORES))
+
+```
+
+
+
+
+<br>
+  
+#### Question 4:  What happens if we attempt to compute a "Respect Score?"  Gender differences?
+
+
+- Confident Asking Nurses (Yes=1, default=0)
+- Confident Asking Assistants (Yes=1, default=0)
+- Frequency Asking Nurses (More than Twice=0, Twice=1, Once=2, default=2)
+- Recognized by ES Staff (Yes=1, default=0)
+- Recognized by Anesthetists (Yes=1, default=0)
+- Recognized by GI Attending (Yes=1, default=0)
+- First Name Used No Permission (Yes=0, No=1)
+- Teachers train with sensitivity to size/stature (Yes=1, No=0)
+
+
+<br>
+
+
+
+```{r PLAYGROUND-RESPECT}
+
+# CREATE RESPECT INDEX 
+
+RESPECT <-
+  
+  SURVEY %>% 
+  mutate( BIRTHSEX2 = case_when( BIRTHSEX == "M" ~ 0,
+                                 TRUE ~ 1 ),
+          
+          HEIGHT = recode_factor(HEIGHT2, "< 5'"='1', 
+                                          "5-5'3" = '2',
+                                          "5'4-5'6" = '3',
+                                          "5'7-5'9" = '4',
+                                          "5'10-6'" = '5',
+                                          "6'1-6'4" = '6',
+                                          "> 6'4" = '7'),
+          HEIGHT = relevel(HEIGHT, ref="5"),
+          
+          HTCAT = recode_factor(HEIGHT2, "< 5'"='0', 
+                                          "5-5'3" = '0',
+                                          "5'4-5'6" = '0',
+                                          "5'7-5'9" = '1',
+                                          "5'10-6'" = '1',
+                                          "6'1-6'4" = '1',
+                                          "> 6'4" = '1'),
+          
+          RESPECT_NURSES = case_when (COMFORTABLE_ASKING_NURSES == 'Y' ~ 1,
+                                      
+                                TRUE ~ 0 ),
+          
+          RESPECT_TECHS = case_when (COMFORTABLE_ASKING_TECHS == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+          RESPECT_NFREQ = case_when (NURSES_ASKING == "More than Twice" ~ 0,
+                                     NURSES_ASKING == "Twice" ~ 1,
+                                     NURSES_ASKING == "Once" ~ 2,
+                                     TRUE ~ 2),
+          
+          RESPECT_ESTAFF = case_when (RECOGNIZED_RESPECTED_ES_STAFF == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+          RESPECT_ANES = case_when (RECOGNIZED_RESPECTED_ANESTHETISTS == "Y" ~ 1,
+                                TRUE ~ 0),
+          
+          RESPECT_GIATT = case_when (RECOGNIZED_RESPECTED_GASTRO_ATTENDING == "Y" ~ 1,
+                                 TRUE ~ 0),
+
+          RESPECT_GPAINS = case_when (GROWING_PAINS  == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+ 
+          RESPECT_SENSITIVITY = case_when (TEACHER_SENSITIVITY_STATURE_HANDSIZE  == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+  
+          RESPECT_FNAME =  case_when (FIRST_NAME_NO_PERMISSION == "Y" ~ 0,
+                                         TRUE ~ 1)) %>% 
+  
+  
+  rowwise() %>% 
+  mutate(RESPECT_SCORE = sum( RESPECT_NURSES + RESPECT_TECHS + RESPECT_NFREQ + RESPECT_ESTAFF + RESPECT_ANES + 
+                           RESPECT_GIATT + RESPECT_SENSITIVITY + RESPECT_FNAME)) %>% 
+  
+  select( BIRTHSEX, BIRTHSEX2, AGE2, RACE, RACE2, HEIGHT, HTCAT, TRAINING_LEVEL, EVER_INJURED, starts_with("RESPECT_") )
+
+
+
+RESPECT %>% 
+  group_by(BIRTHSEX) %>% 
+  summarize( RSPECTMEAN = mean(RESPECT_SCORE),
+             RSPECTSD = sd(RESPECT_SCORE))
+
+
+
+
+
+shapiro.test(RESPECT$RESPECT_SCORE)
+
+eov.ttest(RESPECT, RESPECT_SCORE, BIRTHSEX)
+eov.ttest(RESPECT, RESPECT_SCORE, RACE2)
+
+
+ggbetweenstats( data= RESPECT,
+                x = BIRTHSEX,
+                y = RESPECT_SCORE,
+                type="parametric",
+                p.adjust.method = "none",
+                title = "Mean RESPECT Scores by Birth Sex")
+
+ggbetweenstats( data= RESPECT,
+                x = RACE2,
+                y = RESPECT_SCORE,
+                type="parametric",
+                p.adjust.method = "none",
+                title = "Mean RESPECT Scores by Race (Broad)")
+
+
+
+
+#If Respect Score includes "Teacher Sensitity to Stature/Hand Size"
+
+respect.birthsex.lm.unadj  <- lm( RESPECT_SCORE ~ BIRTHSEX , data= RESPECT)
+respect.htcat.lm.unadj    <-  lm( RESPECT_SCORE ~ HTCAT , data= RESPECT)
+respect.birthsex.lm.adj   <- lm( RESPECT_SCORE ~ BIRTHSEX + EVER_INJURED , data= RESPECT)
+      
+
+
+  tab_model( respect.birthsex.lm.unadj,
+             respect.htcat.lm.unadj,
+             respect.birthsex.lm.adj,
+             
+             title= "Respect Score - Comparison of Three Models based on Quasi Score <br>.",
+             dv.labels= c('Birth Sex Unadj','Height Cat UnAdj Training Level', 'Birth Sex Adjusted Ever Injured'))
+  
+  
+```
+
+
+
+
+
