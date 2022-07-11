@@ -2874,6 +2874,50 @@ contrast( pscore.adj2, list("Females 30-34 rel to Others" = c(-1/7, -1/7, 1, -1/
 summary(lm(PAIN_SCORE ~ EQUIP_SCORE + BIRTHSEX + TRAINING_LEVEL  , data = SCORES))
 anova(lm(PAIN_SCORE   ~ EQUIP_SCORE + BIRTHSEX + TRAINING_LEVEL , data = SCORES))
 
+
+
+#LOGISTIC MODEL - Does higher EQUIP_SCORE reduce odds of experiencing PAIN/INJURY
+
+PAIN2 <-
+          sqldf(" select a.*,
+                        b.EQUIP_SCORE,
+                        b.TRNG_SCORE,
+                        case when b.PAIN_SCORE = 0 then 0 else 1 end as EVER_INJ_PAIN
+                 from PAIN as a left join SCORES as b on (a.RECORD_ID = b.RECORD_ID) ")
+
+  
+  everinj.equip.glm.unadj <- glm( EVER_INJ_PAIN ~ EQUIP_SCORE  , data= PAIN2 , family= binomial(link="logit"))
+  everinj.equip.emmeans.unadj <- emmeans( everinj.equip.glm.unadj,  c(~EQUIP_SCORE), at = list(EQUIP_SCORE = c(1:7)), type= "response", adjust="none")
+  
+  
+  
+  everinj.equip.glm.adj <- glm( EVER_INJ_PAIN ~ EQUIP_SCORE + BIRTHSEX  , data= PAIN2 , family= binomial(link="logit"))
+  everinj.equip.emmeans.adj <- emmeans( everinj.equip.glm.adj,  ~c(EQUIP_SCORE, BIRTHSEX), at = list(EQUIP_SCORE = c(1:7)), type= "response", adjust="none")
+  
+  everinj.trng.glm.unadj <- glm( EVER_INJ_PAIN ~ TRNG_SCORE  , data= PAIN2 , family= binomial(link="logit"))
+  everinj.trng.emmeans.unadj <- emmeans( everinj.trng.glm.unadj,  c(~TRNG_SCORE), at = list(TRNG_SCORE = c(5:24)), type= "response", adjust="none")
+  
+  
+  
+  summary(everinj.equip.glm.unadj)
+  summary(everinj.equip.emmeans.unadj)
+  
+  summary(everinj.equip.glm.adj)
+  summary(everinj.equip.emmeans.adj)
+  
+  
+  summary(everinj.trng.glm.unadj)
+  summary(everinj.trng.emmeans.unadj)
+  
+  # 
+  # 
+  # summary(everinj.respect.glm.adj)
+  # summary(everinj.respect.emmeans.adj, adjust="none")
+  # contrast(everinj.respect.emmeans.adj, list("Respect1 - Respect2" = c(-1/2, 1/2, 0, 0, 0, 0, 0, 0, 0,
+  #                                                                      -1/2, 1/2, 0 ,0, 0, 0, 0, 0, 0 )))
+  # contrast(everinj.respect.emmeans.adj, list("Respect5 - Respect6" = c(0, 0, 0, 0, -1/2, 1/2, 0, 0, 0,
+  #                                                                      0, 0 ,0, 0, -1/2, 1/2, 0, 0 ,0)))
+
 ```
 
 
@@ -2883,93 +2927,104 @@ anova(lm(PAIN_SCORE   ~ EQUIP_SCORE + BIRTHSEX + TRAINING_LEVEL , data = SCORES)
   
 #### Question 4:  What happens if we attempt to compute a "Respect Score?"  Gender differences?
 
+##### Nine-Point Scale, higher score indicates higher level of Respect
+
 
 - Confident Asking Nurses (Yes=1, default=0)
 - Confident Asking Assistants (Yes=1, default=0)
-- Frequency Asking Nurses (More than Twice=0, Twice=1, Once=2, default=2)
+- Frequency Asking Nurses (Once=1, default=0)
 - Recognized by ES Staff (Yes=1, default=0)
 - Recognized by Anesthetists (Yes=1, default=0)
 - Recognized by GI Attending (Yes=1, default=0)
-- First Name Used No Permission (Yes=0, No=1)
-- Teachers train with sensitivity to size/stature (Yes=1, No=0)
+- Pains dismissed as Growing Pain (Yes=0, default=1, REVERSE SCORED)
+- Teachers train with sensitivity to stature (Yes=1, default=0)
+- First Name Used No Permission (Yes=0, default=1, REVERSE SCORED)
 
 
 <br>
 
 
 
-```{r PLAYGROUND-RESPECT}
+```{r PLAYGROUND-RESPECT, warning=F}
 
 # CREATE RESPECT INDEX 
 
-RESPECT <-
-  
-  SURVEY %>% 
-  mutate( BIRTHSEX2 = case_when( BIRTHSEX == "M" ~ 0,
-                                 TRUE ~ 1 ),
-          
-          HEIGHT = recode_factor(HEIGHT2, "< 5'"='1', 
-                                          "5-5'3" = '2',
-                                          "5'4-5'6" = '3',
-                                          "5'7-5'9" = '4',
-                                          "5'10-6'" = '5',
-                                          "6'1-6'4" = '6',
-                                          "> 6'4" = '7'),
-          HEIGHT = relevel(HEIGHT, ref="5"),
-          
-          HTCAT = recode_factor(HEIGHT2, "< 5'"='0', 
-                                          "5-5'3" = '0',
-                                          "5'4-5'6" = '0',
-                                          "5'7-5'9" = '1',
-                                          "5'10-6'" = '1',
-                                          "6'1-6'4" = '1',
-                                          "> 6'4" = '1'),
-          
-          RESPECT_NURSES = case_when (COMFORTABLE_ASKING_NURSES == 'Y' ~ 1,
-                                      
-                                TRUE ~ 0 ),
-          
-          RESPECT_TECHS = case_when (COMFORTABLE_ASKING_TECHS == "Y" ~ 1,
-                                 TRUE ~ 0),
-          
-          RESPECT_NFREQ = case_when (NURSES_ASKING == "More than Twice" ~ 0,
-                                     NURSES_ASKING == "Twice" ~ 1,
-                                     NURSES_ASKING == "Once" ~ 2,
-                                     TRUE ~ 2),
-          
-          RESPECT_ESTAFF = case_when (RECOGNIZED_RESPECTED_ES_STAFF == "Y" ~ 1,
-                                 TRUE ~ 0),
-          
-          RESPECT_ANES = case_when (RECOGNIZED_RESPECTED_ANESTHETISTS == "Y" ~ 1,
-                                TRUE ~ 0),
-          
-          RESPECT_GIATT = case_when (RECOGNIZED_RESPECTED_GASTRO_ATTENDING == "Y" ~ 1,
-                                 TRUE ~ 0),
 
-          RESPECT_GPAINS = case_when (GROWING_PAINS  == "Y" ~ 1,
-                                 TRUE ~ 0),
-          
  
-          RESPECT_SENSITIVITY = case_when (TEACHER_SENSITIVITY_STATURE_HANDSIZE  == "Y" ~ 1,
-                                 TRUE ~ 0),
-          
   
-          RESPECT_FNAME =  case_when (FIRST_NAME_NO_PERMISSION == "Y" ~ 0,
-                                         TRUE ~ 1)) %>% 
+  RESPECT <-
+    
+    SURVEY %>% 
+    mutate( BIRTHSEX2 = case_when( BIRTHSEX == "M" ~ 0,
+                                   TRUE ~ 1 ),
+            
+            HEIGHT = recode_factor(HEIGHT2, "< 5'"='1', 
+                                   "5-5'3" = '2',
+                                   "5'4-5'6" = '3',
+                                   "5'7-5'9" = '4',
+                                   "5'10-6'" = '5',
+                                   "6'1-6'4" = '6',
+                                   "> 6'4" = '7'),
+            HEIGHT = relevel(HEIGHT, ref="5"),
+            
+            HTCAT = recode_factor(HEIGHT2, "< 5'"='0', 
+                                  "5-5'3" = '0',
+                                  "5'4-5'6" = '0',
+                                  "5'7-5'9" = '1',
+                                  "5'10-6'" = '1',
+                                  "6'1-6'4" = '1',
+                                  "> 6'4" = '1'),
+            
+            RESPECT_NURSES = case_when (is.na(COMFORTABLE_ASKING_NURSES) ~ NA_real_,
+                                        COMFORTABLE_ASKING_NURSES == 'Y' ~ 1,
+                                        TRUE ~ 0 ),
+            
+            RESPECT_TECHS = case_when (is.na(COMFORTABLE_ASKING_TECHS) ~ NA_real_,
+                                       COMFORTABLE_ASKING_TECHS == "Y" ~ 1,
+                                       TRUE ~ 0),
+            
+            RESPECT_NFREQ = case_when (is.na(NURSES_ASKING) ~ NA_real_,
+                                       NURSES_ASKING == "Once" ~ 1,
+                                       TRUE ~ 0),
+            
+            RESPECT_ESTAFF = case_when (is.na(RECOGNIZED_RESPECTED_ES_STAFF) ~ NA_real_,
+                                        RECOGNIZED_RESPECTED_ES_STAFF == "Y" ~ 1,
+                                        TRUE ~ 0),
+            
+            RESPECT_ANES = case_when (is.na(RECOGNIZED_RESPECTED_ANESTHETISTS) ~ NA_real_,
+                                      RECOGNIZED_RESPECTED_ANESTHETISTS == "Y" ~ 1,
+                                      TRUE ~ 0),
+            
+            RESPECT_GIATT = case_when (is.na(RECOGNIZED_RESPECTED_ANESTHETISTS) ~ NA_real_,
+                                       RECOGNIZED_RESPECTED_GASTRO_ATTENDING == "Y" ~ 1,
+                                       TRUE ~ 0),
+            
+            RESPECT_GPAINS = case_when (is.na(GROWING_PAINS) ~ NA_real_,
+                                        GROWING_PAINS  == "Y" ~ 0,
+                                        TRUE ~ 1),
+            
+            RESPECT_SENSITIVITY = case_when (is.na(TEACHER_SENSITIVITY_STATURE_HANDSIZE) ~ NA_real_,
+                                             TEACHER_SENSITIVITY_STATURE_HANDSIZE  == "Y" ~ 1,
+                                             TRUE ~ 0),
+            
+            
+            RESPECT_FNAME =  case_when (is.na(FIRST_NAME_NO_PERMISSION) ~ NA_real_,
+                                        FIRST_NAME_NO_PERMISSION == "Y" ~ 0,
+                                        TRUE ~ 1)) %>% 
+    
+    
+    rowwise() %>% 
+    mutate(RESPECT_SCORE = sum( RESPECT_NURSES + RESPECT_TECHS + RESPECT_NFREQ + RESPECT_ESTAFF + RESPECT_ANES + 
+                                  RESPECT_GIATT + RESPECT_GPAINS + RESPECT_SENSITIVITY + RESPECT_FNAME)) %>% 
+    
+    select(RECORD_ID, BIRTHSEX, BIRTHSEX2, AGE2, RACE, RACE2, HEIGHT, HTCAT, TRAINING_LEVEL, EVER_INJURED, starts_with("RESPECT_") )
   
   
-  rowwise() %>% 
-  mutate(RESPECT_SCORE = sum( RESPECT_NURSES + RESPECT_TECHS + RESPECT_NFREQ + RESPECT_ESTAFF + RESPECT_ANES + 
-                           RESPECT_GIATT + RESPECT_SENSITIVITY + RESPECT_FNAME)) %>% 
   
-  select( BIRTHSEX, BIRTHSEX2, AGE2, RACE, RACE2, HEIGHT, HTCAT, TRAINING_LEVEL, EVER_INJURED, starts_with("RESPECT_") )
-
-
-
-RESPECT %>% 
-  group_by(BIRTHSEX) %>% 
-  summarize( RSPECTMEAN = mean(RESPECT_SCORE),
-             RSPECTSD = sd(RESPECT_SCORE))
+  RESPECT %>% 
+    group_by(BIRTHSEX) %>% 
+    summarize( RSPECTMEAN = mean(RESPECT_SCORE, na.rm=T),
+               RSPECTSD = sd(RESPECT_SCORE, na.rm=T))
 
 
 
@@ -2988,6 +3043,7 @@ ggbetweenstats( data= RESPECT,
                 p.adjust.method = "none",
                 title = "Mean RESPECT Scores by Birth Sex")
 
+
 ggbetweenstats( data= RESPECT,
                 x = RACE2,
                 y = RESPECT_SCORE,
@@ -2998,20 +3054,57 @@ ggbetweenstats( data= RESPECT,
 
 
 
-#If Respect Score includes "Teacher Sensitity to Stature/Hand Size"
 
 respect.birthsex.lm.unadj  <- lm( RESPECT_SCORE ~ BIRTHSEX , data= RESPECT)
 respect.htcat.lm.unadj    <-  lm( RESPECT_SCORE ~ HTCAT , data= RESPECT)
-respect.birthsex.lm.adj   <- lm( RESPECT_SCORE ~ BIRTHSEX + EVER_INJURED , data= RESPECT)
+respect.birthsex.lm.adj   <- lm( RESPECT_SCORE ~ BIRTHSEX + RACE2 , data= RESPECT)
       
 
 
   tab_model( respect.birthsex.lm.unadj,
-             respect.htcat.lm.unadj,
              respect.birthsex.lm.adj,
+             respect.htcat.lm.unadj,
              
              title= "Respect Score - Comparison of Three Models based on Quasi Score <br>.",
-             dv.labels= c('Birth Sex Unadj','Height Cat Unadj Training Level', 'Birth Sex Adjusted Ever Injured'))
+             dv.labels= c('Birth Sex Unadj','Height Cat Unadj', 'Birth Sex Adjusted Race'))
+  
+  
+  
+  
+# Can one's RESPECT score have an influence on Injury/Pain reports?
+  
+  
+  
+  RESPECT2 <-
+      sqldf( "select a.*,
+                    case when b.PAIN_SCORE = 0 then 0 else 1 end as EVER_INJ_PAIN
+              from RESPECT as a left join PAIN as b on 
+              a.RECORD_ID = b.RECORD_ID ")
+  
+  
+  
+  everinj.respect.glm.unadj <- glm( EVER_INJ_PAIN ~ RESPECT_SCORE  , data= RESPECT2 , family= binomial(link="logit"))
+  everinj.respect.emmeans.unadj <- emmeans( everinj.respect.glm.unadj,  c(~RESPECT_SCORE), at = list(RESPECT_SCORE = c(1:9)), type= "response", adjust="none")
+  
+  
+  everinj.respect.glm.adj <- glm( EVER_INJ_PAIN ~ RESPECT_SCORE + BIRTHSEX  , data= RESPECT2 , family= binomial(link="logit"))
+  everinj.respect.emmeans.adj <- emmeans( everinj.respect.glm.adj,  ~c(RESPECT_SCORE, BIRTHSEX), at = list(RESPECT_SCORE = c(1:9)), type= "response", adjust="none")
+  
+  summary(everinj.respect.glm.unadj)
+  
+  summary(everinj.respect.glm.adj)
+  summary(everinj.respect.emmeans.adj, adjust="none")
+  contrast(everinj.respect.emmeans.adj, list("Respect1 - Respect2" = c(-1/2, 1/2, 0, 0, 0, 0, 0, 0, 0,
+                                                                       -1/2, 1/2, 0 ,0, 0, 0, 0, 0, 0 )))
+  contrast(everinj.respect.emmeans.adj, list("Respect5 - Respect6" = c(0, 0, 0, 0, -1/2, 1/2, 0, 0, 0,
+                                                                       0, 0 ,0, 0, -1/2, 1/2, 0, 0 ,0)))
+  
+  
+  
+  #CONCLUSION
+  
+  # For each increment a person improves on the RESPECT_SCORE scale, the exp. odds of incurring an injury or experiencing transient pain REDUCE by ~ 35% in the model adjusted for BIRTHSEX.
+  
   
   
 ```
