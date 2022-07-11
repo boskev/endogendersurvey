@@ -2891,6 +2891,7 @@ anova(lm(PAIN_SCORE   ~ EQUIP_SCORE + BIRTHSEX + TRAINING_LEVEL , data = SCORES)
 - Recognized by Anesthetists (Yes=1, default=0)
 - Recognized by GI Attending (Yes=1, default=0)
 - First Name Used No Permission (Yes=0, No=1)
+- Teachers train with sensitivity to size/stature (Yes=1, No=0)
 
 
 <br>
@@ -2907,7 +2908,25 @@ RESPECT <-
   mutate( BIRTHSEX2 = case_when( BIRTHSEX == "M" ~ 0,
                                  TRUE ~ 1 ),
           
+          HEIGHT = recode_factor(HEIGHT2, "< 5'"='1', 
+                                          "5-5'3" = '2',
+                                          "5'4-5'6" = '3',
+                                          "5'7-5'9" = '4',
+                                          "5'10-6'" = '5',
+                                          "6'1-6'4" = '6',
+                                          "> 6'4" = '7'),
+          HEIGHT = relevel(HEIGHT, ref="5"),
+          
+          HTCAT = recode_factor(HEIGHT2, "< 5'"='0', 
+                                          "5-5'3" = '0',
+                                          "5'4-5'6" = '0',
+                                          "5'7-5'9" = '1',
+                                          "5'10-6'" = '1',
+                                          "6'1-6'4" = '1',
+                                          "> 6'4" = '1'),
+          
           RESPECT_NURSES = case_when (COMFORTABLE_ASKING_NURSES == 'Y' ~ 1,
+                                      
                                 TRUE ~ 0 ),
           
           RESPECT_TECHS = case_when (COMFORTABLE_ASKING_TECHS == "Y" ~ 1,
@@ -2926,6 +2945,14 @@ RESPECT <-
           
           RESPECT_GIATT = case_when (RECOGNIZED_RESPECTED_GASTRO_ATTENDING == "Y" ~ 1,
                                  TRUE ~ 0),
+
+          RESPECT_GPAINS = case_when (GROWING_PAINS  == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
+ 
+          RESPECT_SENSITIVITY = case_when (TEACHER_SENSITIVITY_STATURE_HANDSIZE  == "Y" ~ 1,
+                                 TRUE ~ 0),
+          
   
           RESPECT_FNAME =  case_when (FIRST_NAME_NO_PERMISSION == "Y" ~ 0,
                                          TRUE ~ 1)) %>% 
@@ -2933,9 +2960,9 @@ RESPECT <-
   
   rowwise() %>% 
   mutate(RESPECT_SCORE = sum( RESPECT_NURSES + RESPECT_TECHS + RESPECT_NFREQ + RESPECT_ESTAFF + RESPECT_ANES + 
-                           RESPECT_GIATT + RESPECT_FNAME)) %>% 
+                           RESPECT_GIATT + RESPECT_SENSITIVITY + RESPECT_FNAME)) %>% 
   
-  select( BIRTHSEX, BIRTHSEX2, AGE2, RACE, RACE2, TRAINING_LEVEL, EVER_INJURED, starts_with("RESPECT_") )
+  select( BIRTHSEX, BIRTHSEX2, AGE2, RACE, RACE2, HEIGHT, HTCAT, TRAINING_LEVEL, EVER_INJURED, starts_with("RESPECT_") )
 
 
 
@@ -2968,6 +2995,25 @@ ggbetweenstats( data= RESPECT,
                 p.adjust.method = "none",
                 title = "Mean RESPECT Scores by Race (Broad)")
 
+
+
+
+#If Respect Score includes "Teacher Sensitity to Stature/Hand Size"
+
+respect.birthsex.lm.unadj  <- lm( RESPECT_SCORE ~ BIRTHSEX , data= RESPECT)
+respect.htcat.lm.unadj    <-  lm( RESPECT_SCORE ~ HTCAT , data= RESPECT)
+respect.birthsex.lm.adj   <- lm( RESPECT_SCORE ~ BIRTHSEX + EVER_INJURED , data= RESPECT)
+      
+
+
+  tab_model( respect.birthsex.lm.unadj,
+             respect.htcat.lm.unadj,
+             respect.birthsex.lm.adj,
+             
+             title= "Respect Score - Comparison of Three Models based on Quasi Score <br>.",
+             dv.labels= c('Birth Sex Unadj','Height Cat Unadj Training Level', 'Birth Sex Adjusted Ever Injured'))
+  
+  
 ```
 
 
