@@ -2881,6 +2881,7 @@ anova(lm(PAIN_SCORE   ~ EQUIP_SCORE + BIRTHSEX + TRAINING_LEVEL , data = SCORES)
 PAIN2 <-
           sqldf(" select a.*,
                         b.EQUIP_SCORE,
+                        b.TRNG_SCORE,
                         case when b.PAIN_SCORE = 0 then 0 else 1 end as EVER_INJ_PAIN
                  from PAIN as a left join SCORES as b on (a.RECORD_ID = b.RECORD_ID) ")
 
@@ -2889,14 +2890,24 @@ PAIN2 <-
   everinj.equip.emmeans.unadj <- emmeans( everinj.equip.glm.unadj,  c(~EQUIP_SCORE), at = list(EQUIP_SCORE = c(1:7)), type= "response", adjust="none")
   
   
+  
   everinj.equip.glm.adj <- glm( EVER_INJ_PAIN ~ EQUIP_SCORE + BIRTHSEX  , data= PAIN2 , family= binomial(link="logit"))
   everinj.equip.emmeans.adj <- emmeans( everinj.equip.glm.adj,  ~c(EQUIP_SCORE, BIRTHSEX), at = list(EQUIP_SCORE = c(1:7)), type= "response", adjust="none")
+  
+  everinj.trng.glm.unadj <- glm( EVER_INJ_PAIN ~ TRNG_SCORE  , data= PAIN2 , family= binomial(link="logit"))
+  everinj.trng.emmeans.unadj <- emmeans( everinj.trng.glm.unadj,  c(~TRNG_SCORE), at = list(TRNG_SCORE = c(5:24)), type= "response", adjust="none")
+  
+  
   
   summary(everinj.equip.glm.unadj)
   summary(everinj.equip.emmeans.unadj)
   
   summary(everinj.equip.glm.adj)
   summary(everinj.equip.emmeans.adj)
+  
+  
+  summary(everinj.trng.glm.unadj)
+  summary(everinj.trng.emmeans.unadj)
   
   # 
   # 
@@ -3081,11 +3092,6 @@ respect.birthsex.lm.adj   <- lm( RESPECT_SCORE ~ BIRTHSEX + RACE2 , data= RESPEC
   
   summary(everinj.respect.glm.unadj)
   summary(everinj.respect.emmeans.unadj)
-  
-  summary(everinj.respect.glm.adj)
-  summary(everinj.respect.emmeans.adj)
-  
-  
   
   summary(everinj.respect.glm.adj)
   summary(everinj.respect.emmeans.adj, adjust="none")
