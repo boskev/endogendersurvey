@@ -2487,21 +2487,23 @@ corr.test(  PAIN$BIRTHSEX2,PAIN$PAIN_SCORE, method= 'pearson')
 - Monitor Height Adjustment (Yes=1, No=0)
 - Special Maneuvers/Injury Avoidance (Yes=1, No=0)
 - Strength-Building Exercises (Yes=1, No=0)
-- Use of Dial Extenders (Yes=1, defaut=0)
+- Use of Dial Extenders (Yes=1, default=0)
 - Use of Pedi Colonoscopes (Yes=1, No=0)
-- Ergo Feedback from Teachers (Often=3, Sometimes=2, Rarely=1, Never=0)
+- Ergo Feedback from Teachers (Often=1, Sometimes=1, Rarely=0, Never=0)
 - Equipment optimizatIon (Yes=1, default=0)
 - Glove Size Available (Yes=1, default=0)
 - Dial Extenders Available (Yes=1, default=0)
 - Encouraged to Use Dial Ext (Yes=1, default=0)
 - Pediatric Colonoscopes Available (Yes=1, default=0)
+- Lightweight 1P Aprons Available (Yes=1, default=0)
+- Lightweight 2P Aprons Available (Yes=1, default=0)
 - Well-fitted Aprons Available (Yes=1, default=0)
 - Formal Ergo Time-Out (Yes=1, No=0)
 - Informal Ergo Time-Out (Yes=1, No=0)
 - Monitors Easily Adjustable (Yes=1, No=0)
 - Teachers Sensitivity During Training (Yes=1, No=0)
-- Received Tactile Instruction from Males (Yes=1, No=0)
-- Received Tactile Instruction from Females (Yes=1, default=0)
+- Received Tactile Instruction from Males (Often=1, default=0)
+- Received Tactile Instruction from Females (Often=1, default=0)
 
 <br>
 
@@ -2514,84 +2516,132 @@ corr.test(  PAIN$BIRTHSEX2,PAIN$PAIN_SCORE, method= 'pearson')
 TRAINING <-
   
   SURVEY %>% 
-  mutate( BIRTHSEX2 = case_when( BIRTHSEX == "M" ~ 0,
+  mutate( BIRTHSEX2 = case_when( is.na(BIRTHSEX) ~ NA_real_,
+                                 BIRTHSEX == "M" ~ 0,
                                  TRUE ~ 1 ),
           
-          TRNG_FORMAL = case_when (FELLOWSHIP_FORMAL_ERGO_TRAINING == 'Y' ~ 1,
+         # AGE2 = factor(AGE2, levels=rev(levels(AGE2))),
+          
+          AGENUM  = case_when (AGE2 == "< 30" ~ 1,
+                               AGE2 == "30-34" ~2,
+                               AGE2 == "35-40" ~3,
+                               TRUE ~ 4),
+         
+         
+          TRNG_FORMAL = case_when (is.na(FELLOWSHIP_FORMAL_ERGO_TRAINING) ~ NA_real_,
+                                   FELLOWSHIP_FORMAL_ERGO_TRAINING == 'Y' ~ 1,
                                 TRUE ~ 0 ),
           
-          TRNG_INFORMAL = case_when (INFORMAL_TRAINING == "Y" ~ 1,
+          TRNG_INFORMAL = case_when (is.na(INFORMAL_TRAINING) ~ NA_real_,
+                                     INFORMAL_TRAINING == "Y" ~ 1,
                                  TRUE ~ 0),
           
-          TRNG_POSTURAL = case_when (TRAINING_TECHNIQUES_POSTURAL == "Y" ~ 1,
+          TRNG_POSTURAL = case_when (is.na(TRAINING_TECHNIQUES_POSTURAL) ~ NA_real_,
+                                    TRAINING_TECHNIQUES_POSTURAL == "Y" ~ 1,
                                  TRUE ~ 0),
           
-          TRNG_BEDHT = case_when (TRAINING_TECHNIQUES_BEDHEIGHT == "Y" ~ 1,
+          TRNG_BEDHT = case_when (is.na(TRAINING_TECHNIQUES_BEDHEIGHT) ~ NA_real_,
+                                  TRAINING_TECHNIQUES_BEDHEIGHT == "Y" ~ 1,
                                  TRUE ~ 0),
           
-          TRNG_BEDANG = case_when (TRAINING_TECHNIQUES_BEDANGLE == "Y" ~ 1,
+          TRNG_BEDANG = case_when (is.na(TRAINING_TECHNIQUES_BEDANGLE) ~ NA_real_,
+                                   TRAINING_TECHNIQUES_BEDANGLE == "Y" ~ 1,
                                 TRUE ~ 0),
           
-          TRNG_MONITOR = case_when (TRAINING_TECHNIQUES_MONITORHEIGHT == "Y" ~ 1,
+          TRNG_MONITOR = case_when (is.na(TRAINING_TECHNIQUES_MONITORHEIGHT) ~ NA_real_,
+                                    TRAINING_TECHNIQUES_MONITORHEIGHT == "Y" ~ 1,
                                  TRUE ~ 0),
           
-          TRNG_MANEUVERS = case_when (TRAINING_TECHNIQUES_MUSCULOSKELETAL == "Y" ~ 1,
+          TRNG_MANEUVERS = case_when (is.na(TRAINING_TECHNIQUES_MUSCULOSKELETAL) ~ NA_real_,
+                                      TRAINING_TECHNIQUES_MUSCULOSKELETAL == "Y" ~ 1,
                                     TRUE ~ 0) ,
 
-          TRNG_EXERCISE = case_when (TRAINING_TECHNIQUES_EXERCISE_STRETCHING == "Y" ~ 1,
+          TRNG_EXERCISE = case_when (is.na(TRAINING_TECHNIQUES_EXERCISE_STRETCHING) ~ NA_real_,
+                                     TRAINING_TECHNIQUES_EXERCISE_STRETCHING == "Y" ~ 1,
                                     TRUE ~ 0),
           
-          TRNG_DIALEXT= case_when (TRAINING_TECHNIQUES_DIAL_EXTENDERS == "Y" ~ 1,
+          TRNG_DIALEXT= case_when (is.na(TRAINING_TECHNIQUES_DIAL_EXTENDERS) ~ NA_real_,
+                                   TRAINING_TECHNIQUES_DIAL_EXTENDERS == "Y" ~ 1,
                                    TRUE ~ 0),
           
-          TRNG_PEDISCOPE= case_when (TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE == "Y" ~ 1,
+          TRNG_PEDISCOPE= case_when (is.na(TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE) ~ NA_real_,
+                                     TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE == "Y" ~ 1,
                                    TRUE ~ 0),
           
-          TRNG_FEEDBACK= case_when (ERGO_FEEDBACK == "Often" ~ 3,
-                                    ERGO_FEEDBACK == "Sometimes" ~ 2,
-                                    ERGO_FEEDBACK == "Rarely" ~ 1,
+          TRNG_FEEDBACK= case_when (is.na(ERGO_FEEDBACK) ~ NA_real_,
+                                    ERGO_FEEDBACK == "Often" ~ 1,
+                                    ERGO_FEEDBACK == "Sometimes" ~ 1,
                                     TRUE ~ 0),
           
-          TRNG_OPTIM= case_when (ERGO_OPTIMIZATION == "Y" ~ 1,
+          TRNG_OPTIM= case_when (is.na(ERGO_OPTIMIZATION) ~ NA_real_,
+                                 ERGO_OPTIMIZATION == "Y" ~ 1,
                                  ERGO_OPTIMIZATION == "N" ~ 0,
                                 TRUE ~ 0),
           
-          TRNG_GLOVE_AVAIL = case_when (GLOVE_SIZE_AVAILABLE == "Y" ~ 1,
+          TRNG_GLOVE_AVAIL = case_when (is.na(GLOVE_SIZE_AVAILABLE) ~ NA_real_,
+                                        GLOVE_SIZE_AVAILABLE == "Y" ~ 1,
                                  TRUE ~ 0),
-          TRNG_DIALEXT_AVAIL= case_when (DIAL_EXTENDERS_AVAILABLE == "Y" ~ 1,
+          
+          TRNG_DIALEXT_AVAIL= case_when (is.na(DIAL_EXTENDERS_AVAILABLE) ~ NA_real_,
+                                         DIAL_EXTENDERS_AVAILABLE == "Y" ~ 1,
                                         TRUE ~ 0),
-          TRNG_DIALEXT_ENC= case_when (DIAL_EXTENDERS_ENCOURAGED == "Y" ~ 1,
+          
+          TRNG_DIALEXT_ENC= case_when (is.na(DIAL_EXTENDERS_ENCOURAGED) ~ NA_real_,
+                                       DIAL_EXTENDERS_ENCOURAGED == "Y" ~ 1,
                                                                     TRUE ~ 0),
-          TRNG_PEDISCOPE_AVAIL = case_when (PEDI_COLONOSCOPES_AVAILABLE == "Y" ~ 1,
+          
+          TRNG_PEDISCOPE_AVAIL = case_when (is.na(PEDI_COLONOSCOPES_AVAILABLE) ~ NA_real_,
+                                            PEDI_COLONOSCOPES_AVAILABLE == "Y" ~ 1,
                                         TRUE ~ 0),
-          TRNG_FITTED_APRON_AVAIL = case_when (LEAD_APRONS_DONTKNOW == "Aware" ~ 1,
+          
+          TRNG_APRON_LW1P = case_when (is.na(LEAD_APRONS_LW_ONEPIECE) ~ NA_real_,
+                                               LEAD_APRONS_LW_ONEPIECE == "Y" ~ 1,
                                             TRUE ~ 0),
           
-          TRNG_TO_FORMAL= case_when (ERGO_FORMAL_TIMEOUT_PRIOR == "Y" ~ 1,
+          TRNG_APRON_LW2P = case_when (is.na(LEAD_APRONS_LW_TWOPIECE) ~ NA_real_,
+                                       LEAD_APRONS_LW_TWOPIECE == "Y" ~ 1,
+                                       TRUE ~ 0),
+
+          TRNG_TO_FORMAL= case_when (is.na(ERGO_FORMAL_TIMEOUT_PRIOR) ~ NA_real_,
+                                     ERGO_FORMAL_TIMEOUT_PRIOR == "Y" ~ 1,
                                             TRUE ~ 0),
-          TRNG_TO_INFORMAL= case_when (ERGO_INFORMAL_TIMEOUT_PRIOR == "Y" ~ 1,
+          
+          TRNG_TO_INFORMAL= case_when (is.na(ERGO_INFORMAL_TIMEOUT_PRIOR) ~ NA_real_,
+                                       ERGO_INFORMAL_TIMEOUT_PRIOR == "Y" ~ 1,
                                      TRUE ~ 0),
 
-          TRNG_MONITORS_EASYADJ = case_when (MONITORS_ADJUSTABLE == "Y" ~ 1,
+          TRNG_MONITORS_EASYADJ = case_when (is.na(MONITORS_ADJUSTABLE) ~ NA_real_,
+                                             MONITORS_ADJUSTABLE == "Y" ~ 1,
                                      TRUE ~ 0),
           
-          TRNG_TRAINERS_SENSITIVITY = case_when (TEACHER_SENSITIVITY_STATURE_HANDSIZE == "Y" ~ 1,
+          TRNG_TRAINERS_SENSITIVITY = case_when (is.na(TEACHER_SENSITIVITY_STATURE_HANDSIZE) ~ NA_real_,
+                                                 TEACHER_SENSITIVITY_STATURE_HANDSIZE == "Y" ~ 1,
                                                   TRUE ~ 0),
           
           
-          TRNG_TACTILE_MALES = case_when (TACTILE_INSTRUCTION_FROM_MALES == "Often" ~ 2,
-                                          TACTILE_INSTRUCTION_FROM_MALES == "Rarely" ~ 1,
+          TRNG_TACTILE_MALES = case_when (is.na(TACTILE_INSTRUCTION_FROM_MALES) ~ NA_real_,
+                                          TACTILE_INSTRUCTION_FROM_MALES == "Often" ~ 1,
                                                  TRUE ~ 0),
-          TRNG_TACTILE_FEMALES = case_when (TACTILE_INSTRUCTION_FROM_FEMALES == "Often" ~ 2,
-                                          TACTILE_INSTRUCTION_FROM_FEMALES == "Rarely" ~ 1,
+          
+          TRNG_TACTILE_FEMALES = case_when (is.na(TACTILE_INSTRUCTION_FROM_FEMALES) ~ NA_real_,
+                                            TACTILE_INSTRUCTION_FROM_FEMALES == "Often" ~ 1,
                                           TRUE ~ 0))  %>% 
-  rowwise() %>% 
-  mutate(RECORD_ID, TRNG_SCORE = sum(TRNG_FORMAL+ TRNG_INFORMAL+ TRNG_POSTURAL+ TRNG_BEDHT+ +TRNG_BEDANG+ TRNG_MONITOR+ TRNG_MANEUVERS+ TRNG_EXERCISE+ TRNG_DIALEXT+
-                          TRNG_PEDISCOPE+ TRNG_FEEDBACK+ TRNG_OPTIM+ TRNG_GLOVE_AVAIL+ TRNG_DIALEXT_AVAIL+ TRNG_DIALEXT_ENC+ TRNG_PEDISCOPE_AVAIL+
-                          TRNG_FITTED_APRON_AVAIL+ TRNG_TO_FORMAL+ TRNG_TO_INFORMAL+ TRNG_MONITORS_EASYADJ + TRNG_TRAINERS_SENSITIVITY+
-                          TRNG_TACTILE_MALES+ TRNG_TACTILE_FEMALES)) %>% 
   
-  select( BIRTHSEX, BIRTHSEX2, RACE, RACE2, TRAINING_LEVEL, starts_with("TRNG_") )
+  rowwise() %>% 
+  mutate(TRNG_SCORE = sum(TRNG_FORMAL+ TRNG_INFORMAL+ TRNG_POSTURAL+ TRNG_BEDHT+ +TRNG_BEDANG+ TRNG_MONITOR+ TRNG_MANEUVERS+ TRNG_EXERCISE+ TRNG_DIALEXT+
+                          TRNG_PEDISCOPE+ TRNG_FEEDBACK+ TRNG_OPTIM+ TRNG_GLOVE_AVAIL+ TRNG_DIALEXT_AVAIL+ TRNG_DIALEXT_ENC+ TRNG_PEDISCOPE_AVAIL+
+                            TRNG_APRON_LW1P+ TRNG_APRON_LW2P+ TRNG_TO_FORMAL+ TRNG_TO_INFORMAL+ TRNG_MONITORS_EASYADJ + TRNG_TRAINERS_SENSITIVITY+
+                          TRNG_TACTILE_MALES+ TRNG_TACTILE_FEMALES),
+                          
+          TRNG_SCORE2 = sum(TRNG_FORMAL+ TRNG_INFORMAL+ TRNG_POSTURAL+ TRNG_BEDHT+ +TRNG_BEDANG+ TRNG_MONITOR+ TRNG_MANEUVERS+ TRNG_EXERCISE+ TRNG_DIALEXT+
+                              TRNG_PEDISCOPE+ TRNG_FEEDBACK+ TRNG_TO_FORMAL+ TRNG_TO_INFORMAL+  TRNG_TRAINERS_SENSITIVITY+
+                              TRNG_TACTILE_MALES+ TRNG_TACTILE_FEMALES) ,
+         
+          EQUIP_SCORE = sum(TRNG_OPTIM+ TRNG_GLOVE_AVAIL+ TRNG_DIALEXT_AVAIL+ TRNG_DIALEXT_ENC+ TRNG_PEDISCOPE_AVAIL+
+                              TRNG_APRON_LW1P+ TRNG_APRON_LW2P + TRNG_TRAINERS_SENSITIVITY+ TRNG_MONITORS_EASYADJ
+                              )) %>% 
+  
+  select( RECORD_ID, BIRTHSEX, BIRTHSEX2, AGE2, AGENUM, RACE, RACE2, TRAINING_LEVEL, starts_with("TRNG_"), starts_with("EQUIP_") )
 
 
 
@@ -2601,8 +2651,8 @@ TRAINING <-
 
 TRAINING %>% 
   group_by(BIRTHSEX) %>% 
-  summarize( TRNGMEAN = mean(TRNG_SCORE),
-             TRNGSD = sd(TRNG_SCORE))
+  summarize( TRNGMEAN = mean(TRNG_SCORE, na.rm=T),
+             TRNGSD = sd(TRNG_SCORE, na.rm=T))
 
 
 shapiro.test(TRAINING$TRNG_SCORE)
@@ -2632,6 +2682,8 @@ corr.test(  TRAINING$BIRTHSEX2,TRAINING$TRNG_SCORE, method= 'pearson', ci=T)
 - Dial Extenders Available (Yes=1, default=0)
 - Encouraged to Use Dial Ext (Yes=1, default=0)
 - Pediatric Colonoscopes Available (Yes=1, default=0)
+- LW 1P Aprons Available (Yes=1, default=0)
+- LW 2P Aprons Available (Yes=1, default=0)
 - Well-fitted Aprons Available (Yes=1, default=0)
 - Monitors Easily Adjustable (Yes=1, No=0)
 - Teachers Sensitivity During Training (Yes=1, No=0)
@@ -2643,112 +2695,14 @@ corr.test(  TRAINING$BIRTHSEX2,TRAINING$TRNG_SCORE, method= 'pearson', ci=T)
 ```{r PLAYGROUND-TRAINING-EQUIPMENT-SCORE }
 
 
-TRAINING <-
-  
-  SURVEY %>% 
-  mutate( BIRTHSEX2 = case_when( BIRTHSEX == "M" ~ 0,
-                                 TRUE ~ 1 ),
-          
-         # AGE2 = factor(AGE2, levels=rev(levels(AGE2))),
-          
-          AGENUM  = case_when (AGE2 == "< 30" ~ 1,
-                               AGE2 == "30-34" ~2,
-                               AGE2 == "35-40" ~3,
-                               TRUE ~ 4),
-          
-          TRNG_FORMAL = case_when (FELLOWSHIP_FORMAL_ERGO_TRAINING == 'Y' ~ 1,
-                                TRUE ~ 0 ),
-          
-          TRNG_INFORMAL = case_when (INFORMAL_TRAINING == "Y" ~ 1,
-                                 TRUE ~ 0),
-          
-          TRNG_POSTURAL = case_when (TRAINING_TECHNIQUES_POSTURAL == "Y" ~ 1,
-                                 TRUE ~ 0),
-          
-          TRNG_BEDHT = case_when (TRAINING_TECHNIQUES_BEDHEIGHT == "Y" ~ 1,
-                                 TRUE ~ 0),
-          
-          TRNG_BEDANG = case_when (TRAINING_TECHNIQUES_BEDANGLE == "Y" ~ 1,
-                                TRUE ~ 0),
-          
-          TRNG_MONITOR = case_when (TRAINING_TECHNIQUES_MONITORHEIGHT == "Y" ~ 1,
-                                 TRUE ~ 0),
-          
-          TRNG_MANEUVERS = case_when (TRAINING_TECHNIQUES_MUSCULOSKELETAL == "Y" ~ 1,
-                                    TRUE ~ 0) ,
-
-          TRNG_EXERCISE = case_when (TRAINING_TECHNIQUES_EXERCISE_STRETCHING == "Y" ~ 1,
-                                    TRUE ~ 0),
-          
-          TRNG_DIALEXT= case_when (TRAINING_TECHNIQUES_DIAL_EXTENDERS == "Y" ~ 1,
-                                   TRUE ~ 0),
-          
-          TRNG_PEDISCOPE= case_when (TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE == "Y" ~ 1,
-                                   TRUE ~ 0),
-          
-          TRNG_FEEDBACK= case_when (ERGO_FEEDBACK == "Often" ~ 3,
-                                    ERGO_FEEDBACK == "Sometimes" ~ 2,
-                                    ERGO_FEEDBACK == "Rarely" ~ 1,
-                                    TRUE ~ 0),
-          
-          TRNG_OPTIM= case_when (ERGO_OPTIMIZATION == "Y" ~ 1,
-                                 ERGO_OPTIMIZATION == "N" ~ 0,
-                                TRUE ~ 0),
-          
-          TRNG_GLOVE_AVAIL = case_when (GLOVE_SIZE_AVAILABLE == "Y" ~ 1,
-                                 TRUE ~ 0),
-          TRNG_DIALEXT_AVAIL= case_when (DIAL_EXTENDERS_AVAILABLE == "Y" ~ 1,
-                                        TRUE ~ 0),
-          TRNG_DIALEXT_ENC= case_when (DIAL_EXTENDERS_ENCOURAGED == "Y" ~ 1,
-                                                                    TRUE ~ 0),
-          TRNG_PEDISCOPE_AVAIL = case_when (PEDI_COLONOSCOPES_AVAILABLE == "Y" ~ 1,
-                                        TRUE ~ 0),
-          TRNG_FITTED_APRON_AVAIL = case_when (LEAD_APRONS_DONTKNOW == "Aware" ~ 1,
-                                            TRUE ~ 0),
-          
-          TRNG_TO_FORMAL= case_when (ERGO_FORMAL_TIMEOUT_PRIOR == "Y" ~ 1,
-                                            TRUE ~ 0),
-          TRNG_TO_INFORMAL= case_when (ERGO_INFORMAL_TIMEOUT_PRIOR == "Y" ~ 1,
-                                     TRUE ~ 0),
-
-          TRNG_MONITORS_EASYADJ = case_when (MONITORS_ADJUSTABLE == "Y" ~ 1,
-                                     TRUE ~ 0),
-          
-          TRNG_TRAINERS_SENSITIVITY = case_when (TEACHER_SENSITIVITY_STATURE_HANDSIZE == "Y" ~ 1,
-                                                  TRUE ~ 0),
-          
-          
-          TRNG_TACTILE_MALES = case_when (TACTILE_INSTRUCTION_FROM_MALES == "Often" ~ 2,
-                                          TACTILE_INSTRUCTION_FROM_MALES == "Rarely" ~ 1,
-                                                 TRUE ~ 0),
-          TRNG_TACTILE_FEMALES = case_when (TACTILE_INSTRUCTION_FROM_FEMALES == "Often" ~ 2,
-                                          TACTILE_INSTRUCTION_FROM_FEMALES == "Rarely" ~ 1,
-                                          TRUE ~ 0))  %>% 
-  rowwise() %>% 
-  mutate(TRNG_SCORE = sum(TRNG_FORMAL+ TRNG_INFORMAL+ TRNG_POSTURAL+ TRNG_BEDHT+ +TRNG_BEDANG+ TRNG_MONITOR+ TRNG_MANEUVERS+ TRNG_EXERCISE+ TRNG_DIALEXT+
-                          TRNG_PEDISCOPE+ TRNG_FEEDBACK+ TRNG_OPTIM+ TRNG_GLOVE_AVAIL+ TRNG_DIALEXT_AVAIL+ TRNG_DIALEXT_ENC+ TRNG_PEDISCOPE_AVAIL+
-                          TRNG_FITTED_APRON_AVAIL+ TRNG_TO_FORMAL+ TRNG_TO_INFORMAL+ TRNG_MONITORS_EASYADJ + TRNG_TRAINERS_SENSITIVITY+
-                          TRNG_TACTILE_MALES+ TRNG_TACTILE_FEMALES),
-                          
-          TRNG_SCORE2 = sum(TRNG_FORMAL+ TRNG_INFORMAL+ TRNG_POSTURAL+ TRNG_BEDHT+ +TRNG_BEDANG+ TRNG_MONITOR+ TRNG_MANEUVERS+ TRNG_EXERCISE+ TRNG_DIALEXT+
-                              TRNG_PEDISCOPE+ TRNG_FEEDBACK+ TRNG_TO_FORMAL+ TRNG_TO_INFORMAL+  TRNG_TRAINERS_SENSITIVITY+
-                              TRNG_TACTILE_MALES+ TRNG_TACTILE_FEMALES) ,
-         
-          EQUIP_SCORE = sum(TRNG_OPTIM+ TRNG_GLOVE_AVAIL+ TRNG_DIALEXT_AVAIL+ TRNG_DIALEXT_ENC+ TRNG_PEDISCOPE_AVAIL+
-                              TRNG_FITTED_APRON_AVAIL + TRNG_TRAINERS_SENSITIVITY+ TRNG_MONITORS_EASYADJ
-                              )) %>% 
-  
-
-  select( RECORD_ID, BIRTHSEX, BIRTHSEX2, AGE2, AGENUM, RACE, RACE2, TRAINING_LEVEL, starts_with("TRNG_"), starts_with("EQUIP_") )
-
 
 
 
 
 TRAINING %>% 
   group_by(BIRTHSEX) %>% 
-  summarize( EQUIPM = mean(EQUIP_SCORE),
-             EQUIPSD = sd(EQUIP_SCORE))
+  summarize( EQUIPM = mean(EQUIP_SCORE, na.rm=T),
+             EQUIPSD = sd(EQUIP_SCORE, na.rm=T ))
 
 
 shapiro.test(TRAINING$EQUIP_SCORE)
