@@ -74,7 +74,7 @@ SURVEY  <-
            TRAINING_TECHNIQUES_MONITORHEIGHT, TRAINING_TECHNIQUES_MUSCULOSKELETAL, TRAINING_TECHNIQUES_EXERCISE_STRETCHING, TRAINING_TECHNIQUES_DIAL_EXTENDERS,
            TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE, ERGO_TRAINING_BUDGET, ERGO_FEEDBACK, ERGO_FEEDBACK_BY_WHOM, ERGO_OPTIMIZATION, GLOVE_SIZE_AVAILABLE,
            DIAL_EXTENDERS_AVAILABLE, DIAL_EXTENDERS_ENCOURAGED, DIAL_EXTENDERS_FEMALEATT, DIAL_EXTENDERS_MALEATT, PEDI_COLONOSCOPES_AVAILABLE,
-           LEAD_APRONS_DONTKNOW,  LEAD_APRONS_LW_ONEPIECE, LEAD_APRONS_LW_TWOPIECE, LEAD_APRONS_STANDARD_ONEPIECE, LEAD_APRONS_STANDARD_TWOPIECE,
+           LEAD_APRONS_AVAILABLE,  LEAD_APRONS_LW_ONEPIECE, LEAD_APRONS_LW_TWOPIECE, LEAD_APRONS_STANDARD_ONEPIECE, LEAD_APRONS_STANDARD_TWOPIECE,
            LEAD_APRONS_DOUBLE, LEAD_APRONS_THYROID, LEAD_APRONS_MATERNALDOS, LEAD_APRONS_FETALDOS,
            ERGO_FORMAL_TIMEOUT_PRIOR, ERGO_INFORMAL_TIMEOUT_PRIOR, MONITORS_ADJUSTABLE, TEACHER_SENSITIVITY_STATURE_HANDSIZE,
            TEACHER_SENSITIVITY_BY_GENDER, TACTILE_INSTRUCTION_FROM_MALES, TACTILE_INSTRUCTION_FROM_FEMALES,
@@ -219,9 +219,10 @@ SURVEY  <-
                                                                                    'N' = 'N',
                                                                                    "Don't know" = 'DK', .ordered= T)) %>% 
   
-   mutate( LEAD_APRONS_DONTKNOW = factor(LEAD_APRONS_DONTKNOW),
-          LEAD_APRONS_DONTKNOW = recode_factor(LEAD_APRONS_DONTKNOW, 'N' = 'Aware',
-                                                                     'Y' = 'Not Aware',.ordered= T)) %>% 
+   mutate( LEAD_APRONS_AVAILABLE = factor(LEAD_APRONS_AVAILABLE),
+          LEAD_APRONS_AVAILABLE = recode_factor(LEAD_APRONS_AVAILABLE, 'N' = 'N',
+                                                                       'Y' = 'Y',
+                                                                       "Don't know" = "DK",.ordered= T)) %>% 
   
    mutate( TEACHER_SENSITIVITY_BY_GENDER = factor(TEACHER_SENSITIVITY_BY_GENDER),
           TEACHER_SENSITIVITY_BY_GENDER = recode_factor(TEACHER_SENSITIVITY_BY_GENDER, 'Male' = 'Male',
@@ -1199,12 +1200,12 @@ CrossTable(SURVEY$PEDI_COLONOSCOPES_AVAILABLE, SURVEY$BIRTHSEX, prop.chisq=F, pr
 ```{r CROSSTAB-BIRTHSEX-LEAD-APRON-AVAILABILITY }
   
 
-plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_DONTKNOW, margin = "row", 
+plot_xtab(SURVEY$BIRTHSEX, SURVEY$LEAD_APRONS_AVAILABLE, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          title = "Don't Know Whether Lead Aprons Available at Institution by Birth Sex",
+          title = "Well-Fitted Lead Aprons Available",
           axis.titles = "Birth Sex", 
-          legend.title= "Aware of Lead Aprons?",
-          geom.colors = c("#006cc5","#cbcccb"), 
+          legend.title= "Well-Fitted Lead Aprons?",
+          geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
