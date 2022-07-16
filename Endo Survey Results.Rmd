@@ -3067,7 +3067,7 @@ respect.birthsex.lm.adj   <- lm( RESPECT_SCORE ~ BIRTHSEX + RACE2 , data= RESPEC
 
 <br>
   
-#### Question 5:  What happens if we use Factor Analysis as a means of data reduction and to confirm that the variables that we intuitively assume belong together actually load highly on the same factor?  
+#### Question 5:  What happens if we use <span style="color:red">Factor Analysis</span> as a means of data reduction and to confirm that the variables that we intuitively assume belong together actually load highly on the same factor?  
 
 
 
@@ -3347,6 +3347,14 @@ KMO( X)
 remove<- colnames(X[ , KMO(X)$MSAi<0.5])
 print(remove)
 
+
+
+
+# Bartlett's Test for Sphericity - If you can't reject this null hypothesis, then there is essentially nothing to factor, as all variables are essentially different. 
+# In other words, you want the analysis of your data matrix to have a resultant p value less than 0.05
+
+psych::cortest.bartlett( X )
+
 ```
 
  
@@ -3516,7 +3524,7 @@ ta<- alpha(X, check.keys=T)
 
 # Cronbach's Alphas for all five factors and for the overall dataset
 
-cbind(F1.Respect.alpha=f1a$total$std.alpha, 
+rbind(F1.Respect.alpha=f1a$total$std.alpha, 
       F2.TactTrng.alpha=f2a$total$std.alpha, 
       F3.ErgoTrng.alpha=f3a$total$std.alpha,
       F4.DialExt.alpha=f4a$total$std.alpha, 
@@ -3525,8 +3533,9 @@ cbind(F1.Respect.alpha=f1a$total$std.alpha,
 
 ```
 
+<br>
+<br>
 
-
-- **Conclusion:**  Overall, our factors have a Standardized Cronbach's Alpha of 0.761, which is considered very good.  Three of our factors -- ** F1.Respect, F2.TactileTraining, F4.DialExtenders -- also have CA's above 0.70.  However, two factors -- F3.ErgoTraining and F5.Pain/Injury -- have CA's of 0.52 and 0.55, respectively.  Removing varialbes from the factor do not raise the CA's appreciably, according to the function output (not displayed).  Is this cause for concern?
+- **Conclusion:**  Overall, our factors have a Standardized Cronbach's Alpha of 0.761, which is considered very good.  Three of our factors -- **F1.Respect, F2.TactileTraining, F4.DialExtenders** -- also have CA's above 0.70.  However, two factors -- **F3.ErgoTraining and F5.Pain/Injury** -- have CA's of 0.52 and 0.55, respectively.  Removing variables from the factor do not raise the CA's appreciably, according to the function output (not displayed).  Is this cause for concern?
 
 
