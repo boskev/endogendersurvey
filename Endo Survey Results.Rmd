@@ -3469,8 +3469,9 @@ fnorot5.lm1h <- lm( F1.RESPECT ~ HTCAT + TRAINING_LEVEL + RACE2 , data = FACTANA
 tab_model( fnorot5.lm1,
            fnorot5.lm4,
            fnorot5.lm5,
-           fnorot5.lm1h)
+           fnorot5.lm1h, show.ci=F, show.se=T)
 
+?tab_model
 
 ```
 
