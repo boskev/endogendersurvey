@@ -1833,7 +1833,7 @@ plot_xtab(SURVEY$BIRTHSEX, SURVEY$WHEN_DISABILITY_INSURANCE, margin = "row",
 
 CORRECT <-
    SURVEY %>% 
-    select (BIRTHSEX, ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE,) %>% 
+    select (RECORD_ID, BIRTHSEX, ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE,) %>% 
     mutate( COUNT_CORRECT = rowSums( . == "Correct" ))
 
 
@@ -3065,6 +3065,467 @@ respect.birthsex.lm.adj   <- lm( RESPECT_SCORE ~ BIRTHSEX + RACE2 , data= RESPEC
 ```
 
 
+<br>
+  
+#### Question 5:  What happens if we use Factor Analysis as a means of data reduction and to confirm that the variables that we intuitively assume belong together actually load highly on the same factor?  
 
+
+
+- Pass along virtually all non-demographic variables, converting answers to a numeric scale
+- Examine correlation matrix to highlight pairs of overly correlated variables (PCoeff >0.90). Consider dropping one of the variables
+- Examine results of the Kaiser-Meyer-Olin Factor Adequacy Test.  Consider dropping any variable with a score below 0.50.
+- Examine Eigen Value chart and decide on (1) number of factors to output; (2) whether to rotate your factor solution
+- Output Factor Scores and append to base dataset so that T-tests and regressions can be run by various categorical variables (Sex, Training Level, Agecat, etc.)
+
+<br>
+<br>
+
+
+```{r PLAYGROUND-FACTANAL1, warning=F}
+
+
+
+FACTOR_BASE <-
+  
+  SURVEY %>% 
+  mutate(
+          HTCAT = recode_factor(HEIGHT2, "< 5'"='0', 
+                                "5-5'3" = '0',
+                                "5'4-5'6" = '0',
+                                "5'7-5'9" = '1',
+                                "5'10-6'" = '1',
+                                "6'1-6'4" = '1',
+                                "> 6'4" = '1'),
+       
+          PAIN_INJURY =  case_when(  is.na(EVER_INJURED) ~ NA_real_,
+                                     EVER_INJURED == "Y" ~ 1,
+                                     TRUE ~ 0),
+          
+          PAIN_HAND =  case_when(  is.na(EXPERIENCED_TRANSIENT_PAIN_HAND) ~ NA_real_,
+                                   EXPERIENCED_TRANSIENT_PAIN_HAND == "Y" ~ 1,
+                                   TRUE ~ 0),        
+          PAIN_NECKSH =  case_when(  is.na(EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER) ~ NA_real_,
+                                     EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER == "Y" ~ 1,
+                                   TRUE ~ 0),        
+          PAIN_BACK =  case_when(  is.na(EXPERIENCED_TRANSIENT_PAIN_BACK) ~ NA_real_,
+                                   EXPERIENCED_TRANSIENT_PAIN_BACK == "Y" ~ 1,
+                                   TRUE ~ 0),        
+          PAIN_LEG =  case_when(  is.na(EXPERIENCED_TRANSIENT_PAIN_LEG) ~ NA_real_,
+                                  EXPERIENCED_TRANSIENT_PAIN_LEG == "Y" ~ 1,
+                                   TRUE ~ 0),        
+          PAIN_FOOT = case_when(  is.na(EXPERIENCED_TRANSIENT_PAIN_FOOT) ~ NA_real_,
+                                     EXPERIENCED_TRANSIENT_PAIN_FOOT == "Y" ~ 1,
+                                      TRUE ~ 0),
+          
+    
+         # DEMO_HOURS = case_when (is.na(PERFORMANCE_HOURS) ~ NA_real_,
+         #                          PERFORMANCE_HOURS == '< 10' ~ 1,
+         #                          PERFORMANCE_HOURS == '10-20' ~ 2,
+         #                          PERFORMANCE_HOURS == '21-30' ~ 3,
+         #                          PERFORMANCE_HOURS == '31-40' ~ 4,
+         #                          TRUE ~ 5 ),
+
+        # DEMO_FEMTEACH = case_when (is.na(FEMALE_TRAINERS) ~ NA_real_,
+        #                            FEMALE_TRAINERS == '1-2' ~ 1,
+        #                            FEMALE_TRAINERS == '3-5' ~ 2,
+        #                            FEMALE_TRAINERS == '6-10' ~ 3,
+        #                            FEMALE_TRAINERS == '> 10' ~ 4,
+        #                            TRUE ~ 0 ),
+        # 
+        # DEMO_MALETEACH = case_when (is.na(MALE_TRAINERS) ~ NA_real_,
+        #                             MALE_TRAINERS == '1-2' ~ 1,
+        #                             MALE_TRAINERS == '3-5' ~ 2,
+        #                             MALE_TRAINERS == '6-10' ~ 3,
+        #                             MALE_TRAINERS == '> 10' ~ 4,
+        #                            TRUE ~ 0 ),
+        # 
+        #   DEMO_SGPREF = case_when (is.na(TEACHER_GENDER_PREFERENCE) ~ NA_real_,
+        #                           TEACHER_GENDER_PREFERENCE == 'Yes' ~ 1,
+        #                           TRUE ~ 0),
+
+         # DEMO_GLOVESIZE = GLOVE,
+
+          
+          
+        
+          
+          #Higher numbers equal higher levels of training/attention
+          
+          TRNG_FORMAL = case_when (is.na(FELLOWSHIP_FORMAL_ERGO_TRAINING) ~ NA_real_,
+                                   FELLOWSHIP_FORMAL_ERGO_TRAINING == 'Y' ~ 1,
+                                   TRUE ~ 0 ),
+          
+          
+          TRNG_INFORMAL = case_when (is.na(INFORMAL_TRAINING) ~ NA_real_,
+                                   INFORMAL_TRAINING == 'Y' ~ 1,
+                                   TRUE ~ 0 ),
+          
+          
+          TRNG_POSTURAL = case_when (is.na(TRAINING_TECHNIQUES_POSTURAL) ~ NA_real_,
+                                     TRAINING_TECHNIQUES_POSTURAL == "Y" ~ 1,
+                                     TRUE ~ 0),
+          
+          TRNG_BEDHT = case_when (is.na(TRAINING_TECHNIQUES_BEDHEIGHT) ~ NA_real_,
+                                  TRAINING_TECHNIQUES_BEDHEIGHT == "Y" ~ 1,
+                                  TRUE ~ 0),
+          
+          TRNG_BEDANG = case_when (is.na(TRAINING_TECHNIQUES_BEDANGLE) ~ NA_real_,
+                                   TRAINING_TECHNIQUES_BEDANGLE == "Y" ~ 1,
+                                   TRUE ~ 0),
+          
+          TRNG_MONITOR = case_when (is.na(TRAINING_TECHNIQUES_MONITORHEIGHT) ~ NA_real_,
+                                    TRAINING_TECHNIQUES_MONITORHEIGHT == "Y" ~ 1,
+                                    TRUE ~ 0),
+          
+          TRNG_MANEUVERS = case_when (is.na(TRAINING_TECHNIQUES_MUSCULOSKELETAL) ~ NA_real_,
+                                      TRAINING_TECHNIQUES_MUSCULOSKELETAL == "Y" ~ 1,
+                                      TRUE ~ 0) ,
+          
+          TRNG_EXERCISE = case_when (is.na(TRAINING_TECHNIQUES_EXERCISE_STRETCHING) ~ NA_real_,
+                                     TRAINING_TECHNIQUES_EXERCISE_STRETCHING == "Y" ~ 1,
+                                     TRUE ~ 0),
+          
+          TRNG_DIALEXT= case_when (is.na(TRAINING_TECHNIQUES_DIAL_EXTENDERS) ~ NA_real_,
+                                   TRAINING_TECHNIQUES_DIAL_EXTENDERS == "Y" ~ 1,
+                                   TRUE ~ 0),
+          
+          TRNG_PEDISCOPE= case_when (is.na(TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE) ~ NA_real_,
+                                     TRAINING_TECHNIQUES_PEDIATRIC_COLONOSCOPE == "Y" ~ 1,
+                                     TRUE ~ 0),
+          
+          TRNG_FEEDBACK= case_when (is.na(ERGO_FEEDBACK) ~ NA_real_,
+                                    ERGO_FEEDBACK == "Often" ~ 3,
+                                    ERGO_FEEDBACK == "Sometimes" ~ 2,
+                                    ERGO_FEEDBACK == "Rarely" ~ 1,
+                                    TRUE ~ 0),
+          
+          TRNG_OPTIM= case_when (is.na(ERGO_OPTIMIZATION) ~ NA_real_,
+                                 ERGO_OPTIMIZATION == "Y" ~ 1,
+                                 ERGO_OPTIMIZATION == "N" ~ 0,
+                                 TRUE ~ 0),
+          
+          
+          #Higher numbers equal heightened equipment availability
+          
+          EQUIP_GLOVE_AVAIL = case_when (is.na(GLOVE_SIZE_AVAILABLE) ~ NA_real_,
+                                        GLOVE_SIZE_AVAILABLE == "Y" ~ 1,
+                                        TRUE ~ 0),
+          
+          EQUIP_DIALEXT_AVAIL= case_when (is.na(DIAL_EXTENDERS_AVAILABLE) ~ NA_real_,
+                                         DIAL_EXTENDERS_AVAILABLE == "Y" ~ 1,
+                                         TRUE ~ 0),
+          
+          EQUIP_DIALEXT_ENC= case_when (is.na(DIAL_EXTENDERS_ENCOURAGED) ~ NA_real_,
+                                       DIAL_EXTENDERS_ENCOURAGED == "Y" ~ 1,
+                                       TRUE ~ 0),
+          
+          # EQUIP_PEDISCOPE_AVAIL = case_when (is.na(PEDI_COLONOSCOPES_AVAILABLE) ~ NA_real_,
+          #                                   PEDI_COLONOSCOPES_AVAILABLE == "Y" ~ 1,
+          #                                   TRUE ~ 0),
+          
+          EQUIP_LAPRON_AVAIL = case_when (is.na(LEAD_APRONS_AVAILABLE) ~ NA_real_,
+                                          LEAD_APRONS_AVAILABLE == "Y" ~ 2,
+                                          LEAD_APRONS_AVAILABLE == "N" ~ 1,
+                                             TRUE ~ 0),
+          # EQUIP_TO_FORMAL= case_when (is.na(ERGO_FORMAL_TIMEOUT_PRIOR) ~ NA_real_,
+          #                            ERGO_FORMAL_TIMEOUT_PRIOR == "Y" ~ 1,
+          #                            TRUE ~ 0),
+
+          EQUIP_TO_INFORMAL= case_when (is.na(ERGO_INFORMAL_TIMEOUT_PRIOR) ~ NA_real_,
+                                       ERGO_INFORMAL_TIMEOUT_PRIOR == "Y" ~ 1,
+                                       TRUE ~ 0),
+          
+          EQUIP_MONITORS_EASYADJ = case_when (is.na(MONITORS_ADJUSTABLE) ~ NA_real_,
+                                             MONITORS_ADJUSTABLE == "Y" ~ 1,
+                                             TRUE ~ 0),
+          
+          
+          TRNG_TACTILE_MALES = case_when (is.na(TACTILE_INSTRUCTION_FROM_MALES) ~ NA_real_,
+                                          TACTILE_INSTRUCTION_FROM_MALES == "Often" ~ 2,
+                                          TACTILE_INSTRUCTION_FROM_MALES == "Rarely" ~ 1,
+                                          TRUE ~ 0),
+
+          TRNG_TACTILE_FEMALES = case_when (is.na(TACTILE_INSTRUCTION_FROM_FEMALES) ~ NA_real_,
+                                            TACTILE_INSTRUCTION_FROM_FEMALES == "Often" ~ 2,
+                                            TACTILE_INSTRUCTION_FROM_FEMALES == "Rarely" ~ 1,
+                                            TRUE ~ 0),
+
+          
+          
+          # Higher numbers indicated heightened levels of respect
+          
+          RESPECT_NURSES = case_when (is.na(COMFORTABLE_ASKING_NURSES) ~ NA_real_,
+                                      COMFORTABLE_ASKING_NURSES == 'Y' ~ 1,
+                                      TRUE ~ 0 ),
+          
+          RESPECT_TECHS = case_when (is.na(COMFORTABLE_ASKING_TECHS) ~ NA_real_,
+                                     COMFORTABLE_ASKING_TECHS == "Y" ~ 1,
+                                     TRUE ~ 0),
+          
+          # RESPECT_NFREQ = case_when (is.na(NURSES_ASKING) ~ NA_real_,
+          #                            NURSES_ASKING == "Once" ~ 2,
+          #                            NURSES_ASKING == "Twice" ~ 1,
+          #                            TRUE ~ 0),
+          
+          RESPECT_ESTAFF = case_when (is.na(RECOGNIZED_RESPECTED_ES_STAFF) ~ NA_real_,
+                                      RECOGNIZED_RESPECTED_ES_STAFF == "Y" ~ 1,
+                                      TRUE ~ 0),
+          
+          RESPECT_ANES = case_when (is.na(RECOGNIZED_RESPECTED_ANESTHETISTS) ~ NA_real_,
+                                    RECOGNIZED_RESPECTED_ANESTHETISTS == "Y" ~ 1,
+                                    TRUE ~ 0),
+          
+          RESPECT_GIATT = case_when (is.na(RECOGNIZED_RESPECTED_ANESTHETISTS) ~ NA_real_,
+                                     RECOGNIZED_RESPECTED_GASTRO_ATTENDING == "Y" ~ 1,
+                                     TRUE ~ 0),
+          
+          RESPECT_GPAINS = case_when (is.na(GROWING_PAINS) ~ NA_real_,
+                                      GROWING_PAINS  == "Y" ~ 0,
+                                      TRUE ~ 1),
+          
+          TRNG_SENSITIVITY = case_when (is.na(TEACHER_SENSITIVITY_STATURE_HANDSIZE) ~ NA_real_,
+                                           TEACHER_SENSITIVITY_STATURE_HANDSIZE  == "Y" ~ 1,
+                                           TRUE ~ 0),
+          
+          
+          RESPECT_FNAME =  case_when (is.na(FIRST_NAME_NO_PERMISSION) ~ NA_real_,
+                                      FIRST_NAME_NO_PERMISSION == "Y" ~ 0,
+                                      TRUE ~ 1))  %>% 
+  
+  
+  #Mean Substitute missing values FOR EACH SEX
+# 
+# group_by( BIRTHSEX, RACE2, TRAINING_LEVEL ) %>%
+# mutate_at(vars( DEMO_HOURS:RESPECT_FNAME), ~replace_na(., mean(., na.rm = TRUE))) %>%
+
+  
+  select( RECORD_ID, BIRTHSEX, RACE2, TRAINING_LEVEL, AGE2, HEIGHT2, HTCAT, 
+          starts_with('DEMO_'), starts_with('TRNG_'),  starts_with('EQUIP_'), starts_with('RESPECT_'), starts_with('PAIN_')) %>% 
+  
+  na.omit()  %>%   left_join(CORRECT[, c("RECORD_ID", "COUNT_CORRECT")], by= 'RECORD_ID')  %>% rename( ERGO_QUIZ = COUNT_CORRECT)  %>%
+                   left_join(APRON_SCORE[, c("RECORD_ID", "APRON_SCORE")], by= 'RECORD_ID')  %>% rename( EQUIP_APRONS_CT = APRON_SCORE)
+
+
+```
+
+
+<br>
+
+Here's a glimpse of the structure of the resulting dataset `FACTOR_BASE`:
+  
+  
+```{r GLIMPSE-2 }
+  
+glimpse(FACTOR_BASE)
+
+```
+
+<br>
+<br>
+
+
+```{r PLAYGROUND-FACTANAL2, warning=F}
+
+
+correlations <- round(cor(FACTOR_BASE[, -c(1:7)]),2)
+corr_matrix <- as.data.frame(as.table(correlations))
+corr_matrix %>% arrange(desc(Freq)) %>% rename(PCoeff= Freq) %>% filter(PCoeff !=1 & abs(PCoeff) > 0.90)
+
+
+X <- na.omit(FACTOR_BASE[, -c(1:7)])
+
+# summary(lm( ERGO_QUIZ ~ ., data=X ))
+# vif(lm( ERGO_QUIZ ~ ., X))
+
+
+#Kaiser-Meyer-Olkin factor adequacy
+# Variables < 0.50 should be eliminated from analysis
+# Score north of 0.70 is ideal; above 0.60 is acceptable
+  
+KMO( X)
+
+remove<- colnames(X[ , KMO(X)$MSAi<0.5])
+print(remove)
+
+```
+
+ 
+<br>
+
+- **Conclusion:**  Questions that were targeted only to a subset of respondents (e.g., items around Pregnancy) were eliminated from the final `FACTOR_BASE` dataset. While some varialbes exhibited a high degree of correlation, none exceeded the 0.90 threshold.  However, results of the Kaiser-Meyer-Olin test (KMO) suggested that the following variables should not be part of the factor analysis, as each had a KMO score below 0.50:  Availability of ***Pedioscopes, Formal Ergo Timeouts, Times Needed to Get Nurses' Attention,**
+
+- The final `FACTOR_BASE` dataset contains 36 Questions related to Training, Equipment Availability, Pain/Injury Sustained, as well as two composite variables:  **ERGO_QUIZ** (a variable capturing the number of questions each repsonded answered correctly in the Ergonomic Knowledge section of the survey); and (2) **EQUIP_APRON_CT** (a variable capturing the number of specialty aprons reponsdents indicated were available at their institutions).
+
+
+
+
+```{r PLAYGROUND-FACTANAL3, warning=F}
+
+
+# What does R recommend for the baseline number of Factors?
+fa.parallel(X)
+
+
+
+ev <- eigen(cor(X))
+ev$values
+nfactors <- rep(1:36)
+
+Eigen_Values <- ev$values
+Scree <- data.frame(nfactors, Eigen_Values)
+
+ggplot(data = Scree, mapping = aes(x = nfactors, y = Eigen_Values)) +
+  geom_point() +
+  geom_line() +
+  scale_y_continuous(name = "Eigen Values", limits = c(0,4)) +
+  scale_x_continuous(name= "Number of Factors", breaks = scales::breaks_width(1))+
+  geom_vline(xintercept= 5, linetype='solid', col = 'red')+
+  geom_vline(xintercept= 8, linetype='solid', col = 'darkred')+
+  theme_bw() +
+  theme(panel.grid.major.y = element_line(color = "darkgrey")) +
+  ggtitle("Scree Plot")
+
+```
+
+<br>
+
+- **Conclusion:**  Although R recommends using nine factors, we can run multiple factor analyses to find the number that (1) explains the highest percentage of variance in our data **and**, even more important, (2) is easily interpretable.  Nine factors may be the default, but the Scree plot makes exploring options with 5 to 8 factors reasonable.  Also the first 12 factors have Eigen Values above 1.0, so exploring *more* factors may make sense.  (More factors may make interpreting the loadings more difficult, however.)
+
+<br>
+<br>
+
+```{r PLAYGROUND-FACTANAL4, warning=F}
+
+
+FACTANAL.NOROT <- factanal( X, factors=5, scores = c("regression"), rotation = "none", cutoff=0.3)
+print(FACTANAL.NOROT$loadings,sort=TRUE, cutoff = .35)
+
+
+FACTANAL.VARIMAX <- factanal( X, factors=7, scores = c("regression"), rotation = "varimax", cutoff=0.3)
+print(FACTANAL.VARIMAX$loadings,sort=TRUE, cutoff = .35)
+
+
+```
+
+<br>
+
+- **Conclusion:**  Here are two sample factor analyses: one that is *unrotated* based on a 5-factor solution that explains 29% of the variance; and another that uses a *Varimax rotation* based on a 7-factor solution that explains 35% of the variance.  Since our variables did not display a high degree of pairwise correlation, I have opted to use the *unroted* solution. Although it explains less of the data's variance, I prefer that it loads items related to **Respect** on the first factor, an area of keen interest in this study.
+
+<br>
+<br>
+
+
+```{r PLAYGROUND-FACTANAL5, warning=F,  fig.align='center', fig.dim= c(16,12)}
+
+
+FACTANAL.NOROT5 <- cbind( FACTOR_BASE, FACTANAL.NOROT$scores ) %>%
+  rename( F1.RESPECT = Factor1,
+          F2.TACTTRNG = Factor2,
+          F3.ERGOTRNG = Factor3,
+          F4.DIALEXT = Factor4,
+          F5.PAIN = Factor5) %>% 
+          mutate(TRAINING_LEVEL =  factor(TRAINING_LEVEL, ordered = F),
+                 TRAINING_LEVEL = relevel(TRAINING_LEVEL, ref= "Advanced"))
+
+
+
+
+# Confirm factors are totally uncorrelated
+pairs.panels( FACTANAL.NOROT5[, c(44:48)] , pch=21, stars=T) 
+
+
+#Test Factor Results to see whether there are any gender differences
+
+
+eov.ttest( FACTANAL.NOROT5, F1.RESPECT, BIRTHSEX)
+eov.ttest( FACTANAL.NOROT5, F2.TACTTRNG, BIRTHSEX)
+eov.ttest( FACTANAL.NOROT5, F3.ERGOTRNG, BIRTHSEX)
+eov.ttest( FACTANAL.NOROT5, F4.DIALEXT, BIRTHSEX)
+eov.ttest( FACTANAL.NOROT5, F5.PAIN, BIRTHSEX)
+
+
+
+Y <-
+  FACTANAL.NOROT5 %>% 
+  pivot_longer( cols= F1.RESPECT : F5.PAIN,
+                names_to = "FACTOR",
+                values_to = "FACTOR.SCORES")  %>% select( RECORD_ID, BIRTHSEX:HTCAT, FACTOR, FACTOR.SCORES)
+
+
+grouped_ggbetweenstats(
+  data = Y,
+  x = BIRTHSEX,
+  y = FACTOR.SCORES,
+  grouping.var = FACTOR,)
+
+
+#Simple Linear Regressions to see whether significance survives controlling for Race (binary values) & Training Level
+
+fnorot5.lm1 <- lm(F1.RESPECT ~ BIRTHSEX + TRAINING_LEVEL + RACE2, data = FACTANAL.NOROT5 )
+fnorot5.lm4 <- lm(F4.DIALEXT ~ BIRTHSEX + TRAINING_LEVEL + RACE2 , data = FACTANAL.NOROT5)
+fnorot5.lm5 <- lm(F5.PAIN ~ BIRTHSEX + TRAINING_LEVEL + RACE2, data = FACTANAL.NOROT5)
+fnorot5.lm1h <- lm( F1.RESPECT ~ HTCAT + TRAINING_LEVEL + RACE2 , data = FACTANAL.NOROT5 )
+
+tab_model( fnorot5.lm1,
+           fnorot5.lm4,
+           fnorot5.lm5,
+           fnorot5.lm1h)
+
+
+```
+
+<br>
+
+- **Conclusion:**  Three of our five factors exhibited significant differences along the *BIRTHSEX* variable:  Factor1-Respect, Factor4-DialExt, and Factor5-Pain/Injury.  Moreover, when modeled in simple linear regressions and controlled for both *RACE* and *TRAINING_LEVEL*, each factor remained significant above the p= 0.05 level.  (Factor5-Pain/Injury was most significant at p= 0.009.)
+
+- Another interesting finding here is that the *HTCAT* variable (which divides the sample into those above and below the 5'7" cutoff) behaves almost identically on the Respect factor to Birthsex, which is a result we've seen elsewhere.  This could further bolster the claim that when it comes to feelings of disrespect in the Endoscopy Suite, height may be just as important a consideration as sex.
+
+
+<br>
+<br>
+
+```{r PLAYGROUND-FACTANAL6, warning=F,  fig.align='center', fig.dim= c(16,12)}
+
+#Test Each factor for consistency
+
+
+
+f1 <- X[ , c("RESPECT_NURSES", "RESPECT_TECHS", "RESPECT_ESTAFF", "RESPECT_ANES", "RESPECT_FNAME")]
+f1a<- alpha(f1, check.keys=T)
+alpha(f1, check.keys=T)
+f1a$total$std.alph
+
+f2 <- X[ , c("TRNG_TACTILE_MALES", "TRNG_TACTILE_FEMALES", "TRNG_FEEDBACK")]
+f2a<- alpha(f2, check.keys=T)
+
+f3 <- X[ , c("TRNG_INFORMAL","TRNG_POSTURAL","TRNG_MONITOR", "TRNG_SENSITIVITY")]
+f3a<- alpha(f3, check.keys=T)
+
+
+f4 <- X[ , c("TRNG_DIALEXT","EQUIP_DIALEXT_AVAIL","EQUIP_DIALEXT_ENC")]
+f4a<- alpha(f4, check.keys=T)
+
+f5 <- X[ , c("PAIN_NECKSH","PAIN_LEG", "PAIN_BACK")]
+f5a<- alpha(f5, check.keys=T)
+
+
+
+ta<- alpha(X, check.keys=T)
+
+
+# Cronbach's Alphas for all five factors and for the overall dataset
+
+cbind(F1.Respect.alpha=f1a$total$std.alpha, 
+      F2.TactTrng.alpha=f2a$total$std.alpha, 
+      F3.ErgoTrng.alpha=f3a$total$std.alpha,
+      F4.DialExt.alpha=f4a$total$std.alpha, 
+      F5.Pain.alpha=f5a$total$std.alpha, 
+      Total.alpha= ta$total$std.alpha)
+
+```
+
+
+
+- **Conclusion:**  Overall, our factors have a Standardized Cronbach's Alpha of 0.761, which is considered very good.  Three of our factors -- ** F1.Respect, F2.TactileTraining, F4.DialExtenders -- also have CA's above 0.70.  However, two factors -- F3.ErgoTraining and F5.Pain/Injury -- have CA's of 0.52 and 0.55, respectively.  Removing varialbes from the factor do not raise the CA's appreciably, according to the function output (not displayed).  Is this cause for concern?
 
 
