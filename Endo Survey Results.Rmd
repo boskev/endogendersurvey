@@ -3388,7 +3388,7 @@ ggplot(data = Scree, mapping = aes(x = nfactors, y = Eigen_Values)) +
   scale_y_continuous(name = "Eigen Values", limits = c(0,4)) +
   scale_x_continuous(name= "Number of Factors", breaks = scales::breaks_width(1))+
   geom_vline(xintercept= 5, linetype='solid', col = 'red')+
-  geom_vline(xintercept= 8, linetype='solid', col = 'darkred')+
+  geom_vline(xintercept= 9, linetype='solid', col = 'darkred')+
   theme_bw() +
   theme(panel.grid.major.y = element_line(color = "darkgrey")) +
   ggtitle("Scree Plot")
@@ -3537,6 +3537,75 @@ rbind(F1.Respect.alpha=f1a$total$std.alpha,
 
 - **Conclusion:**  Overall, our factors have a Standardized Cronbach's Alpha of 0.761, which is considered very good.  Three of our factors -- **F1.Respect, F2.TactileTraining, F4.DialExtenders** -- also have CA's above 0.70.  However, two factors -- **F3.ErgoTraining and F5.Pain/Injury** -- have CA's of 0.52 and 0.55, respectively.  Removing variables from the factor do not raise the CA's appreciably, according to the function output (not displayed).  Is this cause for concern?
 
+<br>
+<br>
+
+- Here's what a **9-Factor Varimax Rotated Factor Solution** produces.  (Remember, this was *the default number of factors suggested by R.*)
+
+<br>
+
+```{r PLAYGROUND-FACTANAL7,   fig.align='center', fig.dim= c(16,12)}
+
+
+
+FACTANAL.VARIMAX <- factanal( X, factors=9, scores = c("regression"), rotation = "varimax", cutoff=0.3)
+print(FACTANAL.VARIMAX$loadings,sort=TRUE, cutoff = .3)
+
+
+FACTANAL.VARIMAX9 <- cbind( FACTOR_BASE, FACTANAL.VARIMAX$scores ) %>% 
+  rename( F1.ERGOTRNG = Factor1,
+          F2.TACTTRNG = Factor2,
+          F3.DIAL.EXT = Factor3,
+          F4.RESPECT.JRSTAFF = Factor4,
+          F5.PAIN = Factor5,
+          F6.RESPECT.SRSTAFF = Factor6,
+          F7.APRONS.FIT.AVAIL = Factor7,
+          F8.TRNG.SENSITIVITY = Factor8,
+          F9.MONITORS = Factor9) %>% 
+          mutate(TRAINING_LEVEL =  factor(TRAINING_LEVEL, ordered = F),
+                 TRAINING_LEVEL = relevel(TRAINING_LEVEL, ref= "Advanced"))
+
+
+Y <-
+  FACTANAL.VARIMAX9 %>% 
+  pivot_longer( cols= F1.ERGOTRNG : F9.MONITORS,
+                names_to = "FACTOR",
+                values_to = "FACTOR.SCORES")  %>% select( RECORD_ID, BIRTHSEX:HTCAT, FACTOR, FACTOR.SCORES)
+
+
+grouped_ggbetweenstats(
+  data = Y,
+  x = BIRTHSEX,
+  y = FACTOR.SCORES,
+  grouping.var = FACTOR )
+
+
+
+#Simple Linear Regressions to see whether significance survives controlling for Race (binary values) & Training Level
+
+frot9.lm5 <- lm(F5.PAIN ~ BIRTHSEX + TRAINING_LEVEL + RACE2, data = FACTANAL.VARIMAX9 )
+frot9.lm6 <- lm(F6.RESPECT.SRSTAFF ~ BIRTHSEX + TRAINING_LEVEL + RACE2 , data = FACTANAL.VARIMAX9)
+frot9.lm7 <- lm(F7.APRONS.FIT.AVAIL ~ BIRTHSEX + TRAINING_LEVEL + RACE2, data = FACTANAL.VARIMAX9)
+frot9.lm8 <- lm( F8.TRNG.SENSITIVITY ~ BIRTHSEX + TRAINING_LEVEL + RACE2 , data = FACTANAL.VARIMAX9 )
+frot9.lm6h <- lm( F6.RESPECT.SRSTAFF ~ HTCAT + TRAINING_LEVEL + RACE2 , data = FACTANAL.VARIMAX9 )
+
+tab_model( frot9.lm5,
+           frot9.lm6,
+           frot9.lm7,
+           frot9.lm8,
+           frot9.lm6h,
+           show.ci=F, show.se=T)
+
+```
+<br>
+<br>
+
+- **Conclusion:**  Rotated factor solutions do not load **RESPECT** as highly as the unrotated solution we initially selected.  Furthermore, rotated solutions with more than five factors seem to load respect-oriented elements highly onto two separate factors that can loosely be seen as **RESPECT-JUNIOR STAFF** (nurses, techs)  and **RESPECT-SR STAFF** (GI Attending, Anesthesiologist), with only the later have statistical significance when regressed onto BIRTHSEX in a linear model.  
+
+- Four of our factors -- **F5.Pain, F6.Respect.SrStaff, F7.Aprons.Fit.Avail, F8.Training.Sensitivity** -- all showed gender difference, and with the exception of F5.Pain, BIRTHSEX maintained its significance in linear regression models after controlling for Training Level (ref level = "Advanced") and Race (binary, ref=White vs. Non-White).  The *TRAINING_LEVEL* variable seemed to knock the F5.Pain factor out of significance, but only barely (p=0.0610). The *HTCAT* variable also showed statistical significance in our fully-adjusted model with outcome factor F6.RESEPECT.SRSTAFF, which is similar to what we've seen in other analyses here:  specifically, that height and sex seem to behave almost identically in various models where RESPECT is the outcome of interest.  And in many cases, height produces a stronger model, based on the R<sup>2</sup> score.
+
+<br>
+<br>
 
 
 <br>
@@ -3547,7 +3616,9 @@ rbind(F1.Respect.alpha=f1a$total$std.alpha,
 
 
 - Confirmatory Factor Analysis attempts to reduce a set of variables by finding the latent variables *observed in your data.*  In this survey, we'd essentially created questions that dealt with Ergonomics, Respect, Tactile Training, Specialty Equipment use and availability, and our hope was that CFA would load our variables onto factors that match the categories already inherent in our data.  (The five-factor unrotated solution above essentially did that.)
+
 - Principal Component Analysis approaches data reduction slightly differently:  It aggregates related variables to create *composite variables* that might not have be obvious initially in our data.
+
 - Here, the `psych` package is used to create a 7-component solution with a quartimax rotation applied. This solution explains 45% of the variability in our data.
 - The resultant scores are then examined to see whether there are any differences noted along certain demographic variables, chief among them, BIRTHSEX.
 
@@ -3558,6 +3629,8 @@ rbind(F1.Respect.alpha=f1a$total$std.alpha,
 
 ```{r PLAYGROUND-PRINCOMP1, warning=F }
 
+
+  require(GPArotation)
 
   #call for principal from psych package
   #nfactors specifies the  number of COMPONENTS to extract/display, despite its name
@@ -3635,9 +3708,9 @@ tab_model( pcrot7.lm1,
 
 <br>
 
-- **Conclusion:**  Four of our seven rotated components exhibited significant differences along the *BIRTHSEX* variable:  **Component1-Respect, Component5-Pain/Injury, Component6-Aprons, and Component7-Traning with Sensitivity & Optimization.**  Moreover, when modeled in simple linear regressions and controlled for both *RACE* and *TRAINING_LEVEL*, three components remained significant above the p= 0.05 level.  (Component1-Respect was almost significant at p= 0.052. The *TRAINING_LEVEL* covariate knocked this component out of significance.)
+- **Conclusion:**  Four of our seven rotated components exhibited significant differences along the *BIRTHSEX* variable:  **Component1-Respect, Component5-Pain/Injury, Component6-Aprons, and Component7-Traning with Sensitivity & Optimization.**  Moreover, when modeled in simple linear regressions and controlled for both *RACE* and *TRAINING_LEVEL*, BIRTHSEX remained significant against three of these rotated components as outcome variables.  (Component1-Respect was almost significant at p= 0.052. The *TRAINING_LEVEL* covariate knocked this component out of significance.)
 
-- Similar to what was observed during our CFA analysis, the *HTCAT* variable (which divides the sample into those above and below the 5'7" cutoff) behaves *almost identically* on the Respect component to Birthsex.  In fact, in the fully adjusted model (shown), it actually retains its significance. 
+- Similar to what was observed during our CFA analysis, the *HTCAT* variable (which divides the sample into those above and below the 5'7" cutoff) behaves *almost identically* on the Respect component to BIRTHSEX  In fact, in the fully adjusted model (shown), it actually retains its significance. 
 
 
 <br>
