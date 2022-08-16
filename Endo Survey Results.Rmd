@@ -3640,6 +3640,7 @@ tab_model( frot9.lm5,
   summary(PRINCOMP_FINAL)
   print(PRINCOMP_FINAL$values)
   print(PRINCOMP_FINAL$loadings)
+  print(PRINCIPAL_FINAL$PVAL)
 
   
 ```
