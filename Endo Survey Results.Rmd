@@ -3407,11 +3407,11 @@ ggplot(data = Scree, mapping = aes(x = nfactors, y = Eigen_Values)) +
 
 FACTANAL.NOROT <- factanal( X, factors=5, scores = c("regression"), rotation = "none", cutoff=0.3)
 print(FACTANAL.NOROT$loadings,sort=TRUE, cutoff = .35)
-
+print(FACTANAL.NOROT$PVAL)
 
 FACTANAL.VARIMAX <- factanal( X, factors=7, scores = c("regression"), rotation = "varimax", cutoff=0.3)
 print(FACTANAL.VARIMAX$loadings,sort=TRUE, cutoff = .35)
-
+print(FACTANAL.VARIMAX$PVAL)
 
 ```
 
@@ -3550,7 +3550,7 @@ rbind(F1.Respect.alpha=f1a$total$std.alpha,
 
 FACTANAL.VARIMAX <- factanal( X, factors=9, scores = c("regression"), rotation = "varimax", cutoff=0.3)
 print(FACTANAL.VARIMAX$loadings,sort=TRUE, cutoff = .3)
-
+print(FACTANAL.VARIMAX$PVAL)
 
 FACTANAL.VARIMAX9 <- cbind( FACTOR_BASE, FACTANAL.VARIMAX$scores ) %>% 
   rename( F1.ERGOTRNG = Factor1,
