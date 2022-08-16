@@ -3385,7 +3385,7 @@ Scree <- data.frame(nfactors, Eigen_Values)
 ggplot(data = Scree, mapping = aes(x = nfactors, y = Eigen_Values)) +
   geom_point() +
   geom_line() +
-  scale_y_continuous(name = "Eigen Values", limits = c(0,4)) +
+  scale_y_continuous(name = "Eigen Values", limits = c(0, max(ev$values+0.5))) +
   scale_x_continuous(name= "Number of Factors", breaks = scales::breaks_width(1))+
   geom_vline(xintercept= 5, linetype='solid', col = 'red')+
   geom_vline(xintercept= 9, linetype='solid', col = 'darkred')+
@@ -3417,7 +3417,7 @@ print(FACTANAL.VARIMAX$loadings,sort=TRUE, cutoff = .35)
 
 <br>
 
-- **Conclusion:**  Here are two sample factor analyses: one that is *unrotated* based on a 5-factor solution that explains 29% of the variance; and another that uses a *Varimax rotation* based on a 7-factor solution that explains 35% of the variance.  Since our variables did not display a high degree of pairwise correlation, I have opted to use the *unroted* solution. Although it explains less of the data's variance, I prefer that it loads items related to **Respect** on the first factor, an area of keen interest in this study.
+- **Conclusion:**  Here are two sample factor analyses: one that is *unrotated* based on a 5-factor solution that explains 29% of the variance; and another that uses a *Varimax rotation* based on a 7-factor solution that explains 35% of the variance.  Since our variables did not display a high degree of pairwise correlation, I have opted to use the *unrotated* solution. Although it explains less of the data's variance, I prefer that it loads items related to **Respect** on the first factor, an area of keen interest in this study.
 
 <br>
 <br>
