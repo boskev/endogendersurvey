@@ -346,7 +346,7 @@ glimpse(SURVEY)
 ```{r CROSSTAB-BIRTHSEX-AGE }
   
 
-#Female/Male Totals
+#BIRTHSEX Female/Male Totals
 
 sqldf("select BIRTHSEX,
               count(RECORD_ID) as N
@@ -367,7 +367,8 @@ chisq.test(females_males, p= c(1/2, 1/2))
 
 
 
-#Female/Male Totals
+
+#GENDER Woman/Man/Other Totals
 
 sqldf("select GENDER,
               count(RECORD_ID) as N
