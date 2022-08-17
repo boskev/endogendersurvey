@@ -66,7 +66,7 @@ SURVEY  <-
     filter( COMPLETE != "Incomplete" &
             BIRTHSEX != "OTHER" &
             !is.na(BIRTHSEX) ) %>% 
-   select( RECORD_ID, BIRTHSEX, RACE_SOUTHASIAN:RACE_OTHER, AGE, TRAINING_LEVEL, HEIGHT, GLOVE, GLOVE_SIZE_AVAILABLE, PERFORMANCE_HOURS, TEACHER_GENDER_PREFERENCE,
+   select( RECORD_ID, BIRTHSEX, GENDER, RACE_SOUTHASIAN:RACE_OTHER, AGE, TRAINING_LEVEL, HEIGHT, GLOVE, GLOVE_SIZE_AVAILABLE, PERFORMANCE_HOURS, TEACHER_GENDER_PREFERENCE,
            FEMALE_TRAINERS, MALE_TRAINERS, EVER_INJURED, EXPERIENCED_TRANSIENT_PAIN_NO, EXPERIENCED_TRANSIENT_PAIN_HAND, EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER,
            EXPERIENCED_TRANSIENT_PAIN_BACK, EXPERIENCED_TRANSIENT_PAIN_LEG, EXPERIENCED_TRANSIENT_PAIN_FOOT, GROWING_PAINS,
            FELLOWSHIP_PREGNANCY, starts_with( c("PREGNANCY", "POSTPARTUM")),
@@ -98,7 +98,8 @@ SURVEY  <-
                    ifelse (RACE_OTHER == "Y", "OTHER", "OTHER" )))))))),
             RACE = factor(RACE, levels= c('ASIAN EAST', 'ASIAN SOUTH', 'BLACK', 'HISPANIC', 'WHITE', 'OTHER'))) %>%
   
-    mutate( BIRTHSEX = factor( BIRTHSEX,  levels= c("F","M") ))  %>% 
+    mutate( BIRTHSEX = factor( BIRTHSEX,  levels= c("F","M") ),
+            GENDER =   factor( toupper(GENDER), levels= c('WOMAN','MAN','OTHER' )))  %>% 
     mutate (AGE2 = factor(AGE2, levels = c('< 30', '30-34', '35-40', '> 40'))) %>%  
 
     mutate (RACE2 = case_when( RACE != "WHITE" ~ 'NON-WHITE',
@@ -363,6 +364,31 @@ mcount
 
 females_males = c(fcount, mcount )
 chisq.test(females_males, p= c(1/2, 1/2))
+
+
+
+#Female/Male Totals
+
+sqldf("select GENDER,
+              count(RECORD_ID) as N
+       from SURVEY 
+       where BIRTHSEX in ('F','M') 
+       group by 1")
+
+
+#Chi-Square Test of Proportions
+
+womancount <- length(SURVEY$GENDER[SURVEY$GENDER =="WOMAN"])
+mancount <- length(SURVEY$GENDER[SURVEY$GENDER =="MAN"])
+othcount <- length(SURVEY$GENDER[SURVEY$GENDER =="OTHER"])
+womancount
+mancount
+othcount
+
+
+gender_spread = c(womancount, mancount, othcount )
+chisq.test(gender_spread, p= c(1/3, 1/3, 1/3))
+
 
 
 
@@ -1799,7 +1825,7 @@ plot_xtab(SURVEY$BIRTHSEX, SURVEY$ENDO_TRAINER_POSITION, margin = "row",
 
 
   
-```{r CROSSTAB-BIRTHSEX-KNOWLEDGE-DISABILITY-INSURANCE }
+```{r CROSSTAB-BIRTHSEX-KNOWLEDGE-DISABILITY-INSURANCE, warning= F }
   
 
 plot_xtab(SURVEY$BIRTHSEX, SURVEY$WHEN_DISABILITY_INSURANCE, margin = "row", 
@@ -1833,8 +1859,10 @@ plot_xtab(SURVEY$BIRTHSEX, SURVEY$WHEN_DISABILITY_INSURANCE, margin = "row",
 
 CORRECT <-
    SURVEY %>% 
-    select (RECORD_ID, BIRTHSEX, ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE,) %>% 
-    mutate( COUNT_CORRECT = rowSums( . == "Correct" ))
+    select (RECORD_ID, BIRTHSEX, TRAINING_LEVEL,ERGO_OPTIMIZATION, ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE,) %>% 
+    mutate( ERGO_KNOWLEDGE_SELF_REPORT = case_when( ERGO_OPTIMIZATION == "Y" ~ "Y",
+                                                        TRUE ~ "N" ),
+            COUNT_CORRECT = rowSums( . == "Correct" )) 
 
 
 eov.ttest(CORRECT, COUNT_CORRECT, BIRTHSEX)  
@@ -1846,6 +1874,32 @@ ggbetweenstats( data= CORRECT,
                 type="parametric",
                 p.adjust.method = "none",
                 title = "Mean Scores by Birth Sex")
+
+
+
+# Did subjects who self-reported having ERGO OPTIM knowlege do better on Quiz?
+
+
+plot_xtab(CORRECT$COUNT_CORRECT, CORRECT$ERGO_KNOWLEDGE_SELF_REPORT, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Ergo Quiz Scores vs. Ergo Optim Knowledge v1",
+          axis.titles = "Self-Reported Ergo Optim Knowledge", 
+          legend.title= "Familiar w/Ergo Optim?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+plot_xtab(CORRECT$COUNT_CORRECT, CORRECT$ERGO_OPTIMIZATION, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Ergo Quiz Scores vs. Ergo Optim Knowledge v2",
+          axis.titles = "Self-Reported Ergo Optim Knowledge", 
+          legend.title= "Familiar w/Ergo Optim?",
+          geom.colors = c( "#cbcccb","lightblue","#006cc5"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
 
 
 ```
