@@ -112,7 +112,7 @@ SURVEY  <-
     mutate( TRAINING_LEVEL = factor (TRAINING_LEVEL, levels= c('First year fellow','Second year fellow', 'Third year fellow', 'Advanced fellow'))) %>% 
     mutate( TRAINING_LEVEL = recode_factor( TRAINING_LEVEL, 'First year fellow'= 'First Year', 
                                                             'Second year fellow'= 'Second Year', 
-                                                            'Third year fellow' = 'Third Year', 
+                                                            'Third year fellow' = 'Advanced', 
                                                             'Advanced fellow' = "Advanced", .ordered = T) ) %>% 
    mutate( HEIGHT2 = factor(HEIGHT, levels= c("< 5'", "5-5'3", "5'4-5'6", "5'7-5'9", "5'10-6'", "6'1-6'4", "> 6'4"))) %>% 
    mutate( PERFORMANCE_HOURS = factor(PERFORMANCE_HOURS),
@@ -1379,6 +1379,67 @@ plot_xtab(SURVEY$BIRTHSEX, SURVEY$TEACHER_SENSITIVITY_STATURE_HANDSIZE, margin =
   set_theme(base= theme_classic())
 
 
+# Is there a Height or Glove Size difference on this question, independent of sex ?
+
+
+
+
+
+plot_xtab(SURVEY$HEIGHT2, SURVEY$TEACHER_SENSITIVITY_STATURE_HANDSIZE, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Teachers Train with Sensitivity to Stature/Hand Size by Height Band",
+          axis.titles = "Height Band", 
+          legend.title= "Teacher Sensitivity to Stature?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+x <-
+SURVEY %>% 
+   mutate(HTCAT = case_when( is.na(HEIGHT2) ~ NA_real_,
+                     HEIGHT2 %in% c( "< 5'" , "5-5'3" ,"5'4-5'6" ) ~ 1,
+                     TRUE ~ 2),
+          
+          GLOVECAT = case_when( is.na(GLOVE) ~ NA_real_,
+                     GLOVE >=7 ~ 2,
+                     TRUE ~ 1) ) %>% select(HTCAT, GLOVECAT, TEACHER_SENSITIVITY_STATURE_HANDSIZE) %>% drop_na()
+  
+
+
+plot_xtab(x$HTCAT, x$TEACHER_SENSITIVITY_STATURE_HANDSIZE, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Teachers Train with Sensitivity to Stature/Hand Size by Height Band v2",
+          axis.titles = "Height Band Category", 
+          axis.labels = c("Shorter than 5'7", "5'7 & Taller"),
+          legend.title= "Teacher Sensitivity to Stature?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$GLOVE, SURVEY$TEACHER_SENSITIVITY_STATURE_HANDSIZE, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Teachers Train with Sensitivity to Stature/Hand Size by Glove Size",
+          axis.titles = "Glove Size", 
+          legend.title= "Teacher Sensitivity to Stature?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+plot_xtab(x$GLOVECAT, x$TEACHER_SENSITIVITY_STATURE_HANDSIZE, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Teachers Train with Sensitivity to Stature/Hand Size by Glove Size v2",
+          axis.titles = "Glove Size Category", 
+          axis.labels = c("Less than Size 7", "Size 7 & Above"),
+          legend.title= "Teacher Sensitivity to Stature?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+rm(x)
+
+
 plot_xtab(SURVEY$TEACHER_SENSITIVITY_BY_GENDER, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Sex of Sensitive Teachers by Birth Sex",
@@ -1580,6 +1641,29 @@ plot_xtab(SURVEY$HEIGHT2, SURVEY$FIRST_NAME_NO_PERMISSION, margin = "row",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
+
+
+
+x <-
+SURVEY %>% 
+   mutate(HTCAT = case_when( is.na(HEIGHT2) ~ NA_real_,
+                     HEIGHT2 %in% c( "< 5'" , "5-5'3" ,"5'4-5'6" ) ~ 1,
+                     TRUE ~ 2) ) %>% select(HTCAT, FIRST_NAME_NO_PERMISSION) %>% drop_na()
+  
+  
+  
+  
+plot_xtab( x$HTCAT, x$FIRST_NAME_NO_PERMISSION, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "First Name Used No Permission by Height Band v2",
+          axis.titles = "Height Band Category", 
+          axis.labels = c("Less than 5'7", "5'7 & Above"),
+          legend.title= "First Name Used No Permission?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+rm(x)
 
 
 ```
@@ -1884,7 +1968,7 @@ ggbetweenstats( data= CORRECT,
 plot_xtab(CORRECT$COUNT_CORRECT, CORRECT$ERGO_KNOWLEDGE_SELF_REPORT, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Ergo Quiz Scores vs. Ergo Optim Knowledge v1",
-          axis.titles = "Self-Reported Ergo Optim Knowledge", 
+          axis.titles = "Questions Answered Correctly on Quiz", 
           legend.title= "Familiar w/Ergo Optim?",
           geom.colors = c("#006cc5","#cbcccb"), 
           show.summary = TRUE )+ 
@@ -1895,7 +1979,7 @@ plot_xtab(CORRECT$COUNT_CORRECT, CORRECT$ERGO_KNOWLEDGE_SELF_REPORT, margin = "r
 plot_xtab(CORRECT$COUNT_CORRECT, CORRECT$ERGO_OPTIMIZATION, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
           title = "Ergo Quiz Scores vs. Ergo Optim Knowledge v2",
-          axis.titles = "Self-Reported Ergo Optim Knowledge", 
+          axis.titles = "Questions Answered Correctly on Quiz", 
           legend.title= "Familiar w/Ergo Optim?",
           geom.colors = c( "#cbcccb","lightblue","#006cc5"), 
           show.summary = TRUE )+ 
@@ -1926,89 +2010,98 @@ The appropriate tack here would be to run a series of "point biserial correlatio
 #### Task 1:  Produce a CORRELATION MATRIX that displays the high-level associations among Sex, Race, Age, Height and Glove Size with other key variables of interest
 
 
-```{r TASKS-CORRELATION-MATRIX, fig.align='center', fig.dim= c(12,12) }
+```{r TASKS-CORRELATION-MATRIX, fig.align='center', fig.dim= c(16,12) }
 
 
-CORRMATRIX <-
 
-  SURVEY %>%
-  select (BIRTHSEX, RACE2, AGE2, TRAINING_LEVEL, PERFORMANCE_HOURS, HEIGHT2, GLOVE, EVER_INJURED, ERGO_OPTIMIZATION, TEACHER_SENSITIVITY_STATURE_HANDSIZE,
-          FIRST_NAME_NO_PERMISSION, EXPERIENCED_TRANSIENT_PAIN_HAND : EXPERIENCED_TRANSIENT_PAIN_FOOT ) %>% 
-  
-  # na.omit()  %>% 
-  
-  mutate( SEX = case_when(  is.na(BIRTHSEX) ~ NA_real_,
+
+  CORRMATRIX <-
+    
+    SURVEY %>%
+    select (BIRTHSEX, RACE2, AGE2, TRAINING_LEVEL, PERFORMANCE_HOURS, HEIGHT2, GLOVE, EVER_INJURED, ERGO_OPTIMIZATION, TEACHER_SENSITIVITY_STATURE_HANDSIZE,
+            FIRST_NAME_NO_PERMISSION, EXPERIENCED_TRANSIENT_PAIN_HAND : EXPERIENCED_TRANSIENT_PAIN_FOOT ) %>% 
+    
+    # na.omit()  %>% 
+    
+    mutate( SEX = case_when(  is.na(BIRTHSEX) ~ NA_real_,
                               BIRTHSEX == "M" ~ 0,
-                                 TRUE ~ 1 ) ,
-          
-          RACE = case_when( is.na(RACE2) ~ NA_real_,
-                            RACE2 == "WHITE" ~ 0,
-                            TRUE  ~ 1),
-          
-          AGECAT = case_when( is.na(AGE2) ~ NA_real_,
-                              AGE2 == "< 30" ~ 1,
-                              AGE2 == "30-34" ~ 2,
-                              AGE2 == "35-40" ~3,
-                              TRUE ~ 4),
-          
-          TRNG_LEVEL = case_when( is.na(TRAINING_LEVEL) ~ NA_real_,
-                                  TRAINING_LEVEL == 'First Year' ~ 1,
-                                  TRAINING_LEVEL == 'Second Year' ~ 2,
-                                  TRAINING_LEVEL == 'Third Year' ~ 3,
-                                  TRUE  ~ 4) ,
-          
-          PERF_HRS = case_when( is.na(PERFORMANCE_HOURS) ~ NA_real_,
-                          PERFORMANCE_HOURS == '< 10' ~ 1,
-                          PERFORMANCE_HOURS == '10-20' ~ 2,
-                          TRUE  ~ 3) ,
-          
-          HEIGHT = case_when( is.na(HEIGHT2) ~ NA_real_,
-                              HEIGHT2 == "< 5" ~ 1,
-                              HEIGHT2 == "5-5'3" ~ 2,
-                              HEIGHT2 == "5'4-5'6" ~ 3,
-                              HEIGHT2 == "5'7-5'9" ~ 4,
-                              HEIGHT2 == "5'10-6'" ~ 5,
-                              HEIGHT2 == "6'1-6'4" ~ 6,
-                                         TRUE ~ 7),
-          
-          INJURY = case_when(  is.na(EVER_INJURED) ~ NA_real_,
-                               EVER_INJURED== "Y" ~ 1,
-                                    TRUE ~ 0)  ,
-          
-          TPAIN =  case_when(   is.na(EXPERIENCED_TRANSIENT_PAIN_BACK) |
-                                is.na(EXPERIENCED_TRANSIENT_PAIN_HAND) |
-                                is.na(EXPERIENCED_TRANSIENT_PAIN_FOOT) |
-                                is.na(EXPERIENCED_TRANSIENT_PAIN_HAND) |
-                                is.na(EXPERIENCED_TRANSIENT_PAIN_LEG) |
-                                is.na(EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER) ~ NA_real_,
+                              TRUE ~ 1 ) ,
+            
+            RACE = case_when( is.na(RACE2) ~ NA_real_,
+                              RACE2 == "WHITE" ~ 0,
+                              TRUE  ~ 1),
+            
+            AGECAT = case_when( is.na(AGE2) ~ NA_real_,
+                                AGE2 == "< 30" ~ 1,
+                                AGE2 == "30-34" ~ 2,
+                                AGE2 == "35-40" ~3,
+                                TRUE ~ 4),
+            
+            TRNG_LEVEL = case_when( is.na(TRAINING_LEVEL) ~ NA_real_,
+                                    TRAINING_LEVEL == 'First Year' ~ 1,
+                                    TRAINING_LEVEL == 'Second Year' ~ 2,
+                                    TRUE  ~ 3) ,
+            
+            PERF_HRS = case_when( is.na(PERFORMANCE_HOURS) ~ NA_real_,
+                                  PERFORMANCE_HOURS == '< 10' ~ 1,
+                                  PERFORMANCE_HOURS == '10-20' ~ 2,
+                                  TRUE  ~ 3) ,
+            
+            HEIGHT = case_when( is.na(HEIGHT2) ~ NA_real_,
+                                HEIGHT2 == "< 5'" ~ 1,
+                                HEIGHT2 == "5-5'3" ~ 2,
+                                HEIGHT2 == "5'4-5'6" ~ 3,
+                                HEIGHT2 == "5'7-5'9" ~ 4,
+                                HEIGHT2 == "5'10-6'" ~ 5,
+                                HEIGHT2 == "6'1-6'4" ~ 6,
+                                TRUE ~ 7),
+            
+            HTCAT = case_when( is.na(HEIGHT2) ~ NA_real_,
+                               HEIGHT2 %in% c( "< 5'" , "5-5'3" ,"5'4-5'6" ) ~ 1,
+                               TRUE ~ 2),
+            
+            GLOVECAT = case_when( is.na(GLOVE) ~ NA_real_,
+                               GLOVE >=7 ~ 1,
+                               TRUE ~ 0),
+            
+            INJURY = case_when(  is.na(EVER_INJURED) ~ NA_real_,
+                                 EVER_INJURED== "Y" ~ 1,
+                                 TRUE ~ 0)  ,
+            
+            TPAIN =  case_when(   is.na(EXPERIENCED_TRANSIENT_PAIN_BACK) |
+                                    is.na(EXPERIENCED_TRANSIENT_PAIN_HAND) |
+                                    is.na(EXPERIENCED_TRANSIENT_PAIN_FOOT) |
+                                    is.na(EXPERIENCED_TRANSIENT_PAIN_HAND) |
+                                    is.na(EXPERIENCED_TRANSIENT_PAIN_LEG) |
+                                    is.na(EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER) ~ NA_real_,
                                   
-                                EXPERIENCED_TRANSIENT_PAIN_BACK == "Y" |
-                                EXPERIENCED_TRANSIENT_PAIN_HAND == "Y" |
-                                EXPERIENCED_TRANSIENT_PAIN_FOOT == "Y" |
-                                EXPERIENCED_TRANSIENT_PAIN_HAND == "Y" |
-                                EXPERIENCED_TRANSIENT_PAIN_LEG == "Y" |
-                                EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER == "Y" ~ 1,
-                                TRUE ~ 0),
-          
-          
-          ERGO_OPTIM =  case_when( is.na(ERGO_OPTIMIZATION) ~ NA_real_,
-                                  ERGO_OPTIMIZATION == "Y" ~ 1,
-                                    TRUE ~ 0),
-                                   
-          SENSITIVE_TEACHER = case_when (is.na(TEACHER_SENSITIVITY_STATURE_HANDSIZE) ~ NA_real_,
-                                         TEACHER_SENSITIVITY_STATURE_HANDSIZE == "Y" ~ 1,
-                                          TRUE ~ 0),
-          
-          FNAME_NP =  case_when (is.na(FIRST_NAME_NO_PERMISSION) ~ NA_real_,
-                                 FIRST_NAME_NO_PERMISSION == "Y" ~ 1,
-                                 TRUE ~ 0)) %>% 
+                                  EXPERIENCED_TRANSIENT_PAIN_BACK == "Y" |
+                                    EXPERIENCED_TRANSIENT_PAIN_HAND == "Y" |
+                                    EXPERIENCED_TRANSIENT_PAIN_FOOT == "Y" |
+                                    EXPERIENCED_TRANSIENT_PAIN_HAND == "Y" |
+                                    EXPERIENCED_TRANSIENT_PAIN_LEG == "Y" |
+                                    EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER == "Y" ~ 1,
+                                  TRUE ~ 0),
+            
+            
+            ERGO_OPTIM =  case_when( is.na(ERGO_OPTIMIZATION) ~ NA_real_,
+                                     ERGO_OPTIMIZATION == "Y" ~ 1,
+                                     TRUE ~ 0),
+            
+            SENSITIVE_TEACHER = case_when (is.na(TEACHER_SENSITIVITY_STATURE_HANDSIZE) ~ NA_real_,
+                                           TEACHER_SENSITIVITY_STATURE_HANDSIZE == "Y" ~ 1,
+                                           TRUE ~ 0),
+            
+            FNAME_NP =  case_when (is.na(FIRST_NAME_NO_PERMISSION) ~ NA_real_,
+                                   FIRST_NAME_NO_PERMISSION == "Y" ~ 1,
+                                   TRUE ~ 0)) %>% 
+    
+    select( SEX, RACE, AGECAT, TRNG_LEVEL, PERF_HRS, HEIGHT, HTCAT, GLOVE, GLOVECAT, INJURY, TPAIN, ERGO_OPTIM, SENSITIVE_TEACHER, FNAME_NP)
   
-  select( SEX, RACE, AGECAT, TRNG_LEVEL, PERF_HRS, HEIGHT, GLOVE, INJURY, TPAIN, ERGO_OPTIM, SENSITIVE_TEACHER, FNAME_NP)
+  
+  
+  pairs.panels( CORRMATRIX, pch=21, stars=T,) 
 
-
-
-
-pairs.panels( CORRMATRIX, pch=21, stars=T,) 
 
 
 
@@ -2045,9 +2138,168 @@ pcor.test( x=GLOVE, y=INJURY, z=RACE, method= 'pearson' )
 
 detach(CORRMATRIX_NOMISS)
 
+
 ```
 
 
+<br>
+
+```{r TASKS-CORRELATION-PARITALS2, warning=F }
+
+
+NEWCORRS <- 
+  SURVEY %>% select( SEX=BIRTHSEX, 
+                     INJURY = EVER_INJURED,
+                     TP_HAND=EXPERIENCED_TRANSIENT_PAIN_HAND,
+                     TP_BACK=EXPERIENCED_TRANSIENT_PAIN_BACK,
+                     TP_NECKSHO=EXPERIENCED_TRANSIENT_PAIN_NECK_SHOULDER,
+                     TP_LEG=EXPERIENCED_TRANSIENT_PAIN_LEG,
+                     TP_FOOT=EXPERIENCED_TRANSIENT_PAIN_FOOT,
+                     GLOVE, HEIGHT,
+                     TEACHER_SENSITIVITY = TEACHER_SENSITIVITY_STATURE_HANDSIZE) %>% 
+  
+  
+  mutate_at(  vars(starts_with( c('TP_', 'INJURY'))),
+              funs(case_when( is.na(.) ~ NA_real_,
+                              . == 'Y' ~ 1,
+                              TRUE ~ 0))) %>% 
+  
+  mutate( SEX = case_when( SEX == 'M' ~ 1,
+                           TRUE ~ 0),
+          
+          TPAIN =  case_when(   is.na(TP_BACK) |
+                                is.na(TP_HAND) |
+                                is.na(TP_FOOT) |
+                                is.na(TP_LEG) |
+                                is.na(TP_NECKSHO) ~ NA_real_,
+                                                                
+                                TP_BACK == 1 |
+                                TP_HAND == 1 |
+                                TP_FOOT == 1 |
+                                TP_LEG == 1 |
+                                TP_NECKSHO == 1 ~ 1,
+                                TRUE ~ 0),
+          
+          HEIGHT = case_when( is.na(HEIGHT) ~ NA_real_,
+                              HEIGHT == "< 5'" ~ 1,
+                              HEIGHT == "5-5'3" ~ 2,
+                              HEIGHT == "5'4-5'6" ~ 3,
+                              HEIGHT == "5'7-5'9" ~ 4,
+                              HEIGHT == "5'10-6'" ~ 5,
+                              HEIGHT == "6'1-6'4" ~ 6,
+                              TRUE ~ 7),
+          
+          HTCAT = case_when( is.na(HEIGHT) ~ NA_real_,
+                             HEIGHT  <= 3 ~ 0,
+                             TRUE ~ 1),
+          
+          TEACHER_SENSITIVITY = case_when( is.na(TEACHER_SENSITIVITY) ~ NA_real_,
+                                           TEACHER_SENSITIVITY == 'Y' ~ 1,
+                                           TRUE ~ 0)) %>% drop_na()
+
+
+
+#[1]
+
+# Pearson Correlations: INJURY with GLOVE, with and wihtout partialling out SEX
+
+
+# INJURY x GLOVE
+
+e <-NEWCORRS %>% 
+  select( GLOVE, INJURY) %>% 
+  summarize_each(funs(cor.test(.,  NEWCORRS$GLOVE)$estimate)) %>%  `rownames<-`("Pearson r")
+                 
+p <-NEWCORRS %>% 
+  select(GLOVE,  INJURY) %>% 
+  summarize_each(funs(cor.test(.,  NEWCORRS$GLOVE)$p.value)) %>%  `rownames<-`("p Values")
+
+x <-  tibble::rownames_to_column( rbind(e,p), 'STATISTIC')
+x
+
+
+
+# INJURY x GLOVE, controlling for Sex 
+e <-NEWCORRS %>% 
+  select( GLOVE, INJURY ) %>%
+  summarise_each(funs(pcor.test(.,  NEWCORRS$GLOVE, NEWCORRS$SEX)$estimate)) %>%  `rownames<-`("Pearson partial r")
+
+p <-NEWCORRS %>% 
+  select(GLOVE,  INJURY) %>% 
+  summarise_each(funs(pcor.test(.,  NEWCORRS$GLOVE, NEWCORRS$SEX)$p.value)) %>%  `rownames<-`("p Values")
+y <-  tibble::rownames_to_column( rbind(e, p), 'STATISTIC')
+y
+
+
+
+#[2]
+
+# Pearson Correlations: TRANSIENT HAND PAIN with GLOVE, with and wihtout partialling out SEX
+
+
+# TP_HAND x GLOVE
+
+e <-NEWCORRS %>% 
+  select( GLOVE, TP_HAND) %>% 
+  summarize_each(funs(cor.test(.,  NEWCORRS$GLOVE)$estimate)) %>%  `rownames<-`("Pearson r")
+                 
+p <-NEWCORRS %>% 
+  select(GLOVE,  TP_HAND) %>% 
+  summarize_each(funs(cor.test(.,  NEWCORRS$GLOVE)$p.value)) %>%  `rownames<-`("p Values")
+
+x <-  tibble::rownames_to_column( rbind(e,p), 'STATISTIC')
+x
+
+
+# TP_HAND x GLOVE, controlling for Sex 
+
+e <-NEWCORRS %>% 
+  select( GLOVE, TP_HAND ) %>%
+  summarise_each(funs(pcor.test(.,  NEWCORRS$GLOVE, NEWCORRS$SEX)$estimate)) %>%  `rownames<-`("Pearson partial r")
+
+p <-NEWCORRS %>% 
+  select(GLOVE,  TP_HAND) %>% 
+  summarise_each(funs(pcor.test(.,  NEWCORRS$GLOVE, NEWCORRS$SEX)$p.value)) %>%  `rownames<-`("p Values")
+y <-  tibble::rownames_to_column( rbind(e, p), 'STATISTIC')
+y
+
+
+
+
+
+#[3]
+
+# Pearson Correlations: TRANSIENT PAINS (alll) with HEIGHT, with and wihtout partialling out SEX
+
+
+
+# TPAINS x HEIGHT
+
+e <-NEWCORRS %>% 
+  select( HEIGHT, starts_with("TP_")) %>% 
+  summarise_each(funs(cor.test(.,  NEWCORRS$HEIGHT)$estimate)) %>%  `rownames<-`("Pearson r")
+                 
+p <-NEWCORRS %>% 
+  select(HEIGHT,  starts_with("TP_")) %>% 
+  summarise_each(funs(cor.test(.,  NEWCORRS$HEIGHT)$p.value)) %>%  `rownames<-`("p Values")
+x <-  tibble::rownames_to_column( rbind(e,p), 'STATISTIC')
+x
+
+
+# TPAINS x HEIGHT, controlling for Sex 
+e <-NEWCORRS %>% 
+  select( HEIGHT,  starts_with("TP_")) %>% 
+  summarise_each(funs(pcor.test(.,  NEWCORRS$HEIGHT, NEWCORRS$SEX)$estimate)) %>%  `rownames<-`("Pearson partial r")
+
+p <-NEWCORRS %>% 
+  select(HEIGHT,  starts_with("TP_")) %>% 
+  summarise_each(funs(pcor.test(.,  NEWCORRS$HEIGHT, NEWCORRS$SEX)$p.value)) %>%  `rownames<-`("p Values")
+y <-  tibble::rownames_to_column( rbind(e, p), 'STATISTIC')
+y
+
+
+
+```
 <br>
   
 #### Task 2: Are Ergonomic Difficulties reported among respondents who were PREGNANT during their fellowship associated at all with GLOVE or HEIGHT ?
@@ -2096,8 +2348,8 @@ PREGNANCY  <-
           TRNG_LEVEL = case_when( is.na(TRAINING_LEVEL) ~ NA_real_,
                                   TRAINING_LEVEL == 'First Year' ~ 1,
                                   TRAINING_LEVEL == 'Second Year' ~ 2,
-                                  TRAINING_LEVEL == 'Third Year' ~ 3,
-                                  TRUE  ~ 4) ,
+                                  TRAINING_LEVEL == 'Advanced' ~ 3,
+                                  TRUE  ~ 3) ,
           
           HEIGHT = case_when( is.na(HEIGHT2) ~ NA_real_,
                               HEIGHT2 == "< 5" ~ 1,
@@ -2190,7 +2442,7 @@ require(car)
 TLEVEL <-
 CORRMATRIX %>%
   mutate(TRNG_LEVEL = factor(TRNG_LEVEL),
-         TRNG_LEVEL = recode_factor(TRNG_LEVEL, '1'= 'First Yr', '2'= "Second Yr", '3'= "Third Yr", '4'="Advanced", .ordered=F),
+         TRNG_LEVEL = recode_factor(TRNG_LEVEL, '1'= 'First Yr', '2'= "Second Yr", '3'= "Advanced", '4'="Advanced", .ordered=F),
          TRNG_LEVEL =  relevel(TRNG_LEVEL, ref= "Advanced")) %>%
   select(TRNG_LEVEL, ERGO_OPTIM, INJURY, TPAIN, SENSITIVE_TEACHER, FNAME_NP)
   
@@ -2210,7 +2462,7 @@ CORRMATRIX %>%
       summary(tpain.eo.glm.adj)
       
       #Before running OR test, determine whether the multilevel categorical variable TRNG_LEVEL is significant overall?
-      aod::wald.test(b = coef(tpain.eo.glm.adj), Sigma = vcov(tpain.eo.glm.adj), Terms = 3:5)
+      aod::wald.test(b = coef(tpain.eo.glm.adj), Sigma = vcov(tpain.eo.glm.adj), Terms = 3:4)
 
       
       contrast(tpain.eo.emmeans.adj, list("Adj OR: Ergo Optim =N on Transient Pain =Y" = c(1, -1)))
@@ -2219,7 +2471,7 @@ CORRMATRIX %>%
 
 <br>
 
-- **Conclusion:**  Ergonomic Optimization is a significant effect before and after adjust for Training Level, which itself is *not* a significant effect. (The Odds Ratio in the adjusted model fell from 3.15 to 3.05, p= 0.0165.  In other words, subjects who reported that their Endoscopy Suite environment was not ergonomically optimized were 3.05 times more likely to also report having experienced Transient Pain in one of the several body parts highlghted in the survey.)
+- **Conclusion:**  Ergonomic Optimization is a significant effect before and after adjust for Training Level, which itself is *not* a significant effect. (The Odds Ratio in the adjusted model rose from 3.15 to 3.23, p= 0.0105.  In other words, subjects who reported that their Endoscopy Suite environment was not ergonomically optimized were 3.23 times more likely to also report having experienced Transient Pain in one of the several body parts highlghted in the survey.)
 
 
 <br>
@@ -2251,16 +2503,17 @@ CORRMATRIX %>%
   
             
     #Before running OR test, determine whether the multilevel categorical variable TRNG_LEVEL is significant overall?
-    aod::wald.test(b = coef(tpain.steach.glm.adj), Sigma = vcov(tpain.steach.glm.adj), Terms = 3:5)
+    aod::wald.test(b = coef(tpain.steach.glm.adj), Sigma = vcov(tpain.steach.glm.adj), Terms = 3:4)
     
     contrast(tpain.steach.emmeans.adj, list("Adj OR: Sensitive Teach =N on Transient Pain =Y" = c(1, -1)))
+    confint(contrast(tpain.steach.emmeans.adj, list("Adj OR: Sensitive Teach =N on Transient Pain =Y" = c(1, -1))))
 
   
 ```
   
 <br>
   
-- **Conclusion:**  Sensitive Teacher is *not* a significant effect before (p=0.198) or after adjust for Training Level (p=0.149), which itself is *not* a significant effect. (In the adjusted model, the odds of experiencing Transient Pain if one did *not* have a Sensitive Teacher was 2.0, but with an insignificant p-value, cl=[0.781, 5.11])
+- **Conclusion:**  Sensitive Teacher is *not* a significant effect before (p=0.198) or after adjust for Training Level (p=0.217), which itself is *not* a significant effect. (In the adjusted model, the odds of experiencing Transient Pain if one did *not* have a Sensitive Teacher was 1.78, but with an insignificant p-value, cl=[0.713, 4.43])
 
   
 <br>
@@ -2286,7 +2539,7 @@ CORRMATRIX %>%
     summary(eo.steach.glm.adj)
     
     #Before running OR test, determine whether the multilevel categorical variable TRNG_LEVEL is significant overall?
-    aod::wald.test(b = coef(eo.steach.glm.adj), Sigma = vcov(eo.steach.glm.adj), Terms = 3:5)
+    aod::wald.test(b = coef(eo.steach.glm.adj), Sigma = vcov(eo.steach.glm.adj), Terms = 3:4)
 
     contrast(eo.steach.emmeans.adj, list("Adj OR: Sensitive Teach =Y on Ergo Optim =Y" = c(-1, 1)))
   
@@ -2294,9 +2547,9 @@ CORRMATRIX %>%
   
 <br>
 
-- **Conclusion:**  Sensitive Teacher is a highly significant effect before, and an extremely highly significant effect after adjusting for Training Level. Training Level itself is *not* a significant effect.  (The model summary shows that there is significance among three levels of TRNG_LEVEL *when compared to the reference category, "Advanced.") Beta for ST increases slightly from +0.9312 to +1.03915, meaning that as Teacher Sensitivity increases, reports of Ergonomic Optimization also rise.  (The Odds Ratio in the adjusted model rose from 2.54 to 2.83, p= 0.0008.  In other words, subjects who reported that their Endoscopy Suite environment was ergonomically optimized were 2.83 times more likely to have had instructors who were sensitive to their physical size/stature.)
+- **Conclusion:**  Sensitive Teacher is a highly significant effect before, and an extremely highly significant effect after adjusting for Training Level. Training Level itself is *not* a significant effect.  The model summary shows that there is no significance between the two levels of TRNG_LEVEL *when compared to the reference category, "Advanced.")* Beta for ST decreased slightly from +0.9312 to +0.9191, meaning that as Teacher Sensitivity increases, reports of Ergonomic Optimization also rise.  (The Odds Ratio in the adjusted model remained relatively flat at 2.54 to 2.51, p= 0.0021.  In other words, subjects who reported that their Endoscopy Suite environment was ergonomically optimized were 2.52 times more likely to have had instructors who were sensitive to their physical size/stature.)
 
-- When compared to the reference category ("Advanced"), *ALL* other training levels were significantly different (i.e., lower Beta weights).  Does this suggest that teachers are more likely to be sensitive to ergonomics when dealing with older trainees, or does it suggest that younger trainees don't really know what proper ergonomics should entail and, therefore, don't know how to rate their instructors on this metric?  (Does it take rising to the Advanced level before a trainee fully understands what constitutes "proper ergonomics?")
+- When compared to the reference category ("Advanced"), *ALL* other training levels performed better (i.e., lower Beta weights), although not statistically so.  Still, could this suggest that teachers are more likely to be sensitive to ergonomics when dealing with older trainees, or does it suggest that younger trainees don't really know what proper ergonomics should entail and, therefore, don't know how to rate their instructors on this metric?  (Does it take rising to the Advanced level before a trainee fully understands what constitutes "proper ergonomics?")
 
 
 <br>
@@ -2331,7 +2584,7 @@ FNAME <-
             AGECAT = relevel(AGECAT, ref="2"),
             
             TRNG_LEVEL = factor(TRNG_LEVEL),
-            TRNG_LEVEL = relevel(TRNG_LEVEL, ref="4"))
+            TRNG_LEVEL = relevel(TRNG_LEVEL, ref="3"))
 
 
     levels(FNAME$HEIGHT)
@@ -2343,16 +2596,17 @@ FNAME <-
     fname.height.emmeans.adj <- emmeans( fname.height.glm.adj,  ~ c(HEIGHT, SEX), type= "response")
     
     
-    summary(fname.height.glm.unadj)
-    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height2 (5-5'3) on FNAME_NP =Y relative to 5'10-6'" =   c(-1, 1, 0, 0, 0, 0)))
-    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height3 (5'4-5'6) on FNAME_NP =Y relative to 5'10-6'" = c(-1, 0, 1, 0, 0, 0)))
-    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height4 (5'7-5'9) on FNAME_NP =Y relative to 5'10-6'" = c(-1, 0, 0, 1, 0, 0)))
-    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height6 (6'-6'4) on FNAME_NP =Y relative to 5'10-6'" = c(-1, 0, 0, 0, 1, 0)))
-    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height7 (< 6'4) on FNAME_NP =Y relative to 5'10-6'" = c(-1, 0, 0, 0, 0, 1)))
+    summary(fname.height.glm.unadj) 
+    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height1 (< 5') on FNAME_NP =Y relative to 5'10-6'" =   c(-1, 1, 0, 0, 0, 0, 0)))
+    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height2 (5-5'3) on FNAME_NP =Y relative to 5'10-6'" =   c(-1, 0, 1, 0, 0, 0, 0)))
+    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height3 (5'4-5'6) on FNAME_NP =Y relative to 5'10-6'" = c(-1, 0, 0, 1, 0, 0, 0)))
+    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height4 (5'7-5'9) on FNAME_NP =Y relative to 5'10-6'" = c(-1, 0, 0, 0, 1, 0, 0)))
+    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height6 (6'-6'4) on FNAME_NP =Y relative to 5'10-6'" = c(-1, 0, 0, 0, 0, 1, 0)))
+    contrast(fname.height.emmeans.unadj, list("Unadj OR: Height7 (< 6'4) on FNAME_NP =Y relative to 5'10-6'" = c(-1, 0, 0, 0, 0, 0, 1)))
 
     
     #Determine whether the multilevel categorical variable HEIGHT is significant overall in the UNADJUSTED model?
-    aod::wald.test(b = coef(fname.height.glm.unadj), Sigma = vcov(fname.height.glm.unadj), Terms = 2:6)
+    aod::wald.test(b = coef(fname.height.glm.unadj), Sigma = vcov(fname.height.glm.unadj), Terms = 2:7)
 
     
     summary(fname.height.glm.adj)
@@ -2360,7 +2614,7 @@ FNAME <-
     
     
     #Determine whether the multilevel categorical variable HEIGHT is significant overall in the ADJUSTED model?
-    aod::wald.test(b = coef(fname.height.glm.adj), Sigma = vcov(fname.height.glm.adj), Terms = 2:6)
+    aod::wald.test(b = coef(fname.height.glm.adj), Sigma = vcov(fname.height.glm.adj), Terms = 2:7)
     
     
     
@@ -2405,11 +2659,12 @@ FNAME <-
     
     fname.htcat.glm.adj3 <- glm( FNAME_NP ~ HTCAT+ SEX , data= FNAME, family= binomial(link="logit"))
     fname.htcat.emmeans.adj3 <- emmeans( fname.htcat.glm.adj,  ~ c(HTCAT), type= "response")
+    
+    summary(fname.htcat.glm.adj3)
 
-
-    tab_model(fname.htcat.glm.unadj, fname.htcat.glm.adj, fname.htcat.glm.adj2,
+    tab_model(fname.htcat.glm.unadj, fname.htcat.glm.adj, fname.htcat.glm.adj2, fname.htcat.glm.adj3,
               title= "First Name - No Permission Logistic Models with Height Bands Collapsed (2) <br>.",
-              dv.labels= c('Height Cat Unadj','Height Cat Adj Training Level', 'Height Cat Adj Race'))
+              dv.labels= c('Height Cat Unadj','Height Cat Adj Training Level', 'Height Cat Adj Race', 'Height Cat Adj Sex'))
 
     
     
@@ -2420,7 +2675,7 @@ FNAME <-
 
 - **Conclusion:**  When compared to the median Male height (HEIGHT=5, or 5'10-6'), the odds of the subjects' first name being used without permission decreases as the reference height is approached.  Subjects who were taller, however, had mixed results:  Ones who were one band above the reference height (6'-6'4), had reduced odds of being disrespected in this manner; but the tallest subjects (HEIGHT=7, or > 6'4) had the worst odds ratio of all, 3.5, a group that is singularly comprised of males (n=2).  Unfortunately, none of these results was statistically significant.
 
-- Even after adjusting for SEX, the significance of HEIGHT in the model did not improve (in fact, it worsened, likely because the variables HEIGHT and SEX are highly correlated). An unadjusetd model where SEX replaced HEIGHT as the predictor variable, yielded good results, but still not significant (p= 0.0938).  
+- Even after adjusting for SEX, the significance of HEIGHT in the model did not improve (in fact, it worsened, likely because the variables HEIGHT and SEX are highly correlated). An unadjusted model where SEX replaced HEIGHT as the predictor variable, yielded good results, but still not significant (p= 0.0938).  
 
 - If the Height Category is collapsed into two groups -- shorter than 5'7" and those who are 5'7" and above, there does appear to be some significance -- even if controlled separately for Training Level and Race.  Only controlling for Sex knocks this predictor out of sigificance, likely because the HEIGHT and SEX are so highly correlated.
 
