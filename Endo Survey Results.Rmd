@@ -312,9 +312,34 @@ SURVEY  <-
     
            WHEN_DISABILITY_INSURANCE = factor(WHEN_DISABILITY_INSURANCE),
            WHEN_DISABILITY_INSURANCE = recode_factor(WHEN_DISABILITY_INSURANCE, 'During training' = 'Correct',
-                                                                       .default = 'Incorrect', .ordered= T) ) 
+                                                                       .default = 'Incorrect', .ordered= T) ) %>% 
+
+
+# Add a Sex-Adjusted Height Cat based on Median Height bands for each Sex
    
-   
+     group_by( BIRTHSEX ) %>% 
+  
+  mutate(HEIGHT3 = case_when( is.na(HEIGHT2) ~ NA_real_,
+                                  HEIGHT2 == "< 5'"    ~ 1,
+                                  HEIGHT2 == "5-5'3"   ~ 2,
+                                  HEIGHT2 == "5'4-5'6" ~ 3,
+                                  HEIGHT2 == "5'7-5'9" ~ 4,
+                                  HEIGHT2 == "5'10-6'" ~ 5,
+                                  HEIGHT2 == "6'1-6'4" ~ 6,
+                                  TRUE ~ 7),
+
+          MEDIAN_HT = median(HEIGHT3, na.rm=T),
+          HTCATSEX = case_when ( is.na(MEDIAN_HT) ~ NA_real_,
+                                 HEIGHT3 < MEDIAN_HT ~ 1,
+                                 HEIGHT3 == MEDIAN_HT ~ 2,
+                                 TRUE ~ 3),
+         
+         HTCATSEX =   recode_factor(factor(HTCATSEX), '1'= 'SHORT', '2'= "AVG", '3'= "TALL", .ordered=F),
+         HTCATSEX =   relevel(HTCATSEX, ref= "TALL")
+         
+         ) %>% ungroup() %>% select ( -HEIGHT3)
+
+
 ```
   
 
@@ -551,9 +576,34 @@ ggplot(  SUBSET2, aes(x= HEIGHT2)) + facet_grid( SUBSET2$BIRTHSEX ) +
 
 #Alternative View, if Birth Sex by Height is desired 
 
-
-
 CrossTable(SURVEY$HEIGHT2, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r = F, prop.t=F, chisq=T, fisher=F)  #rows then/over columns
+
+
+
+#Same Data, but using Sex-Adjusetd Height Bands (Short, Average, Tall)
+
+SUBSET2 <-
+SURVEY %>% 
+  filter( !is.na(HTCATSEX)) %>% 
+  mutate(BIRTHSEX = recode_factor( BIRTHSEX, "M" = "MALES", "F" = "FEMALES", .ordered=T)) %>% select( BIRTHSEX, HTCATSEX, HEIGHT)
+
+
+
+ggplot(  SUBSET2, aes(x= HTCATSEX)) + facet_grid( SUBSET2$BIRTHSEX ) +  
+  geom_bar(aes(fill= BIRTHSEX) ) +
+  stat_count(geom="text", aes(label=..count..), vjust= -.3) + 
+  scale_fill_manual( values = c( "MALES"="darkgrey", "FEMALES"="#006cc5"), guide = "none" )+
+  scale_x_discrete( limits = c('SHORT', 'AVG', 'TALL'))+
+  theme_538()  +
+  xlab(paste0("Sex-Adjusted Height Bands","\n","(Female AVG = Band 3, 5'4-5'6  * Male AVG = Band 5, 5'8-5'10)"))+ ylab("Counts") 
+
+
+
+#Alternative View, if Birth Sex by Height is desired 
+
+CrossTable(SURVEY$HTCATSEX  , SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r = F, prop.t=F, chisq=T, fisher=F)  #rows then/over columns
+
+
 
 
 ```
@@ -1664,6 +1714,20 @@ plot_xtab( x$HTCAT, x$FIRST_NAME_NO_PERMISSION, margin = "row",
   set_theme(base= theme_classic())
 
 rm(x)
+
+
+
+plot_xtab( SURVEY$HTCATSEX, SURVEY$FIRST_NAME_NO_PERMISSION, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "First Name Used No Permission by Sex-Adjusted Height Band v3",
+          axis.titles = "Sex-Adjusted Height Band Category", 
+          legend.title= "First Name Used No Permission?",
+          axis.labels = c("Tall", "Short", "Average"),
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
 
 
 ```
