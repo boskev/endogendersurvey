@@ -595,7 +595,7 @@ ggplot(  SUBSET2, aes(x= HTCATSEX)) + facet_grid( SUBSET2$BIRTHSEX ) +
   scale_fill_manual( values = c( "MALES"="darkgrey", "FEMALES"="#006cc5"), guide = "none" )+
   scale_x_discrete( limits = c('SHORT', 'AVG', 'TALL'))+
   theme_538()  +
-  xlab(paste0("Sex-Adjusted Height Bands","\n","(Female AVG = Band 3, 5'4-5'6  * Male AVG = Band 5, 5'8-5'10)"))+ ylab("Counts") 
+  xlab(paste0("Sex-Adjusted Height Bands","\n","\n","(Female AVG = Band 3, 5'4-5'6  * Male AVG = Band 5, 5'10-6')"))+ ylab("Counts") 
 
 
 
@@ -810,6 +810,8 @@ plot_xtab(SURVEY$BIRTHSEX, SURVEY$EXPERIENCED_TRANSIENT_PAIN_NO, margin = "row",
 
 
 ```
+
+
 
 <br>
 
@@ -2175,40 +2177,13 @@ The appropriate tack here would be to run a series of "point biserial correlatio
 
 <br>
 
-###### There does not appear to be any association in this sample with HEIGHT or GLOVE and having sustained an injury or experienced any of the five specific transient pain types listed in the survey.  Does this change if we adjust the correlations based on sex?  Or race?
+###### There does not appear to be any association in this sample with HEIGHT or GLOVE and having sustained an injury or experienced any of the five specific transient pain types listed in the survey.  Does this change if we adjust the correlations based on sex?  
 
 <br>
 
-```{r TASKS-CORRELATION-PARITALS }
+```{r TASKS-CORRELATION-PARITALS, warning=F}
 
 require(ppcor)
-
-#Partial Correlation:  HEIGHT + INJURY correlation adjusted for SEX and then RACE
-
-CORRMATRIX_NOMISS <- CORRMATRIX %>% na.omit()
-
-attach(CORRMATRIX_NOMISS)
-
-pcor.test( x=HEIGHT, y=INJURY, z=SEX, method= 'pearson')
-pcor.test( x=HEIGHT, y=INJURY, z=RACE, method= 'pearson' )
-
-
-
-#Partial Correlation:  GLOVE + INJURY correlation adjusted for SEX and then RACE
-
-pcor.test( x=GLOVE, y=INJURY, z=SEX, method= 'pearson' )
-pcor.test( x=GLOVE, y=INJURY, z=RACE, method= 'pearson' )
-
-
-detach(CORRMATRIX_NOMISS)
-
-
-```
-
-
-<br>
-
-```{r TASKS-CORRELATION-PARITALS2, warning=F }
 
 
 NEWCORRS <- 
@@ -2259,13 +2234,13 @@ NEWCORRS <-
           
           TEACHER_SENSITIVITY = case_when( is.na(TEACHER_SENSITIVITY) ~ NA_real_,
                                            TEACHER_SENSITIVITY == 'Y' ~ 1,
-                                           TRUE ~ 0)) %>% drop_na()
+                                           TRUE ~ 0)) %>%  drop_na()
 
 
 
 #[1]
 
-# Pearson Correlations: INJURY with GLOVE, with and wihtout partialling out SEX
+# Pearson Correlations: INJURY with GLOVE, with and without partialling out SEX
 
 
 # INJURY x GLOVE
@@ -2278,12 +2253,23 @@ p <-NEWCORRS %>%
   select(GLOVE,  INJURY) %>% 
   summarize_each(funs(cor.test(.,  NEWCORRS$GLOVE)$p.value)) %>%  `rownames<-`("p Values")
 
-x <-  tibble::rownames_to_column( rbind(e,p), 'STATISTIC')
-x
+x <-  tibble::rownames_to_column( rbind(e,p), 'STATISTIC')[-2]
+
+x %>% 
+    kbl(booktabs = T, format= "html", linesep='', padding=0, digits=3,
+        align= c('l','r'), escape=F, 
+        caption = "<b>Ever Sustained an Injury Correlation with <u>Hand Size</u> (Unadjusted)</b><br>",
+        col.names= linebreak(c("Statistic",
+                               "Ever Sustained<br>Injury?"))) %>%  
+    kable_paper(html_font= "Helvetica Neue", full_width = F, "hover", 
+                font_size=16) %>% 
+    column_spec(1,   width = "5cm") %>% 
+    column_spec(2, width= "3cm")
 
 
 
 # INJURY x GLOVE, controlling for Sex 
+
 e <-NEWCORRS %>% 
   select( GLOVE, INJURY ) %>%
   summarise_each(funs(pcor.test(.,  NEWCORRS$GLOVE, NEWCORRS$SEX)$estimate)) %>%  `rownames<-`("Pearson partial r")
@@ -2291,76 +2277,193 @@ e <-NEWCORRS %>%
 p <-NEWCORRS %>% 
   select(GLOVE,  INJURY) %>% 
   summarise_each(funs(pcor.test(.,  NEWCORRS$GLOVE, NEWCORRS$SEX)$p.value)) %>%  `rownames<-`("p Values")
-y <-  tibble::rownames_to_column( rbind(e, p), 'STATISTIC')
-y
+y <-  tibble::rownames_to_column( rbind(e, p), 'STATISTIC')[-2]
 
+y %>% 
+    kbl(booktabs = T, format= "html", linesep='', padding=0, digits=3,
+        align= c('l','r'), escape=F, 
+        caption = "<b>Ever Sustained an Injury Correlation with <u>Hand Size</u> (Adjusted for BirthSex)</b><br>",
+        col.names= linebreak(c("Statistic",
+                               "Ever Sustained<br>Injury?"))) %>%  
+    kable_paper(html_font= "Helvetica Neue", full_width = F, "hover", 
+                font_size=16) %>% 
+    column_spec(1,   width = "5cm") %>% 
+    column_spec(2, width= "3cm")
 
 
 #[2]
 
-# Pearson Correlations: TRANSIENT HAND PAIN with GLOVE, with and wihtout partialling out SEX
+# Pearson Correlations: INJURY with HEIGHT, with and without partialling out SEX
 
 
-# TP_HAND x GLOVE
+# INJURY x HEIGHT
 
 e <-NEWCORRS %>% 
-  select( GLOVE, TP_HAND) %>% 
-  summarize_each(funs(cor.test(.,  NEWCORRS$GLOVE)$estimate)) %>%  `rownames<-`("Pearson r")
+  select( HEIGHT, INJURY) %>% 
+  summarize_each(funs(cor.test(.,  NEWCORRS$HEIGHT)$estimate)) %>%  `rownames<-`("Pearson r")
                  
 p <-NEWCORRS %>% 
-  select(GLOVE,  TP_HAND) %>% 
-  summarize_each(funs(cor.test(.,  NEWCORRS$GLOVE)$p.value)) %>%  `rownames<-`("p Values")
+  select(HEIGHT,  INJURY) %>% 
+  summarize_each(funs(cor.test(.,  NEWCORRS$HEIGHT)$p.value)) %>%  `rownames<-`("p Values")
 
-x <-  tibble::rownames_to_column( rbind(e,p), 'STATISTIC')
-x
+x <-  tibble::rownames_to_column( rbind(e,p), 'STATISTIC')[-2]
 
-
-# TP_HAND x GLOVE, controlling for Sex 
-
-e <-NEWCORRS %>% 
-  select( GLOVE, TP_HAND ) %>%
-  summarise_each(funs(pcor.test(.,  NEWCORRS$GLOVE, NEWCORRS$SEX)$estimate)) %>%  `rownames<-`("Pearson partial r")
-
-p <-NEWCORRS %>% 
-  select(GLOVE,  TP_HAND) %>% 
-  summarise_each(funs(pcor.test(.,  NEWCORRS$GLOVE, NEWCORRS$SEX)$p.value)) %>%  `rownames<-`("p Values")
-y <-  tibble::rownames_to_column( rbind(e, p), 'STATISTIC')
-y
+x %>% 
+    kbl(booktabs = T, format= "html", linesep='', padding=0, digits=3,
+        align= c('l','r'), escape=F, 
+        caption = "<b>Ever Sustained an Injury Correlation with <u>Height Band</u> (Unadjusted)</b><br>",
+        col.names= linebreak(c("Statistic",
+                               "Ever Sustained<br>Injury?"))) %>%  
+    kable_paper(html_font= "Helvetica Neue", full_width = F, "hover", 
+                font_size=16) %>% 
+    column_spec(1,   width = "5cm") %>% 
+    column_spec(2, width= "3cm")
 
 
 
-
-
-#[3]
-
-# Pearson Correlations: TRANSIENT PAINS (alll) with HEIGHT, with and wihtout partialling out SEX
-
-
-
-# TPAINS x HEIGHT
+# INJURY x HEIGHT, controlling for Sex 
 
 e <-NEWCORRS %>% 
-  select( HEIGHT, starts_with("TP_")) %>% 
-  summarise_each(funs(cor.test(.,  NEWCORRS$HEIGHT)$estimate)) %>%  `rownames<-`("Pearson r")
-                 
-p <-NEWCORRS %>% 
-  select(HEIGHT,  starts_with("TP_")) %>% 
-  summarise_each(funs(cor.test(.,  NEWCORRS$HEIGHT)$p.value)) %>%  `rownames<-`("p Values")
-x <-  tibble::rownames_to_column( rbind(e,p), 'STATISTIC')
-x
-
-
-# TPAINS x HEIGHT, controlling for Sex 
-e <-NEWCORRS %>% 
-  select( HEIGHT,  starts_with("TP_")) %>% 
+  select( HEIGHT, INJURY ) %>%
   summarise_each(funs(pcor.test(.,  NEWCORRS$HEIGHT, NEWCORRS$SEX)$estimate)) %>%  `rownames<-`("Pearson partial r")
 
 p <-NEWCORRS %>% 
-  select(HEIGHT,  starts_with("TP_")) %>% 
+  select(HEIGHT,  INJURY) %>% 
   summarise_each(funs(pcor.test(.,  NEWCORRS$HEIGHT, NEWCORRS$SEX)$p.value)) %>%  `rownames<-`("p Values")
-y <-  tibble::rownames_to_column( rbind(e, p), 'STATISTIC')
-y
+y <-  tibble::rownames_to_column( rbind(e, p), 'STATISTIC')[-2]
 
+y %>% 
+    kbl(booktabs = T, format= "html", linesep='', padding=0, digits=3,
+        align= c('l','r'), escape=F, 
+        caption = "<b>Ever Sustained an Injury Correlation with <u>Height Band</u> (Adjusted for BirthSex)</b><br>",
+        col.names= linebreak(c("Statistic",
+                               "Ever Sustained<br>Injury?"))) %>%  
+    kable_paper(html_font= "Helvetica Neue", full_width = F, "hover", 
+                font_size=16) %>% 
+    column_spec(1,   width = "5cm") %>% 
+    column_spec(2, width= "3cm")
+
+
+
+
+
+  # [3] 
+  
+  #Transient Pain Correlations by Glove Size
+  
+  e <-NEWCORRS %>% 
+    select( GLOVE, starts_with("TP_")) %>% 
+    summarise_each(funs(cor.test(.,  NEWCORRS$GLOVE)$estimate)) %>%  `rownames<-`("Pearson r")
+  
+  p <-NEWCORRS %>% 
+    select(GLOVE,  starts_with("TP_")) %>% 
+    summarise_each(funs(cor.test(.,  NEWCORRS$GLOVE)$p.value)) %>%  `rownames<-`("p Values")
+  x <-  tibble::rownames_to_column( rbind(e,p), 'STATISTIC')[, -2]
+  
+  
+  x %>%    
+    kbl(booktabs = T, format= "html", linesep='', padding=0, digits=3,
+        align= c('l','r','r','r','r', 'r'), escape=F, 
+        caption = "<b>Transient Pain Correlations with <u>Hand Size</u> (Unadjusted)</b><br>",
+        col.names= linebreak(c("Statistic",
+                               "TP Hand",
+                               "TP Back",
+                               "TP Neck/Sho",
+                               "TP Leg",
+                               "TP Foot"))) %>%  
+    kable_paper(html_font= "Helvetica Neue", full_width = F, "hover", 
+                font_size=16) %>% 
+    column_spec(1,   width = "5cm") %>% 
+    column_spec(2:6, width= "3cm")
+  
+  
+        # Transient Pain Partial Correlations by GLOVE, controlling for Sex 
+  e <-NEWCORRS %>% 
+    select( GLOVE,  starts_with("TP_")) %>% 
+    summarise_each(funs(pcor.test(.,  NEWCORRS$GLOVE, NEWCORRS$SEX)$estimate)) %>%  `rownames<-`("Pearson partial r")
+  
+  p <-NEWCORRS %>% 
+    select(GLOVE,  starts_with("TP_")) %>% 
+    summarise_each(funs(pcor.test(.,  NEWCORRS$GLOVE, NEWCORRS$SEX)$p.value)) %>%  `rownames<-`("p Values")
+  y <-  tibble::rownames_to_column( rbind(e, p), 'STATISTIC')[, -2]
+  
+  y  %>% 
+    kbl(booktabs = T, format= "html", linesep='', padding=0, digits=3,
+        align= c('l','r','r','r','r', 'r'), escape=F, 
+        caption = "<b>Transient Pain Correlations with <u>Hand Size</u> (Adjusted for Birthsex)</b><br>",
+        col.names= linebreak(c("Statistic",
+                               "TP Hand",
+                               "TP Back",
+                               "TP Neck/Sho",
+                               "TP Leg",
+                               "TP Foot"))) %>%  
+    kable_paper(html_font= "Helvetica Neue", full_width = F, "hover", 
+                font_size=16) %>% 
+    column_spec(1,   width = "5cm") %>% 
+    column_spec(2:6, width= "3cm")
+  
+  
+  
+
+
+
+  # [4]
+  
+  # Transient Pain Correlations by Height
+  
+  e <-NEWCORRS %>% 
+    select( HEIGHT, starts_with("TP_")) %>% 
+    summarise_each(funs(cor.test(.,  NEWCORRS$HEIGHT)$estimate)) %>%  `rownames<-`("Pearson r")
+  
+  p <-NEWCORRS %>% 
+    select(HEIGHT,  starts_with("TP_")) %>% 
+    summarise_each(funs(cor.test(.,  NEWCORRS$HEIGHT)$p.value)) %>%  `rownames<-`("p Values")
+  x <-  tibble::rownames_to_column( rbind(e,p), 'STATISTIC')[, -2]
+  x %>%    
+    kbl(booktabs = T, format= "html", linesep='', padding=0, digits=3,
+                align= c('l','r','r','r','r', 'r'), escape=F, 
+                caption = "<b>Transient Pain Correlations with <u>Height</u> (Unadjusted)</b><br>",
+                col.names= linebreak(c("Statistic",
+                                       "TP Hand",
+                                       "TP Back",
+                                       "TP Neck/Sho",
+                                       "TP Leg",
+                                       "TP Foot"))) %>%  
+    kable_paper(html_font= "Helvetica Neue", full_width = F, "hover", 
+                font_size=16) %>% 
+    column_spec(1,   width = "5cm") %>% 
+    column_spec(2:6, width= "3cm")
+  
+  
+       # Transient Pain Partial Correlations by Height, controlling for Sex 
+  e <-NEWCORRS %>% 
+    select( HEIGHT,  starts_with("TP_")) %>% 
+    summarise_each(funs(pcor.test(.,  NEWCORRS$HEIGHT, NEWCORRS$SEX)$estimate)) %>%  `rownames<-`("Pearson partial r")
+  
+  p <-NEWCORRS %>% 
+    select(HEIGHT,  starts_with("TP_")) %>% 
+    summarise_each(funs(pcor.test(.,  NEWCORRS$HEIGHT, NEWCORRS$SEX)$p.value)) %>%  `rownames<-`("p Values")
+  y <-  tibble::rownames_to_column( rbind(e, p), 'STATISTIC')[, -2]
+  
+  y  %>% 
+    kbl(booktabs = T, format= "html", linesep='', padding=0, digits=3,
+         align= c('l','r','r','r','r', 'r'), escape=F, 
+        caption = "<b>Transient Pain Correlations with <u>Height</u> (Adjusted for Birthsex)</b><br>",
+         col.names= linebreak(c("Statistic",
+                                "TP Hand",
+                                "TP Back",
+                                "TP Neck/Sho",
+                                "TP Leg",
+                                "TP Foot"))) %>%  
+    kable_paper(html_font= "Helvetica Neue", full_width = F, "hover", 
+                font_size=16) %>% 
+    column_spec(1,   width = "5cm") %>% 
+    column_spec(2:6, width= "3cm")
+  
+  
+  
+  
+  
 
 
 ```
