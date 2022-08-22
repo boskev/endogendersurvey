@@ -811,6 +811,80 @@ plot_xtab(SURVEY$BIRTHSEX, SURVEY$EXPERIENCED_TRANSIENT_PAIN_NO, margin = "row",
 
 ```
 
+<br>
+
+***
+
+#### Follow-Up Question:  Is there a difference in Injury reports based on *Training Level?*
+
+<br>
+
+```{r CROSSTAB-BIRTHSEX-INJURY_SPECIFIC-FOLLOWUP }
+  
+
+
+  #Is there a difference by Training Level?
+
+
+plot_xtab(SURVEY$TRAINING_LEVEL,SURVEY$EVER_INJURED,  margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Ever Endo Injured by Training Level (3)",
+          axis.titles = "Training Level", 
+          legend.title= "Ever Injured?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+
+  # Relevel factor 
+  
+  INJ <-
+    SURVEY %>% 
+    select(EVER_INJURED, TRAINING_LEVEL, BIRTHSEX) %>%  
+    mutate( TRAINING_LEVEL = factor(TRAINING_LEVEL, ordered = F),
+            TRAINING_LEVEL = relevel( TRAINING_LEVEL, ref = 'First Year')) %>% drop_na() 
+  
+  
+  injury.trng.glm <- glm( EVER_INJURED ~  TRAINING_LEVEL   , data=  INJ, family=binomial(link="logit"))
+  summary(injury.trng.glm)
+  
+  
+  #Test to see whether Training Level is a significnat effect overall:
+  
+  aod::wald.test(b = coef(injury.trng.glm), Sigma = vcov(injury.trng.glm), Terms = 2:3)
+  injury.trng.emmeans <- emmeans( injury.trng.glm,  ~ c(TRAINING_LEVEL), type= "response")
+  
+  
+  # Odds Ratio pairings:  
+  pwpm( injury.trng.emmeans, reverse= T, adjust='none')
+  pairs(injury.trng.emmeans, reverse=T, adjust= "none")
+  
+  
+ # First Year Respondents seem to have the *lowest* OR (1.09)  & probability (0.0769) of Injury.
+ # How do First Years compare to everyone else? How does Advanced compare to everyone else?  
+  
+
+  a<- contrast(test.emmeans, list("Unadj OR: EVER_INJURED =Y on TRAINING_LEVEL = FirstYr vs. All" = c( 1, -1/2,  -1/2))) %>% tbl_df()
+  b<- contrast(test.emmeans, list("Unadj OR: EVER_INJURED =Y on TRAINING_LEVEL = SecondYr vs. All" = c( -1/2, 1,  -1/2))) %>% tbl_df()
+  c<- contrast(test.emmeans, list("Unadj OR: EVER_INJURED =Y on TRAINING_LEVEL = Advanced vs. All" = c( -1/2, -1/2,  1))) %>% tbl_df()
+  
+  rbind(a,b,c)[, -c(4:6)]
+  rm(a,b,c)
+
+
+
+```
+
+<br>
+
+- **Interpretation:**  `TRAINING_LEVEL` is *not* a significant effect in predicting the likelihood of Injury `EVER_INJURED`.  Despite the facts that (1) the prevalence of self-reported injuries *increases* with each step of `Training Level` (First Years are the least likely to be injured (OR=1.09), compared to Second Years (OR=1.23) and Advanced respondents (OR=1.22); and (2) Second Years & Advanced respondents have a higher likelihood of injury when compared against all other groups, none of these results is statistically significant.
+
+- The result that most closely approaches significance is "First Year Odds vs. All other Training Levels," where with an OR of 0.417, First Years have an approximate 58% *reduced* chance of injury compared to their senior counterparts.  (Due to fewer hours worked?  Due to the nature of the role, which requires more observation and less practical/tactical interaction?)
+
+
+<br>
+<br>
 
 
 <br>
