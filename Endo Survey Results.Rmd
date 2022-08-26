@@ -865,9 +865,9 @@ plot_xtab(SURVEY$TRAINING_LEVEL,SURVEY$EVER_INJURED,  margin = "row",
  # How do First Years compare to everyone else? How does Advanced compare to everyone else?  
   
 
-  a<- contrast(test.emmeans, list("Unadj OR: EVER_INJURED =Y on TRAINING_LEVEL = FirstYr vs. All" = c( 1, -1/2,  -1/2))) %>% tbl_df()
-  b<- contrast(test.emmeans, list("Unadj OR: EVER_INJURED =Y on TRAINING_LEVEL = SecondYr vs. All" = c( -1/2, 1,  -1/2))) %>% tbl_df()
-  c<- contrast(test.emmeans, list("Unadj OR: EVER_INJURED =Y on TRAINING_LEVEL = Advanced vs. All" = c( -1/2, -1/2,  1))) %>% tbl_df()
+  a<- contrast(injury.trng.emmeans, list("Unadj OR: EVER_INJURED =Y on TRAINING_LEVEL = FirstYr vs. All" = c( 1, -1/2,  -1/2))) %>% tbl_df()
+  b<- contrast(injury.trng.emmeans, list("Unadj OR: EVER_INJURED =Y on TRAINING_LEVEL = SecondYr vs. All" = c( -1/2, 1,  -1/2))) %>% tbl_df()
+  c<- contrast(injury.trng.emmeans, list("Unadj OR: EVER_INJURED =Y on TRAINING_LEVEL = Advanced vs. All" = c( -1/2, -1/2,  1))) %>% tbl_df()
   
   rbind(a,b,c)[, -c(4:6)]
   rm(a,b,c)
@@ -2256,7 +2256,6 @@ The appropriate tack here would be to run a series of "point biserial correlatio
 <br>
 
 ```{r TASKS-CORRELATION-PARITALS, warning=F}
-
 require(ppcor)
 
 
@@ -2556,11 +2555,58 @@ y %>%
 ```{r TASKS-CORRELATIONS-PREGNANCY, fig.align='center', fig.dim= c(12,12)}
 
 
+
+plot_xtab(SURVEY$HEIGHT[SURVEY$FELLOWSHIP_PREGNANCY=='Y'],
+          SURVEY$PREGNANCY_ERGO_DIFFICULTY[SURVEY$FELLOWSHIP_PREGNANCY=='Y'], 
+          margin = "row", 
+          bar.pos = "stack", coord.flip = F, 
+          title = "Pregnant During Fellowship - Height Band x Ergo Difficulty",
+          axis.titles = c('Height Band'), 
+          legend.title= "Ergo Difficulty?",
+          geom.colors = c("#006cc5", "#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
+plot_xtab(SURVEY$GLOVE[SURVEY$FELLOWSHIP_PREGNANCY=='Y'],
+          SURVEY$PREGNANCY_ERGO_DIFFICULTY[SURVEY$FELLOWSHIP_PREGNANCY=='Y'], 
+          margin = "row", 
+          bar.pos = "stack", coord.flip = F, 
+          title = "Pregnant During Fellowship - Glove x Ergo Difficulty",
+          axis.titles = c('Glove/Hand Size'), 
+          legend.title= "Ergo Difficulty?",
+          geom.colors = c("#006cc5","#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+
 #Ergonomic Difficulty during Pregnancy?
 
 CrossTable(SURVEY$PREGNANCY_ERGO_DIFFICULTY, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=F, fisher=F)  
 CrossTable(SURVEY$PREGNANCY_ERGO_INJURY, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=F, fisher=F) 
 CrossTable(SURVEY$POSTPARTUM_ERGO_INJURY, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=F, prop.t=F, chisq=F, fisher=F) 
+
+
+
+# Did pregnant women report egonomic difficulties at a rate higher than women who were never pregnant during their fellowship
+
+PREGCOMP <-
+
+  SURVEY %>% 
+    filter( BIRTHSEX == 'F') %>% 
+    
+    mutate( ERGO_DIFFICULTY = case_when( FELLOWSHIP_PREGNANCY == "Y" & PREGNANCY_ERGO_DIFFICULTY== "Y" ~ "Y",
+                                         FELLOWSHIP_PREGNANCY == "N" & ERGO_OPTIMIZATION == "N" ~ "Y",
+                                         TRUE ~ "N"
+                                         )) %>% 
+    select( BIRTHSEX, FELLOWSHIP_PREGNANCY, PREGNANCY_ERGO_DIFFICULTY, ERGO_DIFFICULTY, GLOVE, HEIGHT, TRAINING_LEVEL)
+
+
+CrossTable(PREGCOMP$ERGO_DIFFICULTY, PREGCOMP$FELLOWSHIP_PREGNANCY, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=T) 
+
+
+
+
 
 
 #Correlation Matrix to view "associations" with Glove Size and Height
