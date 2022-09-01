@@ -2081,6 +2081,11 @@ plot_xtab(SURVEY$BIRTHSEX, SURVEY$WHEN_DISABILITY_INSURANCE, margin = "row",
 #     mutate( COUNT_CORRECT = apply( . , 1, function(x) sum( x== "Correct", na.rm= T )))
 
 
+# CORRECT <- 
+# SURVEY %>%   select( ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE) %>% 
+#   rowwise() %>%
+#   mutate(COUNT_CORRECT = sum(c_across( ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE ) == "Correct"))
+
 
 CORRECT <-
    SURVEY %>% 
