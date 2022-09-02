@@ -4241,7 +4241,7 @@ tab_model( frot9.lm5,
   
   summary(PRINCOMP_FINAL)
   print(PRINCOMP_FINAL$values)
-  print(PRINCOMP_FINAL$loadings)
+  print(PRINCOMP_FINAL$loadings, digits=2, cutoff=.4, sort=T)
   print(PRINCIPAL_FINAL$PVAL)
 
   
