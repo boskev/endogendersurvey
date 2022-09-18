@@ -4287,6 +4287,7 @@ pairs.panels( codeswitch, pch=21, stars=T )
 
 <br>
 <br>
+
 - The factor `F4.CODE.SWITCH` is highly correlated with SEX (females), and HEIGHT (shorter trainees), and less correlated with TRAINING_LEVEL (where, curiously, it seems to be more positively associated with Advanced trainees).  It is *not* correlated at all with RACE, however (where RACE is a binary variable, Whites vs. Non-Whites -- it is higher among Non-Whites, but not statistically).
 
 <br>
