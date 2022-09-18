@@ -4255,7 +4255,7 @@ tab_model( frot9.lm5,
 
 <br>
 
-- The regression summary above charts what happens to the coefficient of the variable BIRTHSEX when it is used to predict the factor PAIN.  Unadjusted, the coefficient starts at 0.41. The next six models show what happens if only *one* intervention is made:  For example, adding a *standard* apron increases the coefficient to 0.43 (i.e., increases the likelihood of PAIN). But the next single-step interventions (red underscores) - using a lightweight apron, improving trainee confidence, treating trainees with respect, having nurses be more cooperative, and training with sensitivity and appropriate feedback - each reduces the coefficient to as low as 0.34.   In the next models (blue underscores), we see what happens when we (1) include *all* the aforementioned interventions (coefficient drops to 0.30); (2) include the Tactile Training factor, which is positively correlated with the Pain factor (coefficient drops further to 0.27); and (3) adjust further for HEIGHT (which is so correlated with BIRTHSEX that it must be included to confirm a true sex effect), and Training Level.  The final model, which includes all these covariates, has a coefficient of 0.31 and our variable of interest, BIRTHSEX, has maintained its significance throughout (whereas HEIGHT and TRAINING_LEVEL did not, according to the Anova table, not shown).
+- The regression summary above charts what happens to the coefficient of the variable BIRTHSEX when it is used to predict the factor PAIN.  Unadjusted, the coefficient starts at 0.41. The next six models show what happens if only *one* intervention is made:  For example, adding a *standard* apron increases the coefficient to 0.43 (i.e., increases the likelihood of PAIN). But the next single-step interventions (red underscores) - using a lightweight apron, improving trainee confidence, treating trainees with respect, having nurses be more cooperative, and training with sensitivity and appropriate feedback - each reduces the coefficient to as low as 0.34.   In the next models (blue underscores), we see what happens when we (1) include *all* the aforementioned interventions (coefficient drops to 0.30); (2) include the Tactile Training factor, which is positively correlated with the Pain factor (coefficient drops further to 0.27); and (3) adjust further for HEIGHT (which is so correlated with BIRTHSEX that it must be included to confirm a true sex effect), and Training Level.  The final model, which includes all these covariates, has a coefficient of 0.31 and our variable of interest, BIRTHSEX, has maintained its significance throughout (whereas HEIGHT and TRAINING_LEVEL did not, according to the Type 3 Anova table, not shown).
 - <b>Final Takeaway:</b>  Training with Sensitivity + Respect from Sr. ES Staff + Cooperative Nurses + Lightweight Aprons signficiantlyreduce the likelihood of Pain relative to Sex, even after adjusting for Height and Training Level.
 
 
@@ -4299,15 +4299,21 @@ pairs.panels( codeswitch, pch=21, stars=T )
 
 - The regression summary is similar to the one used in the previous 9-factor PROMAX solution, where we try to confirm a SEX-PAIN association.  But in addition to controlling for HEIGHT, we now must contend with this new Code Switch factor, which is correlated with both of these covariates as well as with the outcome (PAIN).
 - The first three models establish a baseline coefficient for each of these three variables: BIRTHEX = 0.43, HEIGHTBAND = 0.40 and F4.CODE.SWITCH = 0.30.
-- The next two models adjust BIRTHSEX and HEIGHTBAND for `F4.CODE.SWITCH,` and in each case, while all varialbes remain statistically significant, the p-values for BIRTHSEX and HEIGHTBAND rose, while that of the Code Swich factor remained very low (p < 0.001).  In the next model, where all three variables have PAIN regressed on to them, *only* `F4.CODE.SWITCH` remains statistically significant (p < 0.001), suggesting that in this three-way battle, it is the Code Switch factor that is strongest predictor of transient pain/injury.
+- The next two models adjust BIRTHSEX and HEIGHTBAND for `F4.CODE.SWITCH,` and in each case, while all variables remain statistically significant, the p-values for BIRTHSEX and HEIGHTBAND rose, while that of the Code Swich factor remained very low (p < 0.001).  In the next model, where all three variables have PAIN regressed on to them, *only* `F4.CODE.SWITCH` remains statistically significant (p < 0.001), suggesting that in this three-way battle, it is the Code Switch factor that is strongest predictor of transient pain/injury.
 - Similar to what was done previously, the next models (blue underscore) add single interventions (lighweight Aprons, Respect, Cooperative Nurses, etc.), each of which drops the coefficient for `F4.CODE.SWITCH` from its 0.30 high to as low as 0.20 (and this is with BIRTHSEX and HEIGHTBAND also included in the model).
 - In the two "fully loaded" models -- one with Tactile Training and one without -- the effect of `F4.CODESWITCH` remains statistically significant, and its coefficient drops as low as 0.13
 
 <br>
+
+- <b>NOTE:  </b><br>The variable `HEIGHTBAND` (a binvary variable, where 0=Short and 1=Tall) was used in the above regressions for the sake of simplicity.  (Having only two levels, `HEIGHTBAND` makes tracking the effects of height easier.)  But if the *original* multilevel categorical variable `HEIGHT2` was used in these models instead -- similar to what was done with the previous Promax-9 solution -- the results would've have been virtually identical:  `F4.CODE.SWITCH` would have knocked both `BIRTHSEX` and `HEIGHT2` out of significance in the 'fully loaded' model (where adjustments were made for Aprons, Nurse Cooperation, Training with Sensitivity, Respect/Confidence, Tactile Training, and Training Level).  But if `F4.CODE.SWITCH` is removed from the 'fully-loaded' model, then just as before, `BIRTHSEX` prevails over its highly correlated covariate `HEIGHT2,` retaining its significance even in the presence of all the aforementioned covariates ("interventions"), with its coefficient falling from 0.43 to 0.28, p= 0.048.  While not shown, the multilevel variable `HEIGHT2` is *not* significant in the final model, according to the Type 3 Anova table.
+
+<br>
 <br>
   
-  
-  
+![Regressions:  BIRTHSEX predicting PAIN/INJURY with HEIGHT2, as captured in the survey](images/Promax 9 - Code Switch Regressions 2.png){width=1600px}
+
+<br>
+<br>
   
 #### Question 6:  What happens if we use <span style="color:red">Principal Component Analysis</span> instead as a means of data reduction?
 
