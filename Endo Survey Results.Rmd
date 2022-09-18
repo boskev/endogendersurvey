@@ -4221,6 +4221,7 @@ tab_model( frot9.lm5,
 - The factor analysis solutions above were based on *orthogonal* rotations, ones where the resulting factors were uncorrelated
 - The following factor solutions are based on *oblique* rotations, ones that allows the factors to retain any correlation they may exhibit among each other
 - Oblique rotations (e.g., olbimin or Promax), allow the factors themselves to be regressed onto each other to explore answers to certain research questions that are not driven solely by categorical covariates such as SEX, HEIGHT, GLOVE or RACE
+- Various factoring methods were tested - Principal Axis (PA), Minimum Residual (MINRES), Weighted Least Squares (WLS), and Maximum Likelihood Estimation (MLE) - with the last (MLE) being the method used in both these solutions
 - For the sake of brevity, the results of only two nine-factor `Promax` solutions are displayed below.  Each has passed certain key model fit and consistency/reliability tests:
 
     - Each solution has an overall KMO greater than 0.65
