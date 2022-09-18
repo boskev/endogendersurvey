@@ -4264,7 +4264,7 @@ tab_model( frot9.lm5,
 
 #### Promax Solution 2:  9-Factors (43 of 54 variables included in final factor load)
 
-![Correlation Matrix for Promax-9-DialExt](images/PA Factor Analysis - 9-Factor PROMAX Corrmatrix (Median Substitution CODESWITCH).png)
+![Correlation Matrix for Promax-9-CodeSwitch](images/PA Factor Analysis - 9-Factor PROMAX Corrmatrix (Median Substitution CODESWITCH).png)
 
 
 <br>
