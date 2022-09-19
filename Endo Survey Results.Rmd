@@ -40,7 +40,7 @@ This is a brief workflow highlighting the exploratory analysis of survey data mi
 <br>
 <br>
 
-#### <span style="color:red">Click here to see the latest [Oblique](#Oblique) Factor Analysis Solutions</span>
+#### <span style="color:red">[Click here to see the latest Oblique Factor Analysis Solutions](#Oblique)</span>
 
 
 
