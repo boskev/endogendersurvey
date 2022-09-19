@@ -37,6 +37,12 @@ This is a brief workflow highlighting the exploratory analysis of survey data mi
 
 #### <span style="color:red"> [Click here for the latest version of the Summary Tables (downloadable Word document)](https://github.com/boskev/endogendersurvey/blob/main/Ergonomics%20Study%20Tables%207-5-22%20Full%20Cohort.docx)</span>
 
+<br>
+<br>
+
+#### <span style="color:red">Click here to see the latest [Oblique](#Oblique) Factor Analysis Solutions</span>
+
+
 
 <br>
 
@@ -4214,7 +4220,7 @@ tab_model( frot9.lm5,
 
 <br>
   
-#### Question 5A:  <span style="color:red">Factor Analysis Revisited: OBLIQUE (PROMAX) ROTATIONS</span>
+#### <a name="Oblique"></a>Question 5A:  <span style="color:red">Factor Analysis Revisited: OBLIQUE (PROMAX) ROTATIONS</span>
 
 
 
