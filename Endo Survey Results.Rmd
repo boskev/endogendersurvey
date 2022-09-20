@@ -40,7 +40,7 @@ This is a brief workflow highlighting the exploratory analysis of survey data mi
 <br>
 <br>
 
-#### <span style="color:red">[Click here to see the latest Oblique Factor Analysis Solutions](#Oblique)</span>
+#### <span style="color:red">[Click here to jump to the latest Oblique Factor Analysis Solutions](#Oblique)</span>
 
 
 
@@ -4295,7 +4295,7 @@ pairs.panels( codeswitch, pch=21, stars=T )
 <br>
 <br>
 
-- The factor `F4.CODE.SWITCH` is highly correlated with SEX (females), and HEIGHT (shorter trainees), and less correlated with TRAINING_LEVEL (where, curiously, it seems to be more positively associated with Advanced trainees).  It is *not* correlated at all with RACE, however (where RACE is a binary variable, Whites vs. Non-Whites -- it is higher among Non-Whites, but not statistically).
+- The factor `F4.CODE.SWITCH` is highly correlated with SEX (females), and HEIGHT (shorter trainees), and less correlated with TRAINING_LEVEL (where, it seems to be more positively associated with First-Year & Second-Year trainees -- "Advanced" is the reference category, and as such, its bar appears first in the histogram).  It is *not* correlated at all with RACE, however (where RACE is a binary variable, Whites vs. Non-Whites -- it is higher among Non-Whites, but not statistically).
 
 <br>
 <br>
