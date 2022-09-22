@@ -35,7 +35,7 @@ This is a brief workflow highlighting the exploratory analysis of survey data mi
 ***
 
 
-#### <span style="color:red"> [Click here for the latest version of the Summary Tables (downloadable Word document)](https://github.com/boskev/endogendersurvey/blob/main/Ergonomics%20Study%20Tables%207-5-22%20Full%20Cohort.docx)</span>
+#### <span style="color:red"> [Click here for the latest version of the Summary Tables (downloadable Word document)](https://github.com/boskev/endogendersurvey/blob/main/Ergonomics%20tables%20questions%209-21.docx)</span>
 
 <br>
 <br>
@@ -118,7 +118,7 @@ SURVEY  <-
     mutate( TRAINING_LEVEL = factor (TRAINING_LEVEL, levels= c('First year fellow','Second year fellow', 'Third year fellow', 'Advanced fellow'))) %>% 
     mutate( TRAINING_LEVEL = recode_factor( TRAINING_LEVEL, 'First year fellow'= 'First Year', 
                                                             'Second year fellow'= 'Second Year', 
-                                                            'Third year fellow' = 'Advanced', 
+                                                            'Third year fellow' = 'Third Year', 
                                                             'Advanced fellow' = "Advanced", .ordered = T) ) %>% 
    mutate( HEIGHT2 = factor(HEIGHT, levels= c("< 5'", "5-5'3", "5'4-5'6", "5'7-5'9", "5'10-6'", "6'1-6'4", "> 6'4"))) %>% 
    mutate( PERFORMANCE_HOURS = factor(PERFORMANCE_HOURS),
@@ -522,7 +522,7 @@ CrossTable(SURVEY$RACE, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r = T, pro
   
 plot_xtab(SURVEY$TRAINING_LEVEL, SURVEY$BIRTHSEX, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          title = "Training Levels by Birth Sex",
+          title = "Training Levels (4) by Birth Sex",
           axis.titles = c('Training Levels'), 
           legend.title= "Birth Sex",
           geom.colors = c("#006cc5","#cbcccb"), 
@@ -536,6 +536,48 @@ plot_xtab(SURVEY$TRAINING_LEVEL, SURVEY$BIRTHSEX, margin = "row",
 CrossTable(SURVEY$TRAINING_LEVEL, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=F)  #rows then/over columns
 
 
+#If it is decided to combine the Third Year/Advanced Levels, then use these tables:
+
+
+RECODE <-
+ SURVEY %>% 
+ select( TRAINING_LEVEL, BIRTHSEX) %>% 
+ mutate( TRAINING_LEVEL = recode_factor( TRAINING_LEVEL, 'First Year'= 'First Year', 
+                                                            'Second Year'= 'Second Year', 
+                                                            'Third Year' = 'Advanced', 
+                                                            'Advanced' = "Advanced", .ordered = T) ) 
+
+        
+      plot_xtab(RECODE$TRAINING_LEVEL, RECODE$BIRTHSEX, margin = "row", 
+                bar.pos = "stack", coord.flip = TRUE, 
+                title = "Training Levels (3) by Birth Sex",
+                axis.titles = c('Training Levels'), 
+                legend.title= "Birth Sex",
+                geom.colors = c("#006cc5","#cbcccb"), 
+                show.summary = TRUE )+ 
+        set_theme(base= theme_classic())
+      
+      
+      #Alternative View, if Birth Sex by Training Level is desired 
+      
+      
+      CrossTable(RECODE$TRAINING_LEVEL, RECODE$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=F)  #rows then/over columns
+      
+      
+      
+# Reset Training Level back to three levels 
+
+
+SURVEY %<>% 
+  
+mutate( TRAINING_LEVEL = as.character(TRAINING_LEVEL),
+        TRAINING_LEVEL = factor (TRAINING_LEVEL, levels= c('First Year','Second Year', 'Third Year', 'Advanced')),
+        TRAINING_LEVEL = recode_factor( TRAINING_LEVEL, 'First Year'= 'First Year', 
+                                                            'Second Year'= 'Second Year', 
+                                                            'Third Year' = 'Advanced', 
+                                                            'Advanced' = "Advanced", .ordered = T) )
+      
+      
 ```
 
 
@@ -1587,15 +1629,31 @@ plot_xtab(SURVEY$TEACHER_SENSITIVITY_BY_GENDER, SURVEY$BIRTHSEX, margin = "row",
 CrossTable(SURVEY$TEACHER_SENSITIVITY_BY_GENDER, SURVEY$BIRTHSEX, prop.chisq=F, prop.c=T, prop.r=T, prop.t=F, chisq=T, fisher=T)  #rows then/over columns
 
 
+RECODE <-
+  SURVEY %>% 
+  select( BIRTHSEX, TACTILE_INSTRUCTION_FROM_FEMALES, TACTILE_INSTRUCTION_FROM_MALES ) %>% 
+    
+  mutate_at( vars( contains("TACTILE_INST")), funs( case_when (is.na(.) ~ NA_character_,
+                                                         . %in% c('Often', 'Rarely') ~ 'Yes',
+                                                           TRUE ~ 'No')))
 
 
 
 plot_xtab(SURVEY$BIRTHSEX, SURVEY$TACTILE_INSTRUCTION_FROM_MALES, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          title = "Tactile Instruction from Male Teachers by Birth Sex",
+          title = "Tactile Instruction from Male Teachers by Birth Sex (3 Levels)",
           axis.titles = "Birth Sex", 
           legend.title= "Tactile Instruction from Males?",
           geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
+plot_xtab(RECODE$BIRTHSEX, RECODE$TACTILE_INSTRUCTION_FROM_MALES, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Tactile Instruction from Male Teachers by Birth Sex (2 Levels)",
+          axis.titles = "Birth Sex", 
+          legend.title= "Tactile Instruction from Males?",
+          geom.colors = c("#006cc5", "#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
 
@@ -1603,12 +1661,23 @@ plot_xtab(SURVEY$BIRTHSEX, SURVEY$TACTILE_INSTRUCTION_FROM_MALES, margin = "row"
 
 plot_xtab(SURVEY$BIRTHSEX, SURVEY$TACTILE_INSTRUCTION_FROM_FEMALES, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
-          title = "Tactile Instruction from Females Teachers by Birth Sex",
+          title = "Tactile Instruction from Female Teachers by Birth Sex (3 Levels)",
           axis.titles = "Birth Sex", 
           legend.title= "Tactile Instruction from Females?",
           geom.colors = c("#006cc5","lightblue", "#cbcccb"), 
           show.summary = TRUE )+ 
   set_theme(base= theme_classic())
+
+
+plot_xtab(RECODE$BIRTHSEX, RECODE$TACTILE_INSTRUCTION_FROM_FEMALES, margin = "row", 
+          bar.pos = "stack", coord.flip = TRUE, 
+          title = "Tactile Instruction from Female Teachers by Birth Sex (2 Levels)",
+          axis.titles = "Birth Sex", 
+          legend.title= "Tactile Instruction from Females?",
+          geom.colors = c("#006cc5", "#cbcccb"), 
+          show.summary = TRUE )+ 
+  set_theme(base= theme_classic())
+
 
 ```
 
