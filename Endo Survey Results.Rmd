@@ -4370,7 +4370,7 @@ pairs.panels( codeswitch, pch=21, stars=T )
 <br>
 <br>
 
-```{r PLAYGROUND-CODESWITCH2,  fig.align='center', fig.dim= c(16,12) }
+```{r PLAYGROUND-CODESWITCH2,  fig.align='center' }
 
 cs <-
 rbind( 
