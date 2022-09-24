@@ -4372,6 +4372,7 @@ pairs.panels( codeswitch, pch=21, stars=T )
 
 ```{r PLAYGROUND-CODESWITCH2,  fig.align='center' }
 
+
 cs <-
 rbind( 
       summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ BIRTHSEX , data=TEST, family=binomial(link='logit')), spec='BIRTHSEX', reverse=T),
@@ -4389,10 +4390,30 @@ rbind(
       
       summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ RACE2 , data=TEST, family=binomial(link='logit')), spec='RACE2', reverse=T),
                        list('Unadj OR: Non-Whites vs Whites CODE.SWITCH=Y' = c( -1, 1))), infer=T) %>% 
-        tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)) )
+        tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)) ,
 
 
-cs$metric = c('Sex=F', "Height < 5'7", 'Training < Advanced', 'Race=Non-White')
+
+    summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ F1.TRNG.FEEDBACK.SENSITIVITY , data=TEST, family=binomial(link='logit')), spec='F1.TRNG.FEEDBACK.SENSITIVITY', reverse=T),
+                     list('Unadj OR: TRNG.FBACK.SENS= N &  CODE.SWITCH=Y' = c( 1, -1))), infer=T) %>% 
+      tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)) ,
+    
+    summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ F2.RESPECT.CONFIDENCE , data=TEST, family=binomial(link='logit')), spec='F2.RESPECT.CONFIDENCE', reverse=T),
+                     list('Unadj OR: RESPECT.CONFIDENCE= N &  CODE.SWITCH=Y' = c( 1, -1))), infer=T) %>% 
+      tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)) ,
+    
+    summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ F3.NURSE.COOP , data=TEST, family=binomial(link='logit')), spec='F3.NURSE.COOP', reverse=T),
+                     list('Unadj OR: NURSE.COOP= N &  CODE.SWITCH=Y' = c( 1, -1))), infer=T) %>% 
+      tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)) ,
+    
+    summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ F9.PAIN , data=TEST, family=binomial(link='logit')), spec='F9.PAIN', reverse=T),
+                     list('Unadj OR: TRANSIENT.PAIN= Y &  CODE.SWITCH=Y' = c( -1, 1))), infer=T) %>% 
+      tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)) )
+
+
+cs$metric = c('Sex= F', "Height < 5'7", 'Training < Advanced', 'Race= Non-White', "Trained w/Sensitivity = N",
+              "Respected & Confident = N", "Nurses Cooperative = N", "Transient Pain = Y")
+
 
 #print(cs)
 
