@@ -4332,7 +4332,8 @@ tab_model( frot9.lm5,
 <br>
 
 - The regression summary above charts what happens to the coefficient of the variable BIRTHSEX when it is used to predict the factor PAIN.  Unadjusted, the coefficient starts at 0.41. The next six models show what happens if only *one* intervention is made:  For example, adding a *standard* apron increases the coefficient to 0.43 (i.e., increases the likelihood of PAIN). But the next single-step interventions (red underscores) - using a lightweight apron, improving trainee confidence, treating trainees with respect, having nurses be more cooperative, and training with sensitivity and appropriate feedback - each reduces the coefficient to as low as 0.34.   In the next models (blue underscores), we see what happens when we (1) include *all* the aforementioned interventions (coefficient drops to 0.30); (2) include the Tactile Training factor, which is positively correlated with the Pain factor (coefficient drops further to 0.27); and (3) adjust further for HEIGHT (which is so correlated with BIRTHSEX that it must be included to confirm a true sex effect), and Training Level.  The final model, which includes all these covariates, has a coefficient of 0.31 and our variable of interest, BIRTHSEX, has maintained its significance throughout (whereas HEIGHT and TRAINING_LEVEL did not, according to the Type 3 Anova table, not shown).
-- <b>Final Takeaway:</b>  Training with Sensitivity + Respect from Sr. ES Staff + Cooperative Nurses + Lightweight Aprons signficiantlyreduce the likelihood of Pain relative to Sex, even after adjusting for Height and Training Level.
+- <b>Final Takeaway:</b>  Training with Sensitivity + Respect from Sr. ES Staff + Cooperative Nurses + Lightweight Aprons signficiantly
+reduce the likelihood of Pain relative to Sex, even after adjusting for Height and Training Level.
 
 
 <br>
@@ -4347,14 +4348,14 @@ tab_model( frot9.lm5,
 
 - This solution is very similar to the one above, except that it includes two questions that were originally ignored due to their perceived limited scope (i.e., questions regarding whether trainees were more or less likely to use Dial Extenders in front of a male or female instructor, as 70% of trainees reported not even using Dial Extenders).  With the addition of these two new questions, and by holiding the number of factors requested constant at nine factors, we noticed that the "Respect" and "Trainee Confidence" factors were "reunited" to form one solid, reliable factor (identical to what was observed in the previously discussed Varimax-rotated solutions).  It should be noted that the scoring of these questions included *all* subjects, not just those reporting having used Dial Extenders -- so *every* respondent contributed in some way to the factor loadings and scores involving these new two questions.
 - By including these two questions, we may have stumbled upon an important factor that can be best described as `"Code Switching."`  While the term is typically used in the context of cultural linguistics, "Code Switching" here is meant to imply that some trainees may act one way in front of one audience (i.e., "their people") and another way in front of perceived figures of authority (or simply in front of instructors who are different from them).
-- Another way of looking at this:  Code Switchers are "people pleasers" who are not inclined to "rock the boat."  And according to the correlation matrix above, they do not appear to command respect from ES Staff, do not perceive nurses as cooperative, are not vocal about ill-fitting lightweight or standard issue aprons, do not feel that they are trained with sensitivity/adequuate feedback (possibly because they do not insist on it), and as a result, they have high correlation with reported incidences of transient pain and injury.
+- Another way of looking at this:  Code Switchers are "people pleasers" who are not inclined to "rock the boat."  And according to the correlation matrix above, they do not appear to command respect from ES Staff, do not perceive nurses as cooperative, are not vocal about ill-fitting lightweight or standard issue aprons, do not feel that they are trained with sensitivity/adequate feedback (possibly because they do not insist on it), and as a result, they have high correlation with reported incidences of transient pain and injury.
 
 <br>
 <br>
 
 
 
-```{r PLAYGROUND-CROSSWITCH,   fig.align='center', fig.dim= c(16,12)}
+```{r PLAYGROUND-CODESWITCH,   fig.align='center', fig.dim= c(12,12)}
 
 
 pairs.panels( codeswitch, pch=21, stars=T )
@@ -4365,6 +4366,79 @@ pairs.panels( codeswitch, pch=21, stars=T )
 <br>
 
 - The factor `F4.CODE.SWITCH` is highly correlated with SEX (females), and HEIGHT (shorter trainees), and less correlated with TRAINING_LEVEL (where, it seems to be more positively associated with First-Year & Second-Year trainees -- "Advanced" is the reference category, and as such, its bar appears first in the histogram).  It is *not* correlated at all with RACE, however (where RACE is a binary variable, Whites vs. Non-Whites -- it is higher among Non-Whites, but not statistically).
+
+<br>
+<br>
+
+```{r PLAYGROUND-CODESWITCH2,  fig.align='center', fig.dim= c(16,12) }
+
+cs <-
+rbind( 
+      summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ BIRTHSEX , data=TEST, family=binomial(link='logit')), spec='BIRTHSEX', reverse=T),
+                       list('Unadj OR: Females vs Males CODE.SWITCH=Y' = c( -1, 1))), infer=T) %>% 
+        tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)) ,
+      
+      summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ HEIGHT2 , data=TEST, family=binomial(link='logit')), spec='HEIGHT2', reverse=T),
+                       list("Unadj OR: 5'-5'6 vs 5'7-6'4 CODE.SWITCH=Y" = c( 0, 1/2, 1/2, -1/3 , -1/3, -1/3, 0))), infer=T) %>% 
+        tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)),
+      
+      summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ TRAINING_LEVEL , data=TEST, family=binomial(link='logit')), spec='TRAINING_LEVEL', reverse=T),
+                       list('Unadj OR: First & Second Yr vs Advanced CODE.SWITCH=Y' = c( -1, 1/2, 1/2))), infer=T) %>% 
+        tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)),
+      
+      
+      summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ RACE2 , data=TEST, family=binomial(link='logit')), spec='RACE2', reverse=T),
+                       list('Unadj OR: Non-Whites vs Whites CODE.SWITCH=Y' = c( -1, 1))), infer=T) %>% 
+        tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)) )
+
+
+cs$metric = c('Sex=F', "Height < 5'7", 'Training < Advanced', 'Race=Non-White')
+
+#print(cs)
+
+# Plot
+
+cs %>% arrange( (OR.EXP)) %>% 
+  mutate ( yAxis = row_number(), 
+           signif = case_when( p.value < 0.001 ~ "***",
+                               p.value < 0.01 ~ "**",
+                               p.value < 0.05 ~ "*",
+                               p.value < 0.10 ~ "~",
+                               TRUE ~ 'NS')) %>% 
+  relocate(yAxis, .before=  contrast) %>% 
+  relocate(signif, .after= p.value) %>% 
+ggplot( ., aes(x = OR.EXP, y = factor(metric, level = metric)) ) +
+  
+  geom_vline(aes(xintercept = 1), size = 1, linetype = "solid", color= "darkred") +
+  geom_errorbarh(aes(xmax = UCL.EXP, xmin = LCL.EXP), size = 2, height = .1, color = "darkgrey", alpha=0.3) +
+  geom_point(size = 4, color = "dodgerblue", alpha=0.5) +
+  theme_538() +
+  theme(panel.grid.minor = element_blank()) +
+  scale_y_discrete (breaks = cs$metric, labels = cs$metric ) +
+  scale_x_continuous(breaks = seq(-1,13,1) ) + 
+  geom_text(data = ~., aes(label = paste(round(OR.EXP,2), signif, sep= " "), 
+                          y = metric, 
+                          x= OR.EXP+0.15), size=4, color="dodgerblue", fontface="bold.italic", nudge_y= 0.15, nudge_x= 0.25)+
+  
+ ylab("")+
+  xlab("Odds Ratio")+
+  ggtitle("Likely Characteristics of Code Switchers")+
+  theme(plot.title =   element_text(color = "black", size = 14, face = "bold", hjust= 0.5))+
+  theme(plot.subtitle= element_text(color = "black", size = 10, face = "bold", hjust= 0.5))
+
+
+```
+
+<br>
+<br>
+
+- Since all factors have a mean of zero, it is simple to convert them to binary variables, where 0=No and 1=Yes, relative to each factor, making running logistic regessions on these factors quite simple
+- If we were to try to use odds ratios to predict the profile of these so-called "Code Switchers," we might find that the . . ..
+
+    - The odds of them being under 5'7" is about 5.21
+    - The odds of them being Female is about 4.76
+    - The odds of them being either a First- or Second-Year trainnee is 2.71
+    - The odds of them trending Non-White is 1.28 (although this result is not statistically significant)
 
 <br>
 <br>
