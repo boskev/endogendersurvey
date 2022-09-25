@@ -4294,22 +4294,30 @@ tab_model( frot9.lm5,
 
 
 - The factor analysis solutions above were based on *orthogonal* rotations, ones where the resulting factors were uncorrelated
-- The following factor solutions are based on *oblique* rotations, ones that allows the factors to retain any correlation they may exhibit among each other
+- The following factor solutions are based on *oblique* rotations, ones that allow the factors to retain any correlation they may exhibit among each other
 - Oblique rotations (e.g., olbimin or Promax), allow the factors themselves to be regressed onto each other to explore answers to certain research questions that are not driven solely by categorical covariates such as SEX, HEIGHT, GLOVE or RACE
 - Various factoring methods were tested - Principal Axis (PA), Minimum Residual (MINRES), Weighted Least Squares (WLS), and Maximum Likelihood Estimation (MLE) - with the last (MLE) being the method used in both these solutions
 - For the sake of brevity, the results of only two nine-factor `Promax` solutions are displayed below.  Each has passed certain key model fit and consistency/reliability tests:
 
-    - Each solution has an overall KMO greater than 0.65
-    - Each solution explains at least 40% of the overall variance
+    - Each solution has an overall KMO greater than 0.67
+    - Each solution explains at least 42% of the overall variance
     - Each solution has a Tucker-Lewis Index (TMI) greater than 0.92 and a Root Mean Standard Error Approximation (RMSEA) less than 0.3
     - Each solution was evaluated for *overall* consistency/reliability using Cronbach's Alpha, Greatest Lower Bound, and Omega; and each scored greater than 0.70 on each of these tests
-    - The individual factors themselves for each solution were evaluated for consistency/reliability, and none scored lower than 0.60 on any of the three aforementioned tests
+    - The individual factors themselves for each solution were evaluated for consistency/reliability, and none scored lower than 0.60 on any of the three aforementioned tests (both solutions produced eight factors that scored above the 0.70, but each solution produced *only one factor* that was between 0.60 and 0.69)
 
 
 <br>
 <br>
 
 #### Promax Solution 1:  9-Factors (41 of 54 variables included in final factor load)
+
+<br>
+<br>
+
+
+![MLE Factor Analysis: Promax Rotation with 9 factors produced from 41 questions](images/Promax9-41Q.png)
+<br>
+<br>
 
 ![Correlation Matrix for Promax-9-DialExt](images/PA Factor Analysis - 9-Factor PROMAX Corrmatrix (Median Substitution DIALEXT).png)
 
@@ -4341,6 +4349,15 @@ reduce the likelihood of Pain relative to Sex, even after adjusting for Height a
 
 #### Promax Solution 2:  9-Factors (43 of 54 variables included in final factor load)
 
+<br>
+<br>
+
+
+![MLE Factor Analysis: Promax Rotation with 9 factors produced from 43 questions](images/Promax9-43Q.png)
+
+<br>
+<br>
+
 ![Correlation Matrix for Promax-9-CodeSwitch](images/PA Factor Analysis - 9-Factor PROMAX Corrmatrix (Median Substitution CODESWITCH).png)
 
 
@@ -4355,7 +4372,7 @@ reduce the likelihood of Pain relative to Sex, even after adjusting for Height a
 
 
 
-```{r PLAYGROUND-CODESWITCH,   fig.align='center', fig.dim= c(12,12)}
+```{r PLAYGROUND-CODESWITCH,   fig.align='center'}
 
 
 pairs.panels( codeswitch, pch=21, stars=T )
