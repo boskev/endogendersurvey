@@ -898,7 +898,7 @@ plot_xtab(SURVEY$TRAINING_LEVEL,SURVEY$EVER_INJURED,  margin = "row",
   summary(injury.trng.glm)
   
   
-  #Test to see whether Training Level is a significnat effect overall:
+  #Test to see whether Training Level is a significant effect overall:
   
   aod::wald.test(b = coef(injury.trng.glm), Sigma = vcov(injury.trng.glm), Terms = 2:3)
   injury.trng.emmeans <- emmeans( injury.trng.glm,  ~ c(TRAINING_LEVEL), type= "response")
@@ -4470,8 +4470,8 @@ ggplot( ., aes(x = OR.EXP, y = factor(metric, level = metric)) ) +
 <br>
 <br>
 
-- Since all factors have a mean of zero, it is simple to convert them to binary variables, where 0=No and 1=Yes, relative to each factor, making running logistic regessions on these factors quite simple
-- If we were to try to use odds ratios to predict the profile of these so-called "Code Switchers," we might find that the . . ..
+- Since all factors have a mean of zero, it is simple to convert them to binary variables (where 0=No and 1=Yes), making running logistic regressions on these factors quite simple
+- If we were to use the resulting odds ratios to inform the profile of these so-called "Code Switchers," we might find that the . . . .
 
     - The odds of them being under 5'7" is about 5.21
     - The odds of them being Female is about 4.76
@@ -4480,7 +4480,7 @@ ggplot( ., aes(x = OR.EXP, y = factor(metric, level = metric)) ) +
     - The odds of them feeling that they were *not* trained with sensitivity and adequate feedback is 3.17
     - The odds of them finding that nurses are not cooperative is 1.93
     - The odds of them having reported incidences of transient pain or injury is about 4.00
-    - The odds of them trending Non-White is 1.28 (although this result is not statistically significant)
+    - The odds of them being Non-White is 1.28 (although this result is the only one tested that tis *not* statistically significant)
     
 - (In the above logistic regression calculations the `F4.CODE.SWITCH` factor is the *response* variable (Factor 4 = 1, or "Yes"))
 
