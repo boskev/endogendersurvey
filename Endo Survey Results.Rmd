@@ -4480,7 +4480,7 @@ ggplot( ., aes(x = OR.EXP, y = factor(metric, level = metric)) ) +
     - The odds of them feeling that they were *not* trained with sensitivity and adequate feedback is 3.17
     - The odds of them finding that nurses are not cooperative is 1.93
     - The odds of them having reported incidences of transient pain or injury is about 4.00
-    - The odds of them being Non-White is 1.28 (although this result is the only one tested that tis *not* statistically significant)
+    - The odds of them being Non-White is 1.28 (although this result is the only one tested that is *not* statistically significant)
     
 - (In the above logistic regression calculations the `F4.CODE.SWITCH` factor is the *response* variable (Factor 4 = 1, or "Yes"))
 
