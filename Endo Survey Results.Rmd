@@ -360,9 +360,123 @@ glimpse(SURVEY)
 
 ```
 
+ 
+<br>
+<br>
+
+#### Do we have a large enough sample to adequate "power" our analysis?
+  
+<br>  
+  
+A glimpse of our scrubbed data shows that we have 236 observations, one for each respondent to our survey.  Is this sample size large enough to power the analyses that we wish to conduct?  It might be helpful to establish that now, especially considering that some observations may be dropped (due to missingness, skew, or the subject having provided an answer that slipped through any validation guardrails that were established beforehand).
+
+Since most of our analyses will be done using the Chi-Square statistic, let's start there.  Below are the results of power calculations for a **"medium effect size" (0.3)**, based off Cohen's effect size calculation.  We use this 0.3 threshold to test how many subjects would be required for 90% power (80% is the standard threshold, but we want to be a bit more aggressive here) based on four Chi-Square Scenarios:
+
+- A 2 x 2 Chi-Square (one degree of freedom): e.g., `BIRTHSEX` x a two-level categorical variable (Y/N)
+- A 2 x 3 Chi-Square (two degrees of freedom): e.g., `BIRTHSEX` x a three-level categorical variable (Y/N/Don't Know)
+- A 2 x 4 Chi-Square (three degress of freedom): e.g., `BIRTHSEX` x a four-level categorical variable (Training Level)
+- A 2 x 6 Chi-Square (five degrees of freedom): e.g., `BIRTHSEX` x a six-level categorical variable (Race)
+
+<br>
+<br>
+
+```{r COHEN-1, fig.align='center', warning= F, fig.dim= c(16,16)}
+
+require(effsize)
+require(pwr)
+  
+cohen.ES(test = "chisq", size = "medium")
+
+
+chi2<- plot(pwr.chisq.test(w=0.3, N=NULL, df=1, sig.level=0.05, power=0.9))+
+  set_theme(base= theme_apa()) +
+  geom_hline(yintercept= .80, linetype='solid', col = 'red', alpha=0.5)+
+  geom_hline(yintercept= .90, linetype='dotted', col = 'darkblue', size=1)+
+  ggtitle("Chi-Square Power Calculation - 2x2 Table")
+  
+
+chi3<- plot(pwr.chisq.test(w=0.3, N=NULL, df=2, sig.level=0.05, power=0.9))+
+  set_theme(base= theme_apa()) +
+  geom_hline(yintercept= .80, linetype='solid', col = 'red', alpha=0.5)+
+  geom_hline(yintercept= .90, linetype='dotted', col = 'darkblue', size=1)+
+    ggtitle("Chi-Square Power Calculation - 2x3 Table")
+  
+chi4<- plot(pwr.chisq.test(w=0.3, N=NULL, df=3, sig.level=0.05, power=0.9))+
+          set_theme(base= theme_apa()) +
+  geom_hline(yintercept= .80, linetype='solid', col = 'red', alpha=0.5)+
+  geom_hline(yintercept= .90, linetype='dotted', col = 'darkblue', size=1)+
+         ggtitle("Chi-Square Power Calculation - 2x4 Table")
+
+chi6<- plot(pwr.chisq.test(w=0.3, N=NULL, df=5, sig.level=0.05, power=0.9))+
+  set_theme(base= theme_apa()) +
+  geom_hline(yintercept= .80, linetype='solid', col = 'red', alpha=0.5)+
+  geom_hline(yintercept= .90, linetype='dotted', col = 'darkblue', size=1)+
+  ggtitle("Chi-Square Power Calculation - 2x6 Table")
+
+wrap_plots(chi2,chi3,chi4, chi6)
+
+```
+
+<br>
+
+Based off these calculations, the maximum number of subjects required to achieve a "moderate effect size" with 90% power in the types of Chi-Square analyses we aim to perform is 183 -- and we have approximately 23% more subjects than that.  So we're good to go as far as Chi-Squares are concerned. 
+
+Since what constitutes a "moderate effect size" can change depending on the type of statistical test being performed, below are the results of a power calculation for a two-tailed T-test, ANOVA (four-level categorical variable),  Pearson correlations, and the F-test from multivariate regression analyses:
+
+<br>
+
+```{r COHEN-2, fig.align='center', fig.dim= c(16,16)}
+
+
+require(effsize)
+require(pwr)
+
+
+#T-Test
+cohen.ES(test = "t", size="medium")
+tpower <- plot(pwr.t.test(n=NULL, d=0.5, sig.level=0.05, power=0.9, type="two.sample"))+
+  set_theme(base= theme_apa()) +
+  geom_hline(yintercept= .80, linetype='solid', col = 'red', alpha=0.5)+
+  geom_hline(yintercept= .90, linetype='dotted', col = 'darkblue', size=1)+
+  ggtitle("Two-Sampe T-Test Power Calculation")
+
+
+#ANOVA - 4 group assumption
+cohen.ES(test= "anov", size="medium")
+apower<- plot(pwr.anova.test( k=4, n=NULL, f=0.25, sig.level=.05,power=.9))+
+  set_theme(base= theme_apa()) +
+  geom_hline(yintercept= .80, linetype='solid', col = 'red', alpha=0.5)+
+  geom_hline(yintercept= .90, linetype='dotted', col = 'darkblue', size=1)+
+  ggtitle("One-Way ANOVA Power Calculation (4-level variable)")
+
+cohen.ES(test= "r", size="medium")
+rpower <-plot(pwr.r.test(n=NULL, r=0.3, sig.level=0.5, power=0.9))+
+  set_theme(base= theme_apa()) +
+  geom_hline(yintercept= .80, linetype='solid', col = 'red', alpha=0.5)+
+  geom_hline(yintercept= .90, linetype='dotted', col = 'darkblue', size=1)+
+  ggtitle("Correlation Power Calculation (arctangh transformation")
+
+wrap_plots( tpower, apower, rpower)
+
+
+cohen.ES(test= "f2", size="medium")
+pwr.f2.test(u=8, v=NULL, f2= .15, sig.level=0.05, power=0.9)
+
+
+```
+
+<br>
+
+Once again, based off these calculations, our sample size of 236 seems to be more than adequate to perform these types of analyses and to adequately test for a "medium effect," if a significant result is found.
+
+(Note that the results for multivariate regression could not be graphed, but according to the `cohen.ES` function from the `effsize` package, a regression with eight covariates (not likely, but assumed here for conservatism), requires about 126 subjects to achieve a "medium effect."
+
+<br>
+<br>
 
 ***
 ***
+
 
 #### DEMOGRAPHIC DATA
 
