@@ -2308,8 +2308,8 @@ ggbetweenstats( data= CORRECT,
                 y = COUNT_CORRECT,
                 type="parametric",
                 p.adjust.method = "none",
-                title = "Mean Scores by Birth Sex")
-
+                title = "Mean Scores by Birth Sex", 
+                bf.message=F)
 
 Anova( lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT), type=3)
 pairs(emmeans(lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT), spec='TRAINING_LEVEL'), adjust='BH')
@@ -2324,7 +2324,8 @@ ggbetweenstats( data= CORRECT,
                 y = COUNT_CORRECT,
                 type="parametric",
                 p.adjust.method = "BH",
-                title = "Mean Scores by Training Level (3)")
+                title = "Mean Scores by Training Level (3)", 
+                bf.message=F)
 
 CORRECT3 <-
     CORRECT %>% 
@@ -2350,7 +2351,10 @@ ggbetweenstats( data= CORRECT3,
                 y = COUNT_CORRECT,
                 type="parametric",
                 p.adjust.method = "BH",
-                title = "Mean Scores by Training Level (4)")
+                title = "Mean Scores by Training Level (4)", 
+                bf.message=F)
+
+
 
 ```
 
