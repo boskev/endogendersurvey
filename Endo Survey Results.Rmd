@@ -2311,7 +2311,12 @@ ggbetweenstats( data= CORRECT,
                 title = "Mean Scores by Birth Sex", 
                 bf.message=F)
 
-Anova( lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT), type=3)
+
+#bartlett.test( COUNT_CORRECT ~  TRAINING_LEVEL , data = CORRECT3)
+#Anova( lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT), type=3)
+
+#Welch's Anova - to match ggbetween stats (unequal variances assumed in plot)
+oneway.test(COUNT_CORRECT ~ TRAINING_LEVEL, data = CORRECT, var.equal = FALSE)
 pairs(emmeans(lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT), spec='TRAINING_LEVEL'), adjust='BH')
 
 # Mean for First Years compared to All Other Years
@@ -2339,7 +2344,11 @@ CORRECT3 <-
 
 
 
-Anova( lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT3), type=3)
+#bartlett.test( COUNT_CORRECT ~  TRAINING_LEVEL , data = CORRECT3)
+#Anova( lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT3), type=3)
+
+#Welch's Anova - to match ggbetweenstats (unequal variances assumed in plot)
+oneway.test(COUNT_CORRECT ~ TRAINING_LEVEL, data = CORRECT3, var.equal = FALSE)
 pairs(emmeans(lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT3), spec='TRAINING_LEVEL'), adjust="BH")
 
 # Mean for First Years compared to All Other Years
