@@ -2314,6 +2314,9 @@ ggbetweenstats( data= CORRECT,
 Anova( lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT), type=3)
 pairs(emmeans(lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT), spec='TRAINING_LEVEL'), adjust='BH')
 
+# Mean for First Years compared to All Other Years
+contrast(emmeans(lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT), spec='TRAINING_LEVEL'),
+         list('Unadj Means First Yr vs All Others' = c( 1, -1/2, -1/2)))
 
 
 ggbetweenstats( data= CORRECT,
@@ -2338,6 +2341,10 @@ CORRECT3 <-
 Anova( lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT3), type=3)
 pairs(emmeans(lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT3), spec='TRAINING_LEVEL'), adjust="BH")
 
+# Mean for First Years compared to All Other Years
+contrast(emmeans(lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT3), spec='TRAINING_LEVEL'),
+         list('Unadj Means First Yr vs All Others' = c( 1, -1/3, -1/3, -1/3)))
+
 ggbetweenstats( data= CORRECT3,
                 x = TRAINING_LEVEL,
                 y = COUNT_CORRECT,
@@ -2346,6 +2353,11 @@ ggbetweenstats( data= CORRECT3,
                 title = "Mean Scores by Training Level (4)")
 
 ```
+
+<br>
+<br>
+
+- **Conclusion:  ** When adjusted for multiple comparisons, the means among the various levels of the variable `TRAINING_LEVEL` are not statistically significant.  This analysis holds true whether `TRAINING_LEVEL` is stratified by three levels (p=0.013) or by four levels (p=0.027).  The mean is lowest among First Year trainees, but after the second year, the mean seems to peak and level off.  It may be worth noting that if the mean for First Year trainees is contrasted against the mean *for all other trainees combined,* it is significant if `TRAINING_LEVEL` is a three-level variable (p=0.0416) but not significant if `TRAINING_LEVEL` is a four-level variable (p=0.0714).
 
 <br>
 <br>
