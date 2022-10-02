@@ -2277,6 +2277,20 @@ plot_xtab(SURVEY$BIRTHSEX, SURVEY$WHEN_DISABILITY_INSURANCE, margin = "row",
 #   rowwise() %>%
 #   mutate(COUNT_CORRECT = sum(c_across( ERGONOMIC_IMPORTANCE: WHEN_DISABILITY_INSURANCE ) == "Correct"))
 
+```
+
+
+
+<br>
+<br>
+
+
+#### Ergo Quiz Score Results by BIRTHSEX and by TRAINING LEVEL:
+
+<br>
+
+```{r CROSSTAB-ERGO-QUIZ-RESULTS, warning= F }
+
 
 CORRECT <-
    SURVEY %>% 
@@ -2297,9 +2311,51 @@ ggbetweenstats( data= CORRECT,
                 title = "Mean Scores by Birth Sex")
 
 
+Anova( lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT), type=3)
 
-# Did subjects who self-reported having ERGO OPTIM knowlege do better on Quiz?
 
+
+
+ggbetweenstats( data= CORRECT,
+                x = TRAINING_LEVEL,
+                y = COUNT_CORRECT,
+                type="parametric",
+                p.adjust.method = "none",
+                title = "Mean Scores by Training Level (3)")
+
+CORRECT3 <-
+    CORRECT %>% 
+      select( RECORD_ID, BIRTHSEX, TLEVEL=TRAINING_LEVEL, COUNT_CORRECT) %>% 
+      left_join( GENDER_DIFF_DATA_LABELS[, c("RECORD_ID", "TRAINING_LEVEL")], by="RECORD_ID") %>% 
+      mutate(TRAINING_LEVEL = factor (TRAINING_LEVEL, levels= c('First year fellow','Second year fellow', 'Third year fellow', 'Advanced fellow')),
+             TRAINING_LEVEL = recode_factor( TRAINING_LEVEL, 'First year fellow'= 'First Year', 
+                                                            'Second year fellow'= 'Second Year', 
+                                                            'Third year fellow' = 'Third Year', 
+                                                            'Advanced fellow' = "Advanced", .ordered = T))
+
+
+
+Anova( lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT3), type=3)
+
+
+ggbetweenstats( data= CORRECT3,
+                x = TRAINING_LEVEL,
+                y = COUNT_CORRECT,
+                type="parametric",
+                p.adjust.method = "none",
+                title = "Mean Scores by Training Level (4)")
+
+```
+
+<br>
+<br>
+
+
+#### Did subjects who self-reported having ERGO OPTIM knowlege do better on Quiz?
+
+<br>
+
+```{r CROSSTAB-ERGO-QUIZ-RESULTS2, warning= F }
 
 plot_xtab(CORRECT$COUNT_CORRECT, CORRECT$ERGO_KNOWLEDGE_SELF_REPORT, margin = "row", 
           bar.pos = "stack", coord.flip = TRUE, 
@@ -2324,6 +2380,10 @@ plot_xtab(CORRECT$COUNT_CORRECT, CORRECT$ERGO_OPTIMIZATION, margin = "row",
 
 
 ```
+
+
+<br>
+<br>
 
 ***
 ***
