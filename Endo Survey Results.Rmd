@@ -2312,7 +2312,7 @@ ggbetweenstats( data= CORRECT,
 
 
 Anova( lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT), type=3)
-
+pairs(emmeans(lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT), spec='TRAINING_LEVEL'), adjust='BH')
 
 
 
@@ -2320,7 +2320,7 @@ ggbetweenstats( data= CORRECT,
                 x = TRAINING_LEVEL,
                 y = COUNT_CORRECT,
                 type="parametric",
-                p.adjust.method = "none",
+                p.adjust.method = "BH",
                 title = "Mean Scores by Training Level (3)")
 
 CORRECT3 <-
@@ -2336,13 +2336,13 @@ CORRECT3 <-
 
 
 Anova( lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT3), type=3)
-
+pairs(emmeans(lm( COUNT_CORRECT ~ TRAINING_LEVEL, data=CORRECT3), spec='TRAINING_LEVEL'), adjust="BH")
 
 ggbetweenstats( data= CORRECT3,
                 x = TRAINING_LEVEL,
                 y = COUNT_CORRECT,
                 type="parametric",
-                p.adjust.method = "none",
+                p.adjust.method = "BH",
                 title = "Mean Scores by Training Level (4)")
 
 ```
