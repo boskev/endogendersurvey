@@ -421,7 +421,7 @@ wrap_plots(chi2,chi3,chi4, chi6)
 
 Based off these calculations, the maximum number of subjects required to achieve a "moderate effect size" with 90% power in the types of Chi-Square analyses we aim to perform is 183 -- and we have approximately 23% more subjects than that.  So we're good to go as far as Chi-Squares are concerned. 
 
-Since what constitutes a "moderate effect size" can change depending on the type of statistical test being performed, below are the results of a power calculation for a two-tailed T-test, ANOVA (four-level categorical variable),  Pearson correlations, and the F-test from multivariate regression analyses:
+Since what constitutes a "moderate effect size" can change depending on the type of statistical test being performed, below are the results of power calculatiosn for a two-tailed T-test, ANOVA (four-level categorical variable),  Pearson correlations, and the F-test from multivariate regression analyses:
 
 <br>
 
@@ -1021,7 +1021,7 @@ plot_xtab(SURVEY$TRAINING_LEVEL,SURVEY$EVER_INJURED,  margin = "row",
   # Odds Ratio pairings:  
   pwpm( injury.trng.emmeans, reverse= T, adjust='none')
   pairs(injury.trng.emmeans, reverse=T, adjust= "none")
-  
+  pairs(injury.trng.emmeans, reverse=F, adjust= "none")
   
  # First Year Respondents seem to have the *lowest* OR (1.09)  & probability (0.0769) of Injury.
  # How do First Years compare to everyone else? How does Advanced compare to everyone else?  
@@ -1040,7 +1040,9 @@ plot_xtab(SURVEY$TRAINING_LEVEL,SURVEY$EVER_INJURED,  margin = "row",
 
 <br>
 
-- **Interpretation:**  `TRAINING_LEVEL` is *not* a significant effect in predicting the likelihood of Injury `EVER_INJURED`.  Despite the facts that (1) the prevalence of self-reported injuries *increases* with each step of `Training Level` (First Years are the least likely to be injured (OR=1.09), compared to Second Years (OR=1.23) and Advanced respondents (OR=1.22); and (2) Second Years & Advanced respondents have a higher likelihood of injury when compared against all other groups, none of these results is statistically significant.
+- **Interpretation:**  `TRAINING_LEVEL` is *not* a significant effect in predicting the likelihood of Injury `EVER_INJURED`.  Despite the facts that (1) the prevalence of self-reported injuries *increases* with each step of `Training Level` (First Years are the least likely to be injured (odds=1.09 or 9%), compared to Second Years (odds=1.23 or 23%) and Advanced respondents (odds=1.22 or 23%); and (2) Second Years & Advanced respondents have a higher likelihood of injury when compared against all other groups, none of these results is statistically significant.  
+
+- [Odds, not odds ratios, are calculated as the *probability* of an event occurring divided by the probability of that event not occurring.  In the case of First Years:  0.0769 / (1 - 0.0769) = 0.0833, which when exponentiated yields 1.0869 -- which can be expressed as a rounded percentage (+9%) or a rounded factor (1.09).]
 
 - The result that most closely approaches significance is "First Year Odds vs. All other Training Levels," where with an OR of 0.417, First Years have an approximate 58% *reduced* chance of injury compared to their senior counterparts.  (Due to fewer hours worked?  Due to the nature of the role, which requires more observation and less practical/tactical interaction?)
 
