@@ -4717,17 +4717,19 @@ ggplot( ., aes(x = OR.EXP, y = factor(metric, level = metric)) ) +
 <br>
 
 - Since all factors have a mean of zero, it is simple to convert them to binary variables (where 0=No and 1=Yes), making running logistic regressions on these factors quite simple
-- If we were to use the resulting odds ratios to inform the profile of these so-called "Code Switchers," we might find that the . . . .
+- If we were to use the resulting odds ratios to inform the profile of these so-called "Code Switchers," we might find that they are . . . .
 
-    - The odds ratio for them being under 5'7" is about 5.21
-    - The odds ratio for them being Female is about 4.76
-    - The odds ratio for them being either a First- or Second-Year trainee is 2.71
-    - The odds ratio for them feeling disrepected by ES Staff and/or unconfident is 6.41
-    - The odds ratio for them feeling that they were *not* trained with sensitivity and adequate feedback is 3.17
-    - The odds ratio for them finding that nurses are not cooperative is 1.93 
-    - The odds ratio for them having reported incidences of transient pain or injury is about 4.00
-    - The odds ratio for them using Dial Extenders is 1.83
-    - The odds ratio for them being Non-White is 1.28 (insignificant results despite significant p-value - confint includes 1)
+    - 5.21 times more likely to be **under 5' 7"**
+    - 4.76 times more likely to be **Female**
+    - 2.71 times more likely to be either a **First- or Second-Year trainee**
+    - 6.41 times more likely to be **unconfident** or feel **disrespected by ES Staff**
+    - 3,16 times more likely to feel that they were **not trained with sensitivity or with adequate feedback**
+    - 1.93 times more likely to **view nurses as uncooperative**
+    - 4.00 times more likely to **report incidences of transient pain** or outright injury
+    - 1.83 times more likley to **use Dial Extenders**
+    - 1.28 times more likely to be **Non-White** (insignificant results despite significant p-value - confint includes 1)
+    
+<br>    
     
 - (In the above logistic regression calculations the `F4.CODE.SWITCH` factor is the *response* variable (Factor 4 = 1, or "Yes"), and odds ratios are computed relative to a corresponding reference category for each test)
 
