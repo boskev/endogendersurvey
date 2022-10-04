@@ -4594,81 +4594,86 @@ pairs.panels( codeswitch, pch=21, stars=T )
 cs <-
 rbind( 
   
-      # summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ BIRTHSEX , data=TEST, family=binomial(link='logit')), spec='BIRTHSEX', reverse=T),
-      #                  list('Unadj OR: Females vs Males CODE.SWITCH=Y' = c( -1, 1))), infer=T) %>%
-      #   tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)) ,
+      summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ BIRTHSEX , data=TEST, family=binomial(link='logit')), spec='BIRTHSEX', reverse=T),
+                       list('Unadj OR: Females vs Males CODE.SWITCH=Y' = c( -1, 1))), infer=T) %>%
+        tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = exp(estimate - 1.96*SE), UCL.EXP = exp(estimate + 1.96*SE)) ,
 
-            regrid(contrast(emmeans(glm( F4.CODE.SWITCH ~ BIRTHSEX , data=TEST, family=binomial(link='logit')), spec='BIRTHSEX', reverse=T),
-                      list('Unadj OR: Females vs Males CODE.SWITCH=Y' = c( -1, 1)))) %>% tbl_df() %>% 
-                      mutate( OR.EXP = odds.ratio, LCL.EXP = OR.EXP-1.96*SE, UCL.EXP = OR.EXP+1.96*SE),
+            # regrid(contrast(emmeans(glm( F4.CODE.SWITCH ~ BIRTHSEX , data=TEST, family=binomial(link='logit')), spec='BIRTHSEX', reverse=T),
+            #           list('Unadj OR: Females vs Males CODE.SWITCH=Y' = c( -1, 1)))) %>% tbl_df() %>% 
+            #           mutate( OR.EXP = odds.ratio, LCL.EXP = OR.EXP-1.96*SE, UCL.EXP = OR.EXP+1.96*SE),
       
 
-      # summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ HEIGHT2 , data=TEST, family=binomial(link='logit')), spec='HEIGHT2', reverse=T),
-      #                  list("Unadj OR: 5'-5'6 vs 5'7-6'4 CODE.SWITCH=Y" = c( 0, 1/2, 1/2, -1/3 , -1/3, -1/3, 0))), infer=T) %>%
-      #   tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)),
+      summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ HEIGHT2 , data=TEST, family=binomial(link='logit')), spec='HEIGHT2', reverse=T),
+                       list("Unadj OR: 5'-5'6 vs 5'7-6'4 CODE.SWITCH=Y" = c( 0, 1/2, 1/2, -1/3 , -1/3, -1/3, 0))), infer=T) %>%
+        tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = exp(estimate - 1.96*SE), UCL.EXP = exp(estimate + 1.96*SE)) ,
       
-            regrid(contrast(emmeans(glm( F4.CODE.SWITCH ~ HEIGHT2 , data=TEST, family=binomial(link='logit')), spec='HEIGHT2', reverse=T),
-                    list("Unadj OR: 5'-5'6 vs 5'7-6'4 CODE.SWITCH=Y" = c( 0, 1/2, 1/2, -1/3 , -1/3, -1/3, 0)))) %>% tbl_df() %>% 
-                      mutate( OR.EXP = odds.ratio, LCL.EXP = OR.EXP-1.96*SE, UCL.EXP = OR.EXP+1.96*SE),
+            # regrid(contrast(emmeans(glm( F4.CODE.SWITCH ~ HEIGHT2 , data=TEST, family=binomial(link='logit')), spec='HEIGHT2', reverse=T),
+            #         list("Unadj OR: 5'-5'6 vs 5'7-6'4 CODE.SWITCH=Y" = c( 0, 1/2, 1/2, -1/3 , -1/3, -1/3, 0)))) %>% tbl_df() %>% 
+            #           mutate( OR.EXP = odds.ratio, LCL.EXP = OR.EXP-1.96*SE, UCL.EXP = OR.EXP+1.96*SE),
   
       
       
-      # summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ TRAINING_LEVEL , data=TEST, family=binomial(link='logit')), spec='TRAINING_LEVEL', reverse=T),
-      #                  list('Unadj OR: First & Second Yr vs Advanced CODE.SWITCH=Y' = c( -1, 1/2, 1/2))), infer=T) %>%
-      #   tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)),
+      summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ TRAINING_LEVEL , data=TEST, family=binomial(link='logit')), spec='TRAINING_LEVEL', reverse=T),
+                       list('Unadj OR: First & Second Yr vs Advanced CODE.SWITCH=Y' = c( -1, 1/2, 1/2))), infer=T) %>%
+        tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = exp(estimate - 1.96*SE), UCL.EXP = exp(estimate + 1.96*SE)) ,
 
-            regrid(contrast(emmeans(glm( F4.CODE.SWITCH ~ TRAINING_LEVEL , data=TEST, family=binomial(link='logit')), spec='TRAINING_LEVEL', reverse=T),
-                    list('Unadj OR: First & Second Yr vs Advanced CODE.SWITCH=Y' = c( -1, 1/2, 1/2)))) %>% tbl_df() %>% 
-                      mutate( OR.EXP = odds.ratio, LCL.EXP = OR.EXP-1.96*SE, UCL.EXP = OR.EXP+1.96*SE),
+            # regrid(contrast(emmeans(glm( F4.CODE.SWITCH ~ TRAINING_LEVEL , data=TEST, family=binomial(link='logit')), spec='TRAINING_LEVEL', reverse=T),
+            #         list('Unadj OR: First & Second Yr vs Advanced CODE.SWITCH=Y' = c( -1, 1/2, 1/2)))) %>% tbl_df() %>% 
+            #           mutate( OR.EXP = odds.ratio, LCL.EXP = OR.EXP-1.96*SE, UCL.EXP = OR.EXP+1.96*SE),
                    
       
-      # summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ RACE2 , data=TEST, family=binomial(link='logit')), spec='RACE2', reverse=T),
-      #                  list('Unadj OR: Non-Whites vs Whites CODE.SWITCH=Y' = c( -1, 1))), infer=T) %>% 
-      #   tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)) ,
+      summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ RACE2 , data=TEST, family=binomial(link='logit')), spec='RACE2', reverse=T),
+                       list('Unadj OR: Non-Whites vs Whites CODE.SWITCH=Y' = c( -1, 1))), infer=T) %>%
+        tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = exp(estimate - 1.96*SE), UCL.EXP = exp(estimate + 1.96*SE)) ,
 
-            regrid(contrast(emmeans(glm( F4.CODE.SWITCH ~ RACE2 , data=TEST, family=binomial(link='logit')), spec='RACE2', reverse=T),
-                    list('Unadj OR: Non-Whites vs Whites CODE.SWITCH=Y' = c( -1, 1)))) %>% tbl_df() %>% 
-                      mutate( OR.EXP = odds.ratio, LCL.EXP = OR.EXP-1.96*SE, UCL.EXP = OR.EXP+1.96*SE),
+            # regrid(contrast(emmeans(glm( F4.CODE.SWITCH ~ RACE2 , data=TEST, family=binomial(link='logit')), spec='RACE2', reverse=T),
+            #         list('Unadj OR: Non-Whites vs Whites CODE.SWITCH=Y' = c( -1, 1)))) %>% tbl_df() %>% 
+            #           mutate( OR.EXP = odds.ratio, LCL.EXP = OR.EXP-1.96*SE, UCL.EXP = OR.EXP+1.96*SE),
 
 
-    # summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ F1.TRNG.FEEDBACK.SENSITIVITY , data=TEST, family=binomial(link='logit')), spec='F1.TRNG.FEEDBACK.SENSITIVITY', reverse=T),
-    #                  list('Unadj OR: TRNG.FBACK.SENS= N &  CODE.SWITCH=Y' = c( 1, -1))), infer=T) %>% 
-    #   tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)) ,
+    summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ F1.TRNG.FEEDBACK.SENSITIVITY , data=TEST, family=binomial(link='logit')), spec='F1.TRNG.FEEDBACK.SENSITIVITY', reverse=T),
+                     list('Unadj OR: TRNG.FBACK.SENS= N &  CODE.SWITCH=Y' = c( 1, -1))), infer=T) %>%
+        tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = exp(estimate - 1.96*SE), UCL.EXP = exp(estimate + 1.96*SE)) ,
 
-            regrid(contrast(emmeans(glm( F4.CODE.SWITCH ~ F1.TRNG.FEEDBACK.SENSITIVITY , data=TEST, family=binomial(link='logit')), spec='F1.TRNG.FEEDBACK.SENSITIVITY', reverse=T),
-                     list('Unadj OR: TRNG.FBACK.SENS= N &  CODE.SWITCH=Y' = c( 1, -1)))) %>% tbl_df() %>% 
-                      mutate( OR.EXP = odds.ratio, LCL.EXP = OR.EXP-1.96*SE, UCL.EXP = OR.EXP+1.96*SE),
+            # regrid(contrast(emmeans(glm( F4.CODE.SWITCH ~ F1.TRNG.FEEDBACK.SENSITIVITY , data=TEST, family=binomial(link='logit')), spec='F1.TRNG.FEEDBACK.SENSITIVITY', reverse=T),
+            #          list('Unadj OR: TRNG.FBACK.SENS= N &  CODE.SWITCH=Y' = c( 1, -1)))) %>% tbl_df() %>% 
+            #           mutate( OR.EXP = odds.ratio, LCL.EXP = OR.EXP-1.96*SE, UCL.EXP = OR.EXP+1.96*SE),
     
     
-    # summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ F2.RESPECT.CONFIDENCE , data=TEST, family=binomial(link='logit')), spec='F2.RESPECT.CONFIDENCE', reverse=T),
-    #                  list('Unadj OR: RESPECT.CONFIDENCE= N &  CODE.SWITCH=Y' = c( 1, -1))), infer=T) %>% 
-    #   tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)) ,
+    summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ F2.RESPECT.CONFIDENCE , data=TEST, family=binomial(link='logit')), spec='F2.RESPECT.CONFIDENCE', reverse=T),
+                     list('Unadj OR: RESPECT.CONFIDENCE= N &  CODE.SWITCH=Y' = c( 1, -1))), infer=T) %>%
+        tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = exp(estimate - 1.96*SE), UCL.EXP = exp(estimate + 1.96*SE)) ,
 
-            regrid(contrast(emmeans(glm( F4.CODE.SWITCH ~ F2.RESPECT.CONFIDENCE , data=TEST, family=binomial(link='logit')), spec='F2.RESPECT.CONFIDENCE', reverse=T),
-                     list('Unadj OR: RESPECT.CONFIDENCE= N &  CODE.SWITCH=Y' = c( 1, -1)))) %>% tbl_df() %>% 
-                      mutate( OR.EXP = odds.ratio, LCL.EXP = OR.EXP-1.96*SE, UCL.EXP = OR.EXP+1.96*SE),
+            # regrid(contrast(emmeans(glm( F4.CODE.SWITCH ~ F2.RESPECT.CONFIDENCE , data=TEST, family=binomial(link='logit')), spec='F2.RESPECT.CONFIDENCE', reverse=T),
+            #          list('Unadj OR: RESPECT.CONFIDENCE= N &  CODE.SWITCH=Y' = c( 1, -1)))) %>% tbl_df() %>% 
+            #           mutate( OR.EXP = odds.ratio, LCL.EXP = OR.EXP-1.96*SE, UCL.EXP = OR.EXP+1.96*SE),
     
     
     
-    # summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ F3.NURSE.COOP , data=TEST, family=binomial(link='logit')), spec='F3.NURSE.COOP', reverse=T),
-    #                  list('Unadj OR: NURSE.COOP= N &  CODE.SWITCH=Y' = c( 1, -1))), infer=T) %>% 
-    #   tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)) ,
+    summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ F3.NURSE.COOP , data=TEST, family=binomial(link='logit')), spec='F3.NURSE.COOP', reverse=T),
+                     list('Unadj OR: NURSE.COOP= N &  CODE.SWITCH=Y' = c( 1, -1))), infer=T) %>%
+        tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = exp(estimate - 1.96*SE), UCL.EXP = exp(estimate + 1.96*SE)) ,
 
-            regrid(contrast(emmeans(glm( F4.CODE.SWITCH ~ F3.NURSE.COOP , data=TEST, family=binomial(link='logit')), spec='F3.NURSE.COOP', reverse=T),
-                     list('Unadj OR: NURSE.COOP= N &  CODE.SWITCH=Y' = c( 1, -1)))) %>% tbl_df() %>% 
-                      mutate( OR.EXP = odds.ratio, LCL.EXP = OR.EXP-1.96*SE, UCL.EXP = OR.EXP+1.96*SE),
+            # regrid(contrast(emmeans(glm( F4.CODE.SWITCH ~ F3.NURSE.COOP , data=TEST, family=binomial(link='logit')), spec='F3.NURSE.COOP', reverse=T),
+            #          list('Unadj OR: NURSE.COOP= N &  CODE.SWITCH=Y' = c( 1, -1)))) %>% tbl_df() %>% 
+            #           mutate( OR.EXP = odds.ratio, LCL.EXP = OR.EXP-1.96*SE, UCL.EXP = OR.EXP+1.96*SE),
     
-    # summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ F9.PAIN , data=TEST, family=binomial(link='logit')), spec='F9.PAIN', reverse=T),
-    #                  list('Unadj OR: TRANSIENT.PAIN= Y &  CODE.SWITCH=Y' = c( -1, 1))), infer=T) %>% 
-    #   tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = round(exp(asymp.LCL),3), UCL.EXP = exp(asymp.UCL)) 
+    summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ F9.PAIN , data=TEST, family=binomial(link='logit')), spec='F9.PAIN', reverse=T),
+                     list('Unadj OR: TRANSIENT.PAIN= Y &  CODE.SWITCH=Y' = c( -1, 1))), infer=T) %>%
+        tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = exp(estimate - 1.96*SE), UCL.EXP = exp(estimate + 1.96*SE)),
 
-            regrid(contrast(emmeans(glm( F4.CODE.SWITCH ~ F9.PAIN , data=TEST, family=binomial(link='logit')), spec='F9.PAIN', reverse=T),
-                      list('Unadj OR: TRANSIENT.PAIN= Y &  CODE.SWITCH=Y' = c( -1, 1)))) %>% tbl_df() %>% 
-                      mutate( OR.EXP = odds.ratio, LCL.EXP = OR.EXP-1.96*SE, UCL.EXP = OR.EXP+1.96*SE)     )
+            # regrid(contrast(emmeans(glm( F4.CODE.SWITCH ~ F9.PAIN , data=TEST, family=binomial(link='logit')), spec='F9.PAIN', reverse=T),
+            #           list('Unadj OR: TRANSIENT.PAIN= Y &  CODE.SWITCH=Y' = c( -1, 1)))) %>% tbl_df() %>% 
+            #           mutate( OR.EXP = odds.ratio, LCL.EXP = OR.EXP-1.96*SE, UCL.EXP = OR.EXP+1.96*SE)     )
+
+
+    summary(contrast(emmeans(glm( F4.CODE.SWITCH ~ F8.DIALEXT , data=TEST, family=binomial(link='logit')), spec='F8.DIALEXT', reverse=T),
+                     list('Unadj OR: DIALEXT= Y &  CODE.SWITCH=Y' = c( -1, 1))), infer=T) %>%
+        tbl_df() %>% mutate (OR.EXP = exp(estimate), LCL.EXP = exp(estimate - 1.96*SE), UCL.EXP = exp(estimate + 1.96*SE)) )
 
 
 cs$metric = c('Sex= F', "Height < 5'7", 'Training < Advanced', 'Race= Non-White', "Trained w/Sensitivity = N",
-              "Respected & Confident = N", "Nurses Cooperative = N", "Transient Pain = Y")
+              "Respected & Confident = N", "Nurses Cooperative = N", "Transient Pain = Y", "Uses Dial Extender = Y")
 
 
 #print(cs)
@@ -4676,7 +4681,8 @@ cs$metric = c('Sex= F', "Height < 5'7", 'Training < Advanced', 'Race= Non-White'
 # Plot
 
 cs %>% arrange( (OR.EXP)) %>% 
-  mutate ( yAxis = row_number(), 
+  mutate ( OR.EXP = round(OR.EXP,2),
+           yAxis = row_number(), 
            signif = case_when( LCL.EXP < 1 ~ 'NS',
                                p.value < 0.001 ~ "***",
                                p.value < 0.01 ~ "**",
@@ -4715,11 +4721,12 @@ ggplot( ., aes(x = OR.EXP, y = factor(metric, level = metric)) ) +
 
     - The odds ratio for them being under 5'7" is about 5.21
     - The odds ratio for them being Female is about 4.76
-    - The odds ratio for them being either a First- or Second-Year trainee is 2.71 (insignificant result despite significant p-value - confint includes 1)
+    - The odds ratio for them being either a First- or Second-Year trainee is 2.71
     - The odds ratio for them feeling disrepected by ES Staff and/or unconfident is 6.41
     - The odds ratio for them feeling that they were *not* trained with sensitivity and adequate feedback is 3.17
-    - The odds ratio for them finding that nurses are not cooperative is 1.93 (insignificant results despite signficant p-value - confint includes 1)
+    - The odds ratio for them finding that nurses are not cooperative is 1.93 
     - The odds ratio for them having reported incidences of transient pain or injury is about 4.00
+    - The odds ratio for them using Dial Extenders is 1.83
     - The odds ratio for them being Non-White is 1.28 (insignificant results despite significant p-value - confint includes 1)
     
 - (In the above logistic regression calculations the `F4.CODE.SWITCH` factor is the *response* variable (Factor 4 = 1, or "Yes"), and odds ratios are computed relative to a corresponding reference category for each test)
