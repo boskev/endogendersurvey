@@ -4501,8 +4501,8 @@ tab_model( frot9.lm5,
 - For the sake of brevity, the results of only two nine-factor `Promax` solutions are displayed below.  Each has passed certain key model fit and consistency/reliability tests:
 
     - Each solution has an overall KMO greater than 0.67
-    - Each solution explains at least 42% of the overall variance
-    - Each solution has a Tucker-Lewis Index (TMI) greater than 0.92 and a Root Mean Standard Error Approximation (RMSEA) less than 0.3
+    - Each solution explains at least 40% of the overall variance
+    - Each solution has a Tucker-Lewis Index (TMI) greater than 0.90 and a Root Mean Standard Error Approximation (RMSEA) less than 0.3
     - Each solution was evaluated for *overall* consistency/reliability using Cronbach's Alpha, Greatest Lower Bound, and Omega; and each scored greater than 0.70 on each of these tests
     - The individual factors themselves for each solution were evaluated for consistency/reliability, and none scored lower than 0.60 on any of the three aforementioned tests (both solutions produced eight factors that scored above the 0.70, but each solution produced *only one factor* that was between 0.60 and 0.69)
 
@@ -4510,25 +4510,25 @@ tab_model( frot9.lm5,
 <br>
 <br>
 
-#### Promax Solution 1:  9-Factors (41 of 54 variables included in final factor load)
+#### Promax Solution 1:  8-Factors (41 of 54 variables included in final factor load)
 
 <br>
 <br>
 
 
-![MLE Factor Analysis: Promax Rotation with 9 factors produced from 41 questions](images/Promax9-41Q.png)
+![MLE Factor Analysis: Promax Rotation with 8 factors produced from 41 questions](images/Promax8-41Q.png)
 
 <br>
 <br>
 
-![Correlation Matrix for Promax-9-DialExt](images/PA Factor Analysis - 9-Factor PROMAX Corrmatrix (Median Substitution DIALEXT).png)
+![Correlation Matrix for Promax-8-DialExt](images/PA Factor Analysis - 8-Factor PROMAX Corrmatrix (Median Substitution DIALEXT).png)
 
 
 <br>
 
-- What makes this solution interesting is that it highlights just how much of what transpires in the Endoscopy Suite hinges on the factor tentatively named **Respect-EStaff** (Respect Endoscopy Suite Staff).
+- What makes this solution interesting is that it highlights just how much of what transpires in the Endoscopy Suite hinges on the factor tentatively named **Respect-Confidence** (Respect Endoscopy Suite Staff/Trainee Confidence).
 - <b>Key Message:</b>  When there is Respect in the workplace, there is also training with sensitivity, nurses who respond on the first ask, heightened trainee confidence, and tendency to use lightweight, more comfortable aprons and dial extenders -- all correlating with a *decrease* in reports of transient pain and injury
-- By expanding to nine factors, not only did we achieve optimal TMI and RMSEA values (i.e., better model fit), we saw a schism in two factors from one of our Varimax-rotated solutions:  "Apron Fit & Availability" produced two distinct, reliable factors related to "Standard Aprons" and "Lightweight Aprons"; and "Respect Senior Staff" spun off a second factor more aptly described as "Trainee Confidence."
+- By expanding to eight factors, not only did we achieve optimal TMI and RMSEA values (i.e., better model fit compared to the Varimax rotation examples discussed previously), we saw a schism in one factor from one of our Varimax solutions:  "Apron Fit & Availability" produced two distinct, reliable factors related to "Standard Aprons" and "Lightweight Aprons."
 
 <br>
 <br>
@@ -4537,12 +4537,12 @@ tab_model( frot9.lm5,
 
 <br>
 
-![Regressions:  BIRTHSEX predicting PAIN/INJURY](images/Promax 9 - Dial Ext Regressions.png){width=1600px}
+![Regressions:  BIRTHSEX predicting PAIN/INJURY](images/Promax 8 - Dial Ext Regressions.png){width=1600px}
 
 <br>
 
-- The regression summary above charts what happens to the coefficient of the variable BIRTHSEX when it is used to predict the factor PAIN.  Unadjusted, the coefficient starts at 0.41. The next six models show what happens if only *one* intervention is made:  For example, adding a *standard* apron increases the coefficient to 0.43 (i.e., increases the likelihood of PAIN). But the next single-step interventions (red underscores) - using a lightweight apron, improving trainee confidence, treating trainees with respect, having nurses be more cooperative, and training with sensitivity and appropriate feedback - each reduces the coefficient to as low as 0.34.   In the next models (blue underscores), we see what happens when we (1) include *all* the aforementioned interventions (coefficient drops to 0.30); (2) include the Tactile Training factor, which is positively correlated with the Pain factor (coefficient drops further to 0.27); and (3) adjust further for HEIGHT (which is so correlated with BIRTHSEX that it must be included to confirm a true sex effect), and Training Level.  The final model, which includes all these covariates, has a coefficient of 0.31 and our variable of interest, BIRTHSEX, has maintained its significance throughout (whereas HEIGHT and TRAINING_LEVEL did not, according to the Type 3 Anova table, not shown).
-- <b>Final Takeaway:</b>  Training with Sensitivity + Respect from Sr. ES Staff + Cooperative Nurses + Lightweight Aprons signficiantly
+- The regression summary above charts what happens to the coefficient of the variable BIRTHSEX when it is used to predict the factor PAIN.  Unadjusted, the coefficient starts at 0.47. The next five models show what happens if only *one* intervention is made:  For example, adding a *standard* apron increases the coefficient marginally to 0.47 (i.e., increases the likelihood of PAIN). But the next single-step interventions (red underscores) - using a lightweight apron, treating trainees with respect, having nurses be more cooperative, and training with sensitivity and appropriate feedback - each reduces the coefficient to as low as 0.36.   In the next models (blue underscores), we see what happens when we (1) include *all* the aforementioned interventions (coefficient drops to 0.34); (2) include the Tactile Training factor, which is *positively* correlated with the Pain factor (coefficient drops further to 0.29); and (3) adjust further for HEIGHT (which is so strongly correlated with BIRTHSEX that it must be included to confirm a true sex effect), and Training Level.  The final model, which includes all these covariates, has a coefficient of 0.30 and our variable of interest, BIRTHSEX, has maintained its significance throughout (whereas HEIGHT and TRAINING_LEVEL did not, according to the Type 3 Anova table, not shown).
+- <b>Final Takeaway:</b>  Training with Sensitivity + Respect from Sr. ES Staff + Cooperative Nurses + Lightweight Aprons all contribute to significantly
 reduce the likelihood of Pain relative to Sex, even after adjusting for Height and Training Level.
 
 
@@ -4560,13 +4560,13 @@ reduce the likelihood of Pain relative to Sex, even after adjusting for Height a
 <br>
 <br>
 
-![Correlation Matrix for Promax-9-CodeSwitch](images/PA Factor Analysis - 9-Factor PROMAX Corrmatrix (Median Substitution CODESWITCH).png)
+![Correlation Matrix For Promax-9-CodeSwitch](images/PA Factor Analysis - 9-Factor PROMAX Corrmatrix (Median Substitution CODESWITCH).png)
 
 
 <br>
 
-- This solution is very similar to the one above, except that it includes two questions that were originally ignored due to their perceived limited scope (i.e., questions regarding whether trainees were more or less likely to use Dial Extenders in front of a male or female instructor, as 70% of trainees reported not even using Dial Extenders).  With the addition of these two new questions, and by holiding the number of factors requested constant at nine factors, we noticed that the "Respect" and "Trainee Confidence" factors were "reunited" to form one solid, reliable factor (identical to what was observed in the previously discussed Varimax-rotated solutions).  It should be noted that the scoring of these questions included *all* subjects, not just those reporting having used Dial Extenders -- so *every* respondent contributed in some way to the factor loadings and scores involving these new two questions.
-- By including these two questions, we may have stumbled upon an important factor that can be best described as `"Code Switching."`  While the term is typically used in the context of cultural linguistics, "Code Switching" here is meant to imply that some trainees may act one way in front of one audience (i.e., "their people") and another way in front of perceived figures of authority (or simply in front of instructors who are different from them).
+- This solution is very similar to the one above, except that it includes two questions that were originally ignored due to their perceived limited scope (i.e., questions regarding whether trainees were more or less likely to use Dial Extenders in front of a male or female instructor, as 70% of trainees reported not even using Dial Extenders).  By adding these two new questions for this solution and *reducing* the number of factors requested to nine factors, we were able to achieve even *better* model fit.  It should be noted that the scoring of these questions included *all* subjects, not just those reporting having used Dial Extenders -- so *every* respondent contributed in some way to the factor loadings and scores involving these new two questions.
+- As a result of these changes, we may have stumbled upon an important factor/latent variable that can be best described as `"Code Switching."`  While the term is typically used in the context of cultural linguistics, "Code Switching" here is meant to imply that some trainees may act one way in front of one audience (i.e., "their people") and another way in front of perceived figures of authority (or simply in front of instructors who are different from them).
 - Another way of looking at this:  Code Switchers are "people pleasers" who are not inclined to "rock the boat."  And according to the correlation matrix above, they do not appear to command respect from ES Staff, do not perceive nurses as cooperative, are not vocal about ill-fitting lightweight or standard issue aprons, do not feel that they are trained with sensitivity/adequate feedback (possibly because they do not insist on it), and as a result, they have high correlation with reported incidences of transient pain and injury.
 
 <br>
@@ -4584,7 +4584,7 @@ pairs.panels( codeswitch, pch=21, stars=T )
 <br>
 <br>
 
-- The factor `F4.CODE.SWITCH` is highly correlated with SEX (females), and HEIGHT (shorter trainees), and less correlated with TRAINING_LEVEL (where, it seems to be more positively associated with First-Year & Second-Year trainees -- "Advanced" is the reference category, and as such, its bar appears first in the histogram).  It is *not* correlated at all with RACE, however (where RACE is a binary variable, Whites vs. Non-Whites -- it is higher among Non-Whites, but not statistically).
+- The factor `F4.CODE.SWITCH` is highly correlated with `BIRTHSEX` (females), and `HEIGHT` (shorter trainees), and less correlated with `TRAINING_LEVEL` (where, it seems to be more positively associated with First-Year & Second-Year trainees -- "Advanced" is the reference category, and as such, its bar appears first in the histogram).  It is *not* significantly correlated all with `RACE`, however (where RACE is a binary variable, Whites vs. Non-Whites, although it appears to trend higher among Non-Whites).
 
 <br>
 <br>
@@ -4724,7 +4724,7 @@ ggplot( ., aes(x = OR.EXP, y = factor(metric, level = metric)) ) +
     - 4.76 times more likely to be **Female**
     - 2.71 times more likely to be either a **First- or Second-Year trainee**
     - 6.41 times more likely to be **unconfident** or feel **disrespected by ES Staff**
-    - 3.16 times more likely to feel that they were ***not*** **trained with sensitivity or with adequate feedback**
+    - 3.17 times more likely to feel that they were ***not*** **trained with sensitivity or with adequate feedback**
     - 1.93 times more likely to **view nurses as uncooperative**
     - 4.00 times more likely to **report incidences of transient pain** or outright injury
     - 1.83 times more likley to **use Dial Extenders**
@@ -4741,14 +4741,14 @@ ggplot( ., aes(x = OR.EXP, y = factor(metric, level = metric)) ) +
 <br>
 
 - The regression summary is similar to the one used in the previous 9-factor PROMAX solution, where we try to confirm a SEX-PAIN association.  But in addition to controlling for HEIGHT, we now must contend with this new Code Switch factor, which is correlated with both of these covariates as well as with the outcome (PAIN).
-- The first three models establish a baseline coefficient for each of these three variables: BIRTHEX = 0.43, HEIGHTBAND = 0.40 and F4.CODE.SWITCH = 0.30.
-- The next two models adjust BIRTHSEX and HEIGHTBAND for `F4.CODE.SWITCH,` and in each case, while all variables remain statistically significant, the p-values for BIRTHSEX and HEIGHTBAND rose, while that of the Code Swich factor remained very low (p < 0.001).  In the next model, where all three variables have PAIN regressed on to them, *only* `F4.CODE.SWITCH` remains statistically significant (p < 0.001), suggesting that in this three-way battle, it is the Code Switch factor that is strongest predictor of transient pain/injury.
-- Similar to what was done previously, the next models (blue underscore) add single interventions (lighweight Aprons, Respect, Cooperative Nurses, etc.), each of which drops the coefficient for `F4.CODE.SWITCH` from its 0.30 high to as low as 0.20 (and this is with BIRTHSEX and HEIGHTBAND also included in the model).
-- In the two "fully loaded" models -- one with Tactile Training and one without -- the effect of `F4.CODESWITCH` remains statistically significant, and its coefficient drops as low as 0.13
+- The first three models establish a baseline coefficient for each of these three variables: `BIRTHEX` = 0.45, `HEIGHTBAND` = 0.42 and `F4.CODE.SWITCH` = 0.32.
+- The next two models adjust `BIRTHSEX` and `HEIGHTBAND` for `F4.CODE.SWITCH,` and in each case, while all variables remain statistically significant, the p-values for BIRTHSEX and HEIGHTBAND rose, while that of the Code Switch factor remained very low (p < 0.001).  In the next model, where all three variables have PAIN regressed on to them, *only* `F4.CODE.SWITCH` remains statistically significant (p < 0.001), suggesting that in this three-way battle, it is the Code Switch factor that is strongest predictor of transient pain/injury.
+- Similar to what was done previously, the next models (blue underscore) add single interventions (ligthweight Aprons, Respect, Cooperative Nurses, etc.), each of which drops the coefficient for `F4.CODE.SWITCH` from its 0.32 high to as low as 0.20 (and this is with BIRTHSEX and HEIGHTBAND also included in the model as covariates).
+- In the two "fully loaded" models -- one which adds Tactile Training, and which then adds Training Level -- the effect of `F4.CODESWITCH` remains statistically significant, and its coefficient drops as low as 0.13 (p= 0.027), even while controlling for *both* `BIRTHSEX` and `HEIGHTBAND`.
 
 <br>
 
-- <b>NOTE:  </b><br>The variable `HEIGHTBAND` (a binvary variable, where 0=Short and 1=Tall) was used in the above regressions for the sake of simplicity.  (Having only two levels, `HEIGHTBAND` makes tracking the effects of height easier.)  But if the *original* multilevel categorical variable `HEIGHT2` was used in these models instead -- similar to what was done with the previous Promax-9 solution -- the results would've have been virtually identical:  `F4.CODE.SWITCH` would have knocked both `BIRTHSEX` and `HEIGHT2` out of significance in the 'fully loaded' model (where adjustments were made for Aprons, Nurse Cooperation, Training with Sensitivity, Respect/Confidence, Tactile Training, and Training Level).  But if `F4.CODE.SWITCH` is removed from the 'fully-loaded' model, then just as before, `BIRTHSEX` prevails over its highly correlated covariate `HEIGHT2,` retaining its significance even in the presence of all the aforementioned covariates ("interventions"), with its coefficient falling from 0.43 to 0.28, p= 0.048.  While not shown, the multilevel variable `HEIGHT2` is *not* significant in the final model, according to the Type 3 Anova table.
+- <b>NOTE:  </b><br>The variable `HEIGHTBAND` (a binary variable, where 0=Short and 1=Tall) was used in the above regressions for the sake of simplicity.  (Having only two levels, `HEIGHTBAND` makes tracking the effects of height easier in these side-by-side model views without having to request a Type 3 Anova table.)  But if the *original* multilevel categorical variable `HEIGHT2` was used in these models instead -- similar to what was done with the previous Promax-9 solution -- the results would've have been virtually identical:  `F4.CODE.SWITCH` would have knocked both `BIRTHSEX` and `HEIGHT2` out of significance in the 'fully loaded' model (where adjustments were made for Aprons, Nurse Cooperation, Training with Sensitivity, Respect/Confidence, Tactile Training, and Training Level).  And if `F4.CODE.SWITCH` is removed from the 'fully-loaded' model, then just as before, `BIRTHSEX` prevails over its highly correlated covariate `HEIGHT2,` *however* it does *not* retain significance even in the presence of all the aforementioned covariates ("interventions"), as its coefficient falls from its original, unadjusted 0.45 to 0.27, p= 0.060 (a "trend").  While not shown, the multilevel variable `HEIGHT2` is *not* significant in this final model, according to the Type 3 Anova table.
 
 <br>
 <br>
