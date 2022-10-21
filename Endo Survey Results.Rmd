@@ -4757,4 +4757,30 @@ ggplot( ., aes(x = OR.EXP, y = factor(metric, level = metric)) ) +
 
 <br>
 <br>
+
+While maintaining the correlation among our factors by using an orthogonal rotation in our EFA (a Promax rotation in this case) allows us to model the effects that one or more factors might have on our outcome-of-interest factor (F9.PAIN), doing so can sometimes create issues with multicollinearity in our regression models -- and this is something we would certainly want to test for by looking at the Variance Inflation Factors (VIFs).
+
+<br>
+
+```{r VARIANCE-INFLATION-FACTOR-TESTS, figure.align= 'center', fig.dim= c(16,12)}
+
+library(performance)
+
+fullyloaded.lm <- lm( F9.PAIN ~ BIRTHSEX + HEIGHT2 + F4.CODE.SWITCH + F7.APRONS.LW  + F3.NURSE.COOP + F1.TRNG.FEEDBACK.SENSITIVITY + F2.RESPECT.CONFIDENCE + F5.TRNG.TACTILE +                                      TRAINING_LEVEL, data = FACTANAL.RIGOROUS.fa)
+
+check_collinearity(fullyloaded.lm)[, c(1:6)] 
+
+plot(check_collinearity( fullyloaded.lm ))
+
+```
+
+<br>
+<br>
+
+- Our ***fully-loaded model*** has three categorical variables (`BIRTHESEX`, `HEIGHT2`, and `TRAINING_LEVEL`) along with five additional numeric regressors (`Factor1 - Training Feedback & Sensitivity`, `Factor2 - Respect & Confidence`,  `Factor3 - Nurse Cooperation`, `Factor5 - Tactile Training`, `Factor7 - Lightweight Aprons`, and our explanatory factor-of-interest `Factor4 - Code Switching`).
+
+- Based on the above VIF tests, all of our *factors* have VIF values well below 5 -- in fact all of them are below 1.5.  Two of our three categorical regressors, `BIRTHSEX` and `HEIGHT2` have VIFs that are slightly higher (2.3 and 2.6, respectively), which is not surprising given how closely correlated these two variables are (*r= * 0.71).  But on balance, based no the output above, what would likely be our *final* model does not appear to have any issues with multicollinearity.  (Our *final* model has a very respectable R-squared value, and we have ensured that this model controls the explanatory variable `Code Switching` for other variables that could reasonably explain any noted differences in the the `Pain` factor, our outcome-of-interest.)
+
+
+
   
