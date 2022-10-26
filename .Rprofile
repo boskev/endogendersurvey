@@ -15,11 +15,14 @@ assign(".lib.loc", "/Library/Frameworks/R.framework/Versions/4.1/Resources/libra
 	
   
   options(gsubfn.engine = "R")
+  
+  
   suppressMessages(library(gsubfn))
   suppressMessages(library(proto))
   suppressMessages(library(sqldf))
-  
+
     suppressMessages(library(pacman))
+    suppressMessages(library(remotes))
     suppressMessages(library(broom))
     suppressMessages(library(dplyr))
     suppressMessages(library(haven))
@@ -74,6 +77,7 @@ assign(".lib.loc", "/Library/Frameworks/R.framework/Versions/4.1/Resources/libra
     suppressMessages(library(gmodels))
     suppressMessages(library(tables))
     suppressMessages(library(MultinomialCI))
+    suppressMessages(library(ppcor))
     suppressMessages(library(DT))
     suppressMessages(library(xaringan))
     suppressMessages(library(xaringanthemer))
@@ -81,10 +85,19 @@ assign(".lib.loc", "/Library/Frameworks/R.framework/Versions/4.1/Resources/libra
     suppressMessages(library(leaflet))
     suppressMessages(library(ggstatsplot))
     suppressMessages(library(plotrix))
+    suppressMessages(library(GPArotation))
+    suppressMessages(library(epiR))
+    suppressMessages(library(performance))
+    suppressMessages(library(dlookr))
+    suppressMessages(library(GPArotation))
+    suppressMessages(library(glmulti))
+    suppressMessages(library(pracma))
+    suppressMessages(library(flextable))
+    
+  suppressMessages(detach("package:dplyr", unload=F))
+#  suppressMessages(detach("package:broom", unload=F))
     
     
-    suppressMessages(detach("package:dplyr", unload=F))
-    suppressMessages(detach("package:broom", unload=F))
     suppressMessages(library(dplyr))
     suppressMessages(library(broom))
 
