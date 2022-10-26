@@ -64,7 +64,7 @@ GENDER_DIFF_DATA_LABELS <- read_excel("/Volumes/EDrive/Kevin/Data by Project/Mis
 ```{r FACTOR-PHASE-VARIABLE}
 
 
-require(broom)
+library(broom)
 require(dplyr)
 
 SURVEY  <-
@@ -382,6 +382,7 @@ Since most of our analyses will be done using the Chi-Square statistic, let's st
 
 ```{r COHEN-1, fig.align='center', warning= F, fig.dim= c(16,16)}
 
+suppressMessages(detach("package:flextable", unload=F))
 require(effsize)
 require(pwr)
   
@@ -415,6 +416,7 @@ chi6<- plot(pwr.chisq.test(w=0.3, N=NULL, df=5, sig.level=0.05, power=0.9))+
 
 wrap_plots(chi2,chi3,chi4, chi6)
 
+
 ```
 
 <br>
@@ -425,7 +427,7 @@ Since what constitutes a "moderate effect size" can change depending on the type
 
 <br>
 
-```{r COHEN-2, fig.align='center', fig.dim= c(16,16)}
+```{r COHEN-2, fig.align='center', fig.dim= c(16,16), warning=F}
 
 
 require(effsize)
@@ -462,6 +464,8 @@ wrap_plots( tpower, apower, rpower)
 cohen.ES(test= "f2", size="medium")
 pwr.f2.test(u=8, v=NULL, f2= .15, sig.level=0.05, power=0.9)
 
+
+suppressMessages(library(flextable))
 
 ```
 
@@ -4781,6 +4785,107 @@ plot(check_collinearity( fullyloaded.lm ))
 
 - Based on the above VIF tests, all of our *factors* have VIF values well below 5 -- in fact all of them are below 1.5.  Two of our three categorical regressors, `BIRTHSEX` and `HEIGHT2` have VIFs that are slightly higher (2.3 and 2.6, respectively), which is not surprising given how closely correlated these two variables are (*r= * 0.71).  But on balance, based no the output above, what would likely be our *final* model does not appear to have any issues with multicollinearity.  (Our *final* model has a very respectable R-squared value, and we have ensured that this model controls the explanatory variable `Code Switching` for other variables that could reasonably explain any noted differences in the the `Pain` factor, our outcome-of-interest.)
 
+<br>
+<br>
+
+#### Tests to Confirm that we have not "overfitted" our model
+
+<br>
+
+Our ***fully-loaded*** model (with 3 categorical independent variables and an additional 6 independent covariates) has been checked for and passed our multicollinearity tests.  While it has a very respectable R-squared value (32.3/27.6), it might be interesting to load *all* the covariates that we considered into the `glmulti` package to see what model it would recommend based on the AIC value (Akaike Information Criterion), a metric often used to gauge the fit of regression models.  With this package we can highlight, for example, the 100 best fitting models and then see whether the model we've chosen falls within the range of these models -- and if it doesn't, we can determine just how different the suggested models differ from ours.
+
+<br>
+<br>
 
 
+
+```{r MODEL-FIT-TESTS1, warning=F}
+
+
+require(glmulti) #alternative to stepwise 
+require(pracma)
+require(flextable)
+
+
+?glmulti
+
+x <- glmulti( F9.PAIN ~ BIRTHSEX + HEIGHT2 + HTNUM + F4.CODE.SWITCH + F7.APRONS.LW  + F3.NURSE.COOP + F1.TRNG.FEEDBACK.SENSITIVITY + 
+                        F2.RESPECT.CONFIDENCE + F5.TRNG.TACTILE + TRAINING_LEVEL,
+         data = FACTANAL.RIGOROUS.fa,
+         crit = aicc,
+         level=1,
+         method= 'g',  # use method =d to see how many models level=1 (no interactions) vs. level=2 (interactions) will produce
+         fitfunction = 'lm',
+         plotty=F,
+         report=F,
+         
+         confetsize = 100 )
+
+
+
+
+print(x)  #prints best model
+plot(x)
+weightable(x)[1:5, ] %>% flextable()  #prints five best models
+
+
+
+```
+
+
+<br>
+
+- Based strictly on the AIC score, a model that controls `BIRTHSEX` and `Code Switching` for Nurse Cooperation, Training with Sensitivity, Respect & Confidence, and Tactile Training provides the best fit, with an AIC of 521.14.  
+- The range of the top 100 models runs from 521.14 to 531.37. Does our fully-loaded model fall within this range?  If not, is that a concern?
+
+<br>
+<br>
+
+```{r MODEL-FIT-TESTS2, warning=F}
   
+
+
+#Compare 3 models  using new package 
+
+suppressMessages(library(AICcmodavg))
+
+
+
+lm.BestAIC <- lm( F9.PAIN ~ BIRTHSEX + F4.CODE.SWITCH + F3.NURSE.COOP + F1.TRNG.FEEDBACK.SENSITIVITY +  F2.RESPECT.CONFIDENCE + F5.TRNG.TACTILE,
+                    data = FACTANAL.RIGOROUS.fa)
+
+
+lm.BestAIC.withSexHeight <- lm(F9.PAIN ~ BIRTHSEX + HTNUM + F4.CODE.SWITCH + F3.NURSE.COOP + F1.TRNG.FEEDBACK.SENSITIVITY + F2.RESPECT.CONFIDENCE +                                       F5.TRNG.TACTILE, data = FACTANAL.RIGOROUS.fa)
+
+lm.fully.loaded <- lm( F9.PAIN ~ BIRTHSEX + HEIGHT2 + F4.CODE.SWITCH + F7.APRONS.LW  + F3.NURSE.COOP + F1.TRNG.FEEDBACK.SENSITIVITY + 
+                         F2.RESPECT.CONFIDENCE + F5.TRNG.TACTILE + TRAINING_LEVEL, 
+                         data = FACTANAL.RIGOROUS.fa)
+
+mod.set <-  list(lm.BestAIC, lm.BestAIC.withSexHeight, lm.fully.loaded)
+mod.names <- c('Best AIC','Best AIC with Sex & Height','Fully-Loaded')
+
+
+aictab( cand.set= mod.set, modnames= mod.names ) %>% flextable()
+
+```
+
+<br>
+<br>
+
+- Based the comparison output from the `AICcmodavg` package, while our fully-loaded model has an AIC that is about 8 points higher than the model that what was deemed as having the best fit, its AIC score is still under the upper limit of the top 100 models (based on fit) from the `glmulti` package.  If the research team decides that the higher AIC is an appropriate trade-off because we *need* to control for sex, height and training level, then it appears as if we do not have to concern ourselves that our model is "too fitted" to our data.  
+
+
+- However if a more parsimonious model is desired, then the recommended model still allows us to tell our story:  Reduction in reports of Transient Pain can be reduced in "Code Switchers" if we add lightweight aprons, cooperative nurses, train with respect and inspire confidence among trainees, and train with feedback and sensitivity -- and this all holds true even when controlled for sex.  Additionally, one of the nice features of this particular model is that both `BIRTHSEX` and `F4.CODE.SWITCH` variables maintain their significance in the presence of the other covariates.  The `BIRTHSEX` unadjusted coefficient of 0.45 falls to 0.25 (*p= * 0.0122), and the unadjusted `F4.CODE.SWITCH` coefficient falls from 0.32 to 0.13 (*p= * 0.0191).
+
+<br>
+
+
+```{r MODEL-FIT-TESTS3, warning=F, fig.dim= c(16,12)}
+
+#Model Stats for Model with Best AIC
+
+summary( lm.BestAIC )
+
+check_model( lm.BestAIC )
+
+```
