@@ -76,6 +76,7 @@ assign(".lib.loc", "/Library/Frameworks/R.framework/Versions/4.1/Resources/libra
     suppressMessages(library(rmarkdown))
     suppressMessages(library(gmodels))
     suppressMessages(library(tables))
+    suppressMessages(library(report))
     suppressMessages(library(MultinomialCI))
     suppressMessages(library(ppcor))
     suppressMessages(library(DT))
