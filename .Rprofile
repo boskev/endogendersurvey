@@ -8,7 +8,7 @@ set.seed(1685)
 
 #dev.set(2)
 
-assign(".lib.loc", "/Library/Frameworks/R.framework/Versions/4.1/Resources/library", envir = environment(.libPaths))
+assign(".lib.loc", "/Library/Frameworks/R.framework/Versions/4.2/Resources/library", envir = environment(.libPaths))
 
 
 .First <- function(){
@@ -45,7 +45,6 @@ assign(".lib.loc", "/Library/Frameworks/R.framework/Versions/4.1/Resources/libra
     suppressMessages(library(ggspatial))
     suppressMessages(library(GGally))
     suppressMessages(library(stargazer))
-    suppressMessages(library(corrmorant))
     suppressMessages(library(sf))
     suppressMessages(library(rnaturalearth))
     suppressMessages(library(rnaturalearthdata))
@@ -89,7 +88,6 @@ assign(".lib.loc", "/Library/Frameworks/R.framework/Versions/4.1/Resources/libra
     suppressMessages(library(GPArotation))
     suppressMessages(library(epiR))
     suppressMessages(library(performance))
-    suppressMessages(library(dlookr))
     suppressMessages(library(GPArotation))
     suppressMessages(library(glmulti))
     suppressMessages(library(pracma))
@@ -99,8 +97,9 @@ assign(".lib.loc", "/Library/Frameworks/R.framework/Versions/4.1/Resources/libra
 #  suppressMessages(detach("package:broom", unload=F))
     
     
-    suppressMessages(library(dplyr))
-    suppressMessages(library(broom))
+    suppressMessages(library(dplyr, warn.conflicts=F))
+    suppressMessages(library(broom, warn.conflicts=F))
+#    suppressMessages(library(dlookr, warn.conflicts=F))
 
     
     source('~/Documents/R/Custom Functions/eov.ttest.R')
