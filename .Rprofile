@@ -8,7 +8,7 @@ set.seed(1685)
 
 #dev.set(2)
 
-assign(".lib.loc", "/Library/Frameworks/R.framework/Versions/4.2/Resources/library", envir = environment(.libPaths))
+assign(".lib.loc", "/Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library", envir = environment(.libPaths))
 
 
 .First <- function(){
@@ -62,7 +62,6 @@ assign(".lib.loc", "/Library/Frameworks/R.framework/Versions/4.2/Resources/libra
     suppressMessages(library(epitools))
     suppressMessages(library(CCA))
     suppressMessages(library(CCP))
-    suppressMessages(library(openxlsx))
     suppressMessages(library(gt))
     suppressMessages(library(kableExtra))
     suppressMessages(library(formattable))
