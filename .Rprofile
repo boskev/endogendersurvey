@@ -52,7 +52,6 @@ assign(".lib.loc", "/Library/Frameworks/R.framework/Versions/4.3-x86_64/Resource
     suppressMessages(library(magrittr))
     suppressMessages(library(corrplot))
     suppressMessages(library(psych))
-    suppressMessages(library(candisc))
     suppressMessages(library(textreg))
     suppressMessages(library(reshape2))
     suppressMessages(library(multcompView))
